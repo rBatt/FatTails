@@ -1,0 +1,16 @@
+# Ignore figures
+*.pdf
+*.tif
+*.png
+*.tiff
+
+# Ignore binary data
+*.RData
+
+# Ignore movies
+*.mov
+
+# Ignore history
+.Rhistory
+.Rapp.history
+
