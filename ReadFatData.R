@@ -14,7 +14,7 @@ graphics.off()
 setwd("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_rawData")
 library("plyr")
 library("reshape")
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Fat_dGEVR")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Fat_dGEV.R")
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/CalcZoopBiomass.R")
 
 manClean <- function(x, varCols){
@@ -266,6 +266,41 @@ Zoop0n <- Zoop000n[,c("lakeid", "year4", "daynum", "sampledate", "taxon", "densi
 
 Zoop0 <- merge(Zoop0n, Zoop0s, all=TRUE) #this contains zooplankton information broken down by taxon
 Zoop <- aggregate(Zoop0[,c("density", "avg_length", "avg_zoop_mass", "tot_zoop_mass")], by=Zoop0[,c("year4", "daynum","sampledate", "lakeid")], FUN=sum, na.rm=TRUE)
+
+uLake <- as.character(unique(Zoop0[,"lakeid"]))
+uTax <- as.character(unique(Zoop0[,"taxon"]))
+uYear <- as.character(unique(Zoop0[,"year4"]))
+
+# function will be applied to unique lake-taxon combinations
+datNames=c("density","avg_length","avg_zoop_mass","tot_zoop_mass")
+countAnnObs <- function(x, datNames){
+	cond <- function(x){sum(!is.na(x)&x>0)}
+	cFunc <- function(x, dN){
+		apply(x[,dN], 2, cond)		
+	}
+	annO <- ddply(x, "year4", cFunc, dN=datNames)
+	# nY <- length(unique(x[,"year4"]))
+	# muC <- apply(x[,datNames], 2, cond)/nY
+	nC <- apply(annO[,datNames], 2, cond)
+	nC
+	# avg number of dates per year the metrics were observed (for this lake-taxon combo)
+	# number of years the metrics were observed at least once
+	
+}
+nLake.annMax <- function(x, datNames, groupName="taxon", yearsNeeded=15){
+	cAO <- ddply(Zoop0, .variables=c("lakeid","taxon"), countAnnObs, datNames=c("density","avg_length","avg_zoop_mass","tot_zoop_mass"))
+	lI <- apply(cAO[,datNames], 2, function(x){x>yearsNeeded})
+	
+}
+
+
+for(i in 1:datNames){
+	
+}
+test[lI[,1],]
+
+
+Zoop_Tax <- aggregate(Zoop0[,c("density", "avg_length", "avg_zoop_mass", "tot_zoop_mass")], by=Zoop0[,c("year4", "daynum","sampledate", "taxon", "lakeid")], FUN=sum, na.rm=TRUE)
 # class(Zoop[,"sampledate"]) <- "Date"
 
 # ========
