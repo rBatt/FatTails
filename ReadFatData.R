@@ -271,37 +271,42 @@ uLake <- as.character(unique(Zoop0[,"lakeid"]))
 uTax <- as.character(unique(Zoop0[,"taxon"]))
 uYear <- as.character(unique(Zoop0[,"year4"]))
 
-# function will be applied to unique lake-taxon combinations
-datNames=c("density","avg_length","avg_zoop_mass","tot_zoop_mass")
-countAnnObs <- function(x, datNames){
-	cond <- function(x){sum(!is.na(x)&x>0)}
-	cFunc <- function(x, dN){
-		apply(x[,dN], 2, cond)		
-	}
-	annO <- ddply(x, "year4", cFunc, dN=datNames)
-	# nY <- length(unique(x[,"year4"]))
-	# muC <- apply(x[,datNames], 2, cond)/nY
-	nC <- apply(annO[,datNames], 2, cond)
-	nC
-	# avg number of dates per year the metrics were observed (for this lake-taxon combo)
-	# number of years the metrics were observed at least once
-	
-}
-nLake.annMax <- function(x, datNames, groupName="taxon", yearsNeeded=15){
-	cAO <- ddply(Zoop0, .variables=c("lakeid","taxon"), countAnnObs, datNames=c("density","avg_length","avg_zoop_mass","tot_zoop_mass"))
-	lI <- apply(cAO[,datNames], 2, function(x){x>yearsNeeded})
-	
-}
 
 
-for(i in 1:datNames){
-	
-}
-test[lI[,1],]
+# # function will be applied to unique lake-taxon combinations
+# datNames=c("density","avg_length","avg_zoop_mass","tot_zoop_mass")
+# countAnnObs <- function(x, datNames){
+# 	cond <- function(x){sum(!is.na(x)&x>0)}
+# 	cFunc <- function(x, dN){
+# 		apply(x[,dN], 2, cond)		
+# 	}
+# 	annO <- ddply(x, "year4", cFunc, dN=datNames)
+# 	# nY <- length(unique(x[,"year4"]))
+# 	# muC <- apply(x[,datNames], 2, cond)/nY
+# 	nC <- apply(annO[,datNames], 2, cond)
+# 	nC
+# 	# avg number of dates per year the metrics were observed (for this lake-taxon combo)
+# 	# number of years the metrics were observed at least once
+# 	
+# }
+# nLake.annMax <- function(x, datNames, groupName="taxon", yearsNeeded=15){
+# 	cAO <- ddply(Zoop0, .variables=c("lakeid","taxon"), countAnnObs, datNames=c("density","avg_length","avg_zoop_mass","tot_zoop_mass"))
+# 	lI <- apply(cAO[,datNames], 2, function(x){x>yearsNeeded})
+# 	
+# } 
+
+
+# for(i in 1:datNames){
+# 	
+# }
+# test[lI[,1],]
 
 
 Zoop_Tax <- aggregate(Zoop0[,c("density", "avg_length", "avg_zoop_mass", "tot_zoop_mass")], by=Zoop0[,c("year4", "daynum","sampledate", "taxon", "lakeid")], FUN=sum, na.rm=TRUE)
 # class(Zoop[,"sampledate"]) <- "Date"
+
+zTax <- data.frame("taxon"=as.character(unique(Zoop_Tax[,"taxon"])))
+write.table(zTax, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/uniqueZoopTaxa.txt", sep="\t", row.names=FALSE)
 
 # ========
 # = Ions =
@@ -417,6 +422,8 @@ TotFish[,"SumLeng"] <- TotFish[,"Nleng"]*TotFish[,"mean_Leng"]
 TotFish[,"cpue3_WeiEff"] <- TotFish[,"SumWei"]/TotFish[,"effort"]
 TotFish[,"cpue4_LengEff"] <- (TotFish[,"Nleng"]*TotFish[,"mean_Leng"])/TotFish[,"effort"]
 
+
+
 # FishCats <- c("total_caught", "cpue1_Sum", "mean_Leng", "max_Leng", "min_Leng", "mean_Wei", "max_Wei", "min_Wei", "Nfish", "Nleng", "Nwei", "SumWei", "SumLeng", "cpue3_WeiEff", "cpue4_LengEff")
 FishCats1 <- c("total_caught", "cpue1_Sum", "Nfish", "Nleng", "Nwei", "SumWei", "SumLeng", "cpue3_WeiEff", "cpue4_LengEff")
 FishCats2 <- c("mean_Leng", "mean_Wei")
@@ -425,6 +432,12 @@ FishCats4 <- c("min_Leng", "min_Wei")
 
 # Inf2NA <- function(x) {x[which(x==-Inf | x==Inf, arr.ind=TRUE)] <- NA; x}
 Inf2NA <- function(x) {x[x==-Inf | x==Inf] <- NA; x}
+
+
+# ====================
+# = 27-Mar-2014 HERE =
+# ====================
+# (.RData saved on mac desktop)
 
 Fish_BySpec1 <- aggregate(TotFish[, FishCats1], by=TotFish[,c("spname", "year4", "lakeid")], sum, na.rm=TRUE)
 Fish_BySpec2 <- aggregate(TotFish[, FishCats2], by=TotFish[,c("spname", "year4", "lakeid")], mean, na.rm=TRUE)
