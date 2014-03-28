@@ -122,6 +122,9 @@ gev.fit <- function (xdat, ydat = NULL, mul = NULL, sigl = NULL, shl = NULL, mul
 # ====================
 # = Extrema Functions =
 # ====================
+# ================================
+# = Method of independent storms =
+# ================================
 MIS <- function(x, Thresh=NULL, quant=0.9){
 	if(is.null(Thresh)){
 		Thresh <- quantile(x, quant)
@@ -142,7 +145,9 @@ MIS <- function(x, Thresh=NULL, quant=0.9){
 	return(matrix(c(StormIndex, Storms), ncol=2, dimnames=list(NULL, c("Index", "Max"))))
 }
 
-
+# ========================================
+# = Find the peak of a cycle via wavelet =
+# ========================================
 PeakCycle <- function(Data, SearchFrac=0.028){
 	# using package "wmtsa"
 	#the SearchFrac parameter just controls how much to look to either side 
@@ -163,6 +168,9 @@ PeakCycle <- function(Data, SearchFrac=0.028){
 	return(matrix(c(NewPeakTimes, Data[NewPeakTimes]), ncol=2, dimnames=list(NULL, c("PeakIndices", "Peaks"))))
 }
 
+# ==============================
+# = Replace non-finite w/ NA's =
+# ==============================
 Inf2NA <- function(x) {x[which(x==-Inf | x==Inf, arr.ind=TRUE)] <- NA; x}
 
 Stationary <- function(x, coluY, coluX){
@@ -372,7 +380,6 @@ lnormTime <- function(x, Level=1){
 # ==========================
 # = The GEV Wrapper for Me =
 # ==========================
-
 calcGEV <- function(nameVarbl, datCols=NULL, fitBy=NULL, fitForm=NULL, MUl=NULL, SIGl=NULL, SHl=NULL){
 	if(is.null(fitBy)&is.null(fitForm) || !is.null(fitBy)&!is.null(fitForm)){stop("One & only one of fitBy and fitForm should be NULL")}
 	if(is.null(datCols)){datCols <- get(paste("All",nameVarbl,sep=""))}

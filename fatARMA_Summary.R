@@ -35,40 +35,6 @@ ieNota <- bquote(sigma[infinity]~'/'~sigma[E])
 lNota <- bquote(ave*.~abs(~~abs(~~lambda~~phantom())~~phantom()))
 lNota2 <- bquote(abs(~~abs(~~lambda~~phantom())~~phantom()))
 
-fWeighted <- function(x){
-	#http://www.ssc.wisc.edu/~bhansen/718/NonParametrics15.pdf
-	# more accurate at: http://machinelearning102.pbworks.com/w/file/fetch/47699411/aic_reg.pdf
-	
-	finiteLogic <- all(!is.finite(x[,"AICc"])) #If all of the AICc's are infinite
-	missLogic <- all(is.na(x[,"AICc"])) #If all of the AICc's are missing
-	if(finiteLogic | missLogic){  #don't compute the AICc-weighted averages (one of these may be true depending on wether I first converted Inf to NA or not)
-		return(data.frame(x, "wLambda"=NA, "wOrder"=NA))
-	}else{
-		minAIC <- min(x[,"AICc"], na.rm=TRUE)
-
-		eaic <- exp(-0.5*(x[,"AICc"]-minAIC))
-
-		saicL <- sum(eaic[!is.na(x[,"Lambda"])], na.rm=TRUE)
-		saicO <- sum(eaic[!is.na(x[,"Order"])], na.rm=TRUE)
-		saicEps <- sum(eaic[!is.na(x[,"sigEps"])], na.rm=TRUE)
-		saicE <- sum(eaic[!is.na(x[,"sigE"])], na.rm=TRUE)
-		saicInf <- sum(eaic[!is.na(x[,"sigInf"])], na.rm=TRUE)
-
-		wsL <- eaic/saicL
-		wdO <- eaic/saicO
-		wEps <- eaic/saicEps
-		wE <- eaic/saicE
-		wInf <- eaic/saicInf
-
-		wLambda <- sum(wsL*x[,"Lambda"], na.rm=TRUE)
-		wOrder <- sum(wdO*x[,"Order"], na.rm=TRUE)
-		wSigEps <- sum(wEps*x[,"sigEps"], na.rm=TRUE)
-		wSigE <- sum(wE*x[,"sigE"], na.rm=TRUE)
-		wSigInf <- sum(wInf*x[,"sigInf"], na.rm=TRUE)
-
-		return(data.frame(x, "wLambda"=wLambda, "wOrder"=wOrder, "wSigEps"=wSigEps, "wSigE"=wSigE, "wSigInf"=wSigInf))
-	}
-}
 
 sigARMA0 <- dlply(fatARMA, .variables=c("variable", "location", "P", "Q"), .fun=getSE, data=finalFrame, .progress="time")
 grabFatARMA <- function(x)x$sigs
@@ -124,16 +90,6 @@ final0[,"Einf"] <- Einf
 # ============================================================
 # = Calculated return time for Level 2 for Residuals of ARMA =
 # ============================================================
-lvl_return_res <- function(x, level=1){
-	lvl0 <- as.numeric(x[paste("Level",level, "_residual", sep="")])
-	a0 <- as.numeric(x[c("residual_mu_0","residual_sig_0","residual_sh_0")])
-	nExts0 <- as.numeric(x["N"])
-	TS_Duration0 <- as.numeric(x["Duration"])
-	result <- lvlX_ReturnTime(lvl=lvl0, a=a0, nExts=nExts0, TS_Duration=TS_Duration0)
-	# names(result) <- NULL
-	# row.names(result) <- NULL
-	result
-}
 final0[,"Level2_time_residual"] <- apply(final0, 1, lvl_return_res, level=2)
 
 #interesting note, the reason TB alkalinity has NA for its mean and other "lvl" values is b/c it has some negative values, which means the logMean etc couldn't be computed, and I used complete.cases to remove "lvl" info from variables that have any NA's in the "lvl" categories. Actually, I'm not sure thsi could have been the case, because convNeg should take care of this.Ah, but it couldn't have more than 20% of the data set (after NA's and Inf removed) be negative.
@@ -150,8 +106,6 @@ if(runStable){
 }else{
 	load("/Data/stableTime.RData")
 }
-
-
 
 
 final <- final0[!is.na(final0[,"N"])&final0[,"N"]>=15,]

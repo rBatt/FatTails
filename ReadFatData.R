@@ -343,8 +343,11 @@ names(Ions) <- c("lakeid", "year4", "daynum", "sampledate", "depth_ions", "zmix"
 # gsub("[0123456789]", "", c("VGN019", "VGN025", "VGN032", "VGN038", "VGN051", "VGN064", "VGN089", "VGN127", "VGN"))
 Fish000_abun <- read.csv("Fish_Abun_NrtnSrtn.csv")
 Fish000_abun[,"gearid"] <- gsub("[0123456789]", "", Fish000_abun[,"gearid"]) #hell yeah, i learned a new function. (well, how to use reular expressions a bit better)
+Fish000_abun[,"gearid"] <- gsub("(?<=FYKNE)[LD]", "T", Fish000_abun[,"gearid"], perl=TRUE)
+# Fish000_abun[Fish000_abun[,"gearid"]=="CRAYTR","gearid"] <- "MINNOW"
 Fish000_abun[,"spname"] <- gsub(" ", "", Fish000_abun[,"spname"]) #remove white space from species names
-BsSpecies <- c("GUPPY", "VIRILIS", "RUSTICUS", "PROPINQUUS", "UNIDCHUB", "UNIDDARTER", "UNIDENTIFIED", "UNIDMINNOW", "CRAYFISH", "DARTER", "LARVALFISH")
+# BsSpecies <- c("GUPPY", "VIRILIS", "RUSTICUS", "PROPINQUUS", "UNIDCHUB", "UNIDDARTER", "UNIDENTIFIED", "UNIDMINNOW", "CRAYFISH", "DARTER", "LARVALFISH")
+BsSpecies <- c("GUPPY", "VIRILIS", "RUSTICUS", "PROPINQUUS", "UNIDENTIFIED", "CRAYFISH", "LARVALFISH")
 Fish00_abun <- subset(Fish000_abun, !is.element(spname, BsSpecies))
 
 Fish00_abun[,"cpue1_Sum"] <- Fish00_abun[,"total_caught"]/Fish00_abun[,"effort"]
@@ -360,6 +363,8 @@ names(TotFish0_abun) <- c("gearid", "lakeid", "year4", "total_caught", "cpue_Sum
 Fish000_size <- read.csv("Fish_LenWei_NrtnSrtn.csv")
 Fish000_size[,"spname"] <- gsub(" ", "", Fish000_size[,"spname"]) 
 Fish000_size[,"gearid"] <- gsub("[0123456789]", "", Fish000_size[,"gearid"])
+Fish000_size[,"gearid"] <- gsub("(?<=FYKNE)[LD]", "T", Fish000_size[,"gearid"], perl=TRUE)
+# Fish000_size[Fish000_size[,"gearid"]=="CRAYTR","gearid"] <- "MINNOW"
 Fish00_size <- subset(Fish000_size, !is.element(spname, BsSpecies))
 FixPike <- which(is.element(Fish00_size[,"spname"], "SILVERPIKE"))
 Fish00_size[FixPike, "spname"] <- "NORTHERNPIKE"
@@ -411,21 +416,79 @@ TotFish0_size <- ddply(Fish00_size, .variables=c("lakeid", "year4", "spname", "g
 # ================
 Fish <- merge(Fish0_abun, Fish0_size, all=TRUE, by=c("lakeid", "year4", "spname"))
 Fish[,"SumWei"] <- Fish[,"Nwei"]*Fish[,"mean_Wei"]
-Fish[,"SumLeng"] <- Fish[,"Nleng"]*Fish[,"mean_Leng"]
+# Fish[,"SumLeng"] <- Fish[,"Nleng"]*Fish[,"mean_Leng"]
 Fish[,"cpue3_WeiEff"] <- Fish[,"SumWei"]/Fish[,"effort"]
-Fish[,"cpue4_LengEff"] <- (Fish[,"Nleng"]*Fish[,"mean_Leng"])/Fish[,"effort"]
+# Fish[,"cpue4_LengEff"] <- (Fish[,"Nleng"]*Fish[,"mean_Leng"])/Fish[,"effort"]
 
 # TotFish <- merge(TotFish0_abun, TotFish0_size, all=TRUE, by=c("lakeid", "year4", "spname"))
 TotFish <- merge(Fish00_abun, TotFish0_size, all=TRUE, by=c("lakeid", "year4", "spname", "gearid"))
 TotFish[,"SumWei"] <- TotFish[,"Nwei"]*TotFish[,"mean_Wei"]
-TotFish[,"SumLeng"] <- TotFish[,"Nleng"]*TotFish[,"mean_Leng"]
+# TotFish[,"SumLeng"] <- TotFish[,"Nleng"]*TotFish[,"mean_Leng"]
 TotFish[,"cpue3_WeiEff"] <- TotFish[,"SumWei"]/TotFish[,"effort"]
-TotFish[,"cpue4_LengEff"] <- (TotFish[,"Nleng"]*TotFish[,"mean_Leng"])/TotFish[,"effort"]
+# TotFish[,"cpue4_LengEff"] <- (TotFish[,"Nleng"]*TotFish[,"mean_Leng"])/TotFish[,"effort"]
+
+TotFish <- cbind(TotFish, "Order"=NA, "Family"=NA, "Genus"=NA, "Species"=NA)
+
+
+
+# fTax <- data.frame("spname"=as.character(unique(TotFish[,"spname"])))
+# write.table(fTax, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/uniqueFishTaxa.txt", sep="\t", row.names=FALSE)
+
+fTax.id <- read.table(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/fatFishTaxa.txt", sep="\t", header=TRUE, colClasses="character")
+fTax.id[fTax.id==""] <- NA
+
+for(i in 1:nrow(fTax.id)){
+	ind <- TotFish[,"spname"] == fTax.id[i,"spname"]
+	TotFish[ind, c("Order","Family","Genus","Species")] <- fTax.id[i,c("order", "family", "genus", "species")]
+}
+
+uLake <- unique(TotFish[,"lakeid"])
+
+# The average CPUE (# individuals) for each gear type in each lake
+# lg_cpue1 <- aggregate(TotFish[,"cpue1_Sum"], by=list(TotFish[,"gearid"], TotFish[,"lakeid"]), mean, na.rm=TRUE)
+# names(lg_cpue1) <- c("gearid", "lakeid", "muCPUE")
+# for(i in 1:length(uLake)){
+# 	tind <- lg_cpue1[,"lakeid"] == uLake[i]
+# 	lg_cpue1
+# }
+
+# The average CPUE (mass) for each gear type in each lake
+# lg_cpue3 <- aggregate(TotFish[,"cpue3_WeiEff"], by=list(TotFish[,"gearid"], TotFish[,"lakeid"]), mean, na.rm=TRUE)
+# names(lg_cpue3) <- c("gearid", "lakeid", "muCPUE")
+
+# ===========================================================
+# = Look for gears that were consistently used in each lake =
+# ===========================================================
+# I can combine data from the different gear types, but if a gear type wasn't used in a partiular year, 
+# then the sum catch per effort might be skewed. Taking the average could have the same effect because
+# the different methods could have different efficiencies.
+# My solution is to figure out which methods were used in "most" years in a given lake,
+# and only take the sum catch for those methods.
+# When one of the methods was not used, that year cannot be analyzed. 
+# HOWEVER, if a particular taxon is only ever seen in Method B, then 
+# in a year when Method A is missing, the time series for this particular taxon is still unbroken.
+
+# gear lake year
+gly <- TotFish[,c("lakeid","year4", "gearid")]
+
+gl.obs <- paste(TotFish[,"gearid"], TotFish[,"lakeid"], sep="")
+gl.valid <- c()
+for(i in 1:length(uLake)){
+	gearYear <- table(gly[gly[,1]==uLake[i],2], gly[gly[,1]==uLake[i],3])
+	gy <- gearYear[!apply(gearYear, 1, function(x)all(x==0 | !is.finite(x))),]
+	# print(gy)
+	# print(as.character(uLake[i]))
+	propPres <- apply(gy, 2, function(x){sum(x>0)/length(x)})
+	# print(apply(gy, 2, function(x){sum(x>0)/length(x)}))
+	validNames <- names(propPres)[propPres>0.96]
+	gl.valid <- c(gl.valid, paste(validNames, as.character(uLake[i]), sep=""))
+}
+TotFish <- TotFish[gl.obs%in%gl.valid,]
 
 
 
 # FishCats <- c("total_caught", "cpue1_Sum", "mean_Leng", "max_Leng", "min_Leng", "mean_Wei", "max_Wei", "min_Wei", "Nfish", "Nleng", "Nwei", "SumWei", "SumLeng", "cpue3_WeiEff", "cpue4_LengEff")
-FishCats1 <- c("total_caught", "cpue1_Sum", "Nfish", "Nleng", "Nwei", "SumWei", "SumLeng", "cpue3_WeiEff", "cpue4_LengEff")
+FishCats1 <- c("total_caught", "cpue1_Sum", "Nfish", "Nleng", "Nwei", "SumWei", "cpue3_WeiEff")
 FishCats2 <- c("mean_Leng", "mean_Wei")
 FishCats3 <- c("max_Leng", "max_Wei")
 FishCats4 <- c("min_Leng", "min_Wei")
@@ -437,13 +500,16 @@ Inf2NA <- function(x) {x[x==-Inf | x==Inf] <- NA; x}
 # ====================
 # = 27-Mar-2014 HERE =
 # ====================
+# ====================
+# = 28-Mar-2014 HERE =
+# ====================
 # (.RData saved on mac desktop)
 
 Fish_BySpec1 <- aggregate(TotFish[, FishCats1], by=TotFish[,c("spname", "year4", "lakeid")], sum, na.rm=TRUE)
 Fish_BySpec2 <- aggregate(TotFish[, FishCats2], by=TotFish[,c("spname", "year4", "lakeid")], mean, na.rm=TRUE)
 Fish_BySpec3 <- aggregate(TotFish[, FishCats3], by=TotFish[,c("spname", "year4", "lakeid")], max, na.rm=TRUE)
 Fish_BySpec4 <- aggregate(TotFish[, FishCats4], by=TotFish[,c("spname", "year4", "lakeid")], min, na.rm=TRUE)
-Fish_BySpec <- merge_recurse(list(Fish_BySpec1, Fish_BySpec2, Fish_BySpec3, Fish_BySpec4), all.x=TRUE, all.y=TRUE)
+Fish_BySpec <- merge_recurse(list(Fish_BySpec1, Fish_BySpec2, Fish_BySpec3 , Fish_BySpec4), all.x=TRUE, all.y=TRUE)
 Fish_BySpec <- Inf2NA(Fish_BySpec)
 
 Fish_ByGear1 <- aggregate(TotFish[, FishCats1], by=TotFish[,c("gearid", "year4", "lakeid")], sum, na.rm=TRUE)

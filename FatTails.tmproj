@@ -10,7 +10,7 @@
 			<key>filename</key>
 			<string>Katz_GEV.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-26T16:03:49Z</date>
+			<date>2014-03-26T16:17:21Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -22,67 +22,61 @@
 			<key>filename</key>
 			<string>CalcZoopBiomass.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-26T16:04:05Z</date>
-		</dict>
-		<dict>
-			<key>filename</key>
-			<string>ARMAFunctions.R</string>
-			<key>lastUsed</key>
-			<date>2014-03-27T20:47:54Z</date>
+			<date>2014-03-26T21:41:55Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>FatTails_Functions.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-27T20:46:19Z</date>
+			<date>2014-03-26T16:17:13Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>FatTails_Figures.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-26T16:02:54Z</date>
+			<date>2014-03-26T16:14:42Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>playing_Xi_ARMA_figures_13Jan2014.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-26T16:04:09Z</date>
+			<date>2014-03-26T16:17:29Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>fatARMA_Figures.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-27T20:45:36Z</date>
+			<date>2014-03-26T16:34:21Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>fatARMA_Summary.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-27T20:45:49Z</date>
+			<date>2014-03-26T16:34:50Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>stableTime.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-26T16:03:32Z</date>
+			<date>2014-03-26T16:16:39Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>FatFrame.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-26T16:03:23Z</date>
+			<date>2014-03-26T16:16:33Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>TurnExtreme_Fat_Data.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-26T16:02:47Z</date>
+			<date>2014-03-26T22:21:24Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>ReadFatData.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-27T20:47:54Z</date>
+			<date>2014-03-26T22:21:24Z</date>
 			<key>selected</key>
 			<true/>
 		</dict>
@@ -90,54 +84,62 @@
 			<key>filename</key>
 			<string>fatARMA_Sim.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-26T16:03:14Z</date>
+			<date>2014-03-26T16:16:19Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>TonySuggestions/tonyARMA_short.R</string>
+			<key>lastUsed</key>
+			<date>2014-03-26T16:14:57Z</date>
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
 	<integer>241</integer>
 	<key>metaData</key>
 	<dict>
-		<key>ARMAFunctions.R</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>83</integer>
-				<key>line</key>
-				<integer>13</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>379</integer>
-		</dict>
 		<key>CalcZoopBiomass.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>61</integer>
 				<key>line</key>
-				<integer>126</integer>
+				<integer>64</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
-			<integer>142</integer>
+			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>104</integer>
+			<integer>100</integer>
 		</dict>
 		<key>FatFrame.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>65</integer>
 				<key>line</key>
-				<integer>101</integer>
+				<integer>1</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>54</integer>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>61</integer>
+				<key>line</key>
+				<integer>1</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>65</integer>
+				<key>line</key>
+				<integer>1</integer>
+			</dict>
 		</dict>
 		<key>FatTails_Figures.R</key>
 		<dict>
@@ -146,7 +148,7 @@
 				<key>column</key>
 				<integer>26</integer>
 				<key>line</key>
-				<integer>17</integer>
+				<integer>8</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -158,30 +160,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>2</integer>
+				<integer>14</integer>
 				<key>line</key>
-				<integer>507</integer>
+				<integer>492</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>60</integer>
-				<key>line</key>
-				<integer>507</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>2</integer>
-				<key>line</key>
-				<integer>507</integer>
-			</dict>
+			<integer>482</integer>
 		</dict>
 		<key>Fat_dGEV.R</key>
 		<dict>
@@ -204,68 +190,66 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>538</integer>
+				<integer>11</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>511</integer>
+			<integer>0</integer>
 		</dict>
 		<key>ReadFatData.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>10</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>437</integer>
+				<integer>0</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>399</integer>
+			<integer>0</integer>
+		</dict>
+		<key>TonySuggestions/tonyARMA_short.R</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>65</integer>
+				<key>line</key>
+				<integer>823</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>808</integer>
 		</dict>
 		<key>TurnExtreme_Fat_Data.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>36</integer>
+				<integer>366</integer>
 				<key>line</key>
-				<integer>230</integer>
+				<integer>4</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
-			<integer>0</integer>
+			<integer>155</integer>
 			<key>firstVisibleLine</key>
-			<integer>528</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>230</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>231</integer>
-			</dict>
+			<integer>0</integer>
 		</dict>
 		<key>fatARMA_Figures.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>12</integer>
 				<key>line</key>
-				<integer>3</integer>
+				<integer>18</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
-			<integer>0</integer>
+			<integer>150</integer>
 			<key>firstVisibleLine</key>
 			<integer>2</integer>
 		</dict>
@@ -274,37 +258,69 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>137</integer>
 				<key>line</key>
-				<integer>238</integer>
+				<integer>9</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>133</integer>
+				<key>line</key>
+				<integer>9</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>137</integer>
+				<key>line</key>
+				<integer>9</integer>
+			</dict>
 		</dict>
 		<key>fatARMA_Summary.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>23</integer>
+				<integer>136</integer>
 				<key>line</key>
-				<integer>157</integer>
+				<integer>23</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
-			<integer>0</integer>
+			<integer>152</integer>
 			<key>firstVisibleLine</key>
-			<integer>120</integer>
+			<integer>9</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>132</integer>
+				<key>line</key>
+				<integer>23</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>136</integer>
+				<key>line</key>
+				<integer>23</integer>
+			</dict>
 		</dict>
 		<key>playing_Xi_ARMA_figures_13Jan2014.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>18</integer>
+				<integer>98</integer>
 				<key>line</key>
-				<integer>53</integer>
+				<integer>11</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -316,14 +332,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>68</integer>
+				<integer>76</integer>
 				<key>line</key>
-				<integer>45</integer>
+				<integer>35</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>30</integer>
+			<integer>9</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
@@ -331,12 +347,12 @@
 		<string>ReadFatData.R</string>
 		<string>TurnExtreme_Fat_Data.R</string>
 		<string>FatTails_Figures.R</string>
+		<string>TonySuggestions/tonyARMA_short.R</string>
 		<string>fatARMA_Sim.R</string>
 		<string>FatFrame.R</string>
 		<string>stableTime.R</string>
 		<string>fatARMA_Summary.R</string>
 		<string>FatTails_Functions.R</string>
-		<string>ARMAFunctions.R</string>
 		<string>Katz_GEV.R</string>
 		<string>Fat_dGEV.R</string>
 		<string>CalcZoopBiomass.R</string>
@@ -346,6 +362,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{-0, 558}, {1761, 860}}</string>
+	<string>{{1, 330}, {1186, 548}}</string>
 </dict>
 </plist>
