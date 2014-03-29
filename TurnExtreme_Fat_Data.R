@@ -18,37 +18,6 @@ ShowPlots <- c(TRUE, FALSE)[2]
 setThresh <- 1.1
 
 
-# ============
-# = Sunspots =
-# ============
-Sunspot_Ext1 <- MIS(Data_X$SunSpots[,"SpotNum"], Thresh=150)
-Sunspot_Ext2 <- PeakCycle(Data=Data_X$SunSpots[,c("SpotNum")], SearchFrac=0.026)
-if(ShowPlots){
-	dev.new(width=6, height=4)
-	par(mar=c(4,4,0.5,0.5))
-	plot(Data_X$SunSpots[,c("SpotNum")], type="l")
-	points(Sunspot_Ext2, col="blue", pch=20)
-}
-Sunspot_gev1 <- gev.fit(Sunspot_Ext1[,2])
-Sunspot_gev2 <- gev.fit(Sunspot_Ext2[,2])
-Sunspot_gev <- Sunspot_gev2
-
-
-Sunspot_Ext2 <- PeakCycle(Data=Data_X$SunSpots[,c("SpotNum")], SearchFrac=0.026)
-SunSpot_Ext <- cbind("One"=1, "year4"=1, "Sunspots"=Sunspot_Ext2[,2])
-SunSpot_fit <- calcGEV("SunSpot", datCols="Sunspots", fitBy="One")
-SunSpot_Params <- SunSpot_fit[[1]]
-SunSpot_gev <- SunSpot_fit[[2]]
-SunSpot_Params <- SunSpot_Params[order(SunSpot_Params[,"sh_0"]),]
-
-names(Data_X$SunSpots)[6] <- "Sunspots"
-SunSpot_vars <- as.character(unique(SunSpot_Params$Variable))
-SunSpot_lvl <- lvl(x=Data_X$SunSpot, variables=SunSpot_vars, fitby=NULL, lvl2Thresh=setThresh)
-SunSpot <- merge(SunSpot_Params, SunSpot_lvl, all=TRUE)
-SunSpot[,"fitBy"] <- "None"
-
-
-
 # 1 / ((1-0.9) * (79/195)) # 79 is the number of extrema, 195 is the duration of the study (years), and 0.9 is the quantile
 # 1 / ( (probability of observing this return level, given that extremes are being observed) * (probability of observing an extreme in the time series)
 # 1 / ( (1 - quantile) * (# extrema / duration of time series) )
@@ -70,37 +39,6 @@ Met_Ext1 <- merge(Met_Ext1_01, Met_Ext1_02, all=TRUE)
 Met_Ext1 <- Inf2NA(Met_Ext1)
 Met_Ext1_Mad <- subset(Met_Ext1, location=="Madison")
 
-if(ShowPlots){
-	dev.new(width=6, height=5)
-	par(mfrow=c(2,2), mar=c(3.5,4,0.5,0.5))
-	AirTrange <- c(min(Met_Ext1_Mad[,"min_air_temp"], na.rm=TRUE), max(Met_Ext1_Mad[,"max_air_temp"], na.rm=TRUE))
-	plot(Met_Ext1_Mad[,c("year4","ave_air_temp")], xlab="", ylab="", type="l", ylim=AirTrange)
-	lines(Met_Ext1_Mad[,c("year4","min_air_temp")], type="l", col="lightblue")
-	lines(Met_Ext1_Mad[,c("year4","max_air_temp")], type="l", col="salmon")
-	mtext("Madi. Air Temp Annual Max(daily min mu max)", side=2, line=2, cex=0.8)
-	plot(Met_Ext1_Mad[,c("year4","range_air_temp")], xlab="", ylab="", type="l")
-	mtext("Madi. Air Temp Annual Max(daily range)", side=2, line=2, cex=0.8)
-	plot(Met_Ext1_Mad[,c("year4","precip_mm")], xlab="", ylab="", type="l")
-	mtext("Madi. Annual Max Precip (mm)", side=2, line=2, cex=0.8)
-	plot(Met_Ext1_Mad[,c("year4","snow_cm")], xlab="", ylab="", type="l")
-	mtext("Madi. Annual Max Snow (cm)", side=2, line=2, cex=0.8)
-
-	Met_Ext1_Min <- subset(Met_Ext1, location=="Minocqua")
-	dev.new(width=6, height=5)
-	par(mfrow=c(2,2), mar=c(3.5,4,0.5,0.5))
-	AirTrange <- c(min(Met_Ext1_Min[,"min_air_temp"], na.rm=TRUE), max(Met_Ext1_Min[,"max_air_temp"], na.rm=TRUE))
-	plot(Met_Ext1_Min[,c("year4","ave_air_temp")], xlab="", ylab="", type="l", ylim=AirTrange)
-	lines(Met_Ext1_Min[,c("year4","min_air_temp")], type="l", col="lightblue")
-	lines(Met_Ext1_Min[,c("year4","max_air_temp")], type="l", col="salmon")
-	mtext("Minoc. Air Temp Annual Max(daily min mu max)", side=2, line=2, cex=0.8)
-	plot(Met_Ext1_Min[,c("year4","range_air_temp")], xlab="", ylab="", type="l")
-	mtext("Minoc. Air Temp Annual Max(daily range)", side=2, line=2, cex=0.8)
-	plot(Met_Ext1_Min[,c("year4","precip_mm")], xlab="", ylab="", type="l")
-	mtext("Minoc. Annual Max Precip (mm)", side=2, line=2, cex=0.8)
-	plot(Met_Ext1_Min[,c("year4","snow_cm")], xlab="", ylab="", type="l")
-	mtext("Minoc. Annual Max Snow (cm)", side=2, line=2, cex=0.8)
-}
-# Met_Ext1[which(Met_Ext1[,"snow_cm"]==0),"snow_cm"] <- NA #to be used if I had the sum of snow, but then a sum doesn't converge to GEV, so max it is!
 
 Met_gev <- list()
 MetFrame <- matrix(model.matrix(Met_Ext1[,"min_air_temp"]~Met_Ext1[,"location"])[,2], ncol=1, dimnames=list(NULL, "Location"))
@@ -131,18 +69,6 @@ Met <- merge(Met_Params, Met_lvl, all=TRUE)
 # =======
 Ice_Ext <- Data_X$Ice
 Ice_Ext[,"Region"] <- c("North","South")[(as.integer(is.element(Ice_Ext[,"lakeid"], c("ME","MO","WI")))+1)]
-if(ShowPlots){
-	dev.new(width=7, height=6)
-	par(mfrow=c(4,3), mar=c(3,3,0.5,0.5), oma=c(0,0,2,0), ps=9)
-	for(i in 1:length(unique(Ice_Ext[,"lakeid"]))){
-		ThisIndex <- which(Ice_Ext[,"lakeid"]==unique(Ice_Ext[,"lakeid"])[i])
-		plot(Ice_Ext[ThisIndex,"year4"], Ice_Ext[ThisIndex,"DaysOpen"], type="l")
-		legend("topright", legend=unique(Ice_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-	}
-	mtext("Ice", side=3, line=0.5, outer=TRUE)
-
-}
-#I want to KEEP the commented code below; the new way of doing the calculations makes a separate fit for each lake, but the below code did it per region, which I kind of liked.
 
 Ice_fit <- calcGEV(nameVarbl="Ice", datCols="DaysOpen", fitForm="DaysOpen~Region", MUl="Region")
 Ice_Params <- Ice_fit[[1]]
@@ -158,16 +84,6 @@ Ice <- merge(Ice_Params, Ice_lvl[1,-c(1:2)], all=TRUE)
 # ==============
 LakLev_Ext <- aggregate(Data_X$LakLev[,"LakeLevel"], by=Data_X$LakLev[,c("year4", "lakeid")], max, na.rm=TRUE)
 names(LakLev_Ext) <- c("year4", "lakeid", "LakeLevel")
-if(ShowPlots){
-	dev.new(width=7, height=5)
-	par(mfrow=c(3,3), mar=c(3,3,0.5,0.5), oma=c(0,0,2,0), ps=9)
-	for(i in 1:length(unique(LakLev_Ext[,"lakeid"]))){
-		ThisIndex <- which(LakLev_Ext[,"lakeid"]==unique(LakLev_Ext[,"lakeid"])[i])
-		plot(LakLev_Ext[ThisIndex,"year4"], LakLev_Ext[ThisIndex,"LakeLevel"], type="l")
-		legend("topright", legend=unique(LakLev_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-	}
-	mtext("LakLev", side=3, line=0.5, outer=TRUE)
-}
 
 LakLev_fit <- calcGEV("LakLev", datCols="LakeLevel", fitBy="lakeid")
 LakLev_Params <- LakLev_fit[[1]]
@@ -185,16 +101,6 @@ Zmix_Ext <- aggregate(Data_X$Zmix[,"Zmix"], by=Data_X$Zmix[,c("year4", "lakeid")
 names(Zmix_Ext) <- c("year4", "lakeid", "Zmix")
 Zmix_Ext[which(Zmix_Ext[,"Zmix"]==-Inf),"Zmix"] <- NA
 
-if(ShowPlots){
-	dev.new(width=7, height=6)
-	par(mfrow=c(4,3), mar=c(3,3,0.5,0.5), oma=c(0,0,2,0), ps=9)
-	for(i in 1:length(unique(Zmix_Ext[,"lakeid"]))){
-		ThisIndex <- which(Zmix_Ext[,"lakeid"]==unique(Zmix_Ext[,"lakeid"])[i])
-		plot(Zmix_Ext[ThisIndex,"year4"], Zmix_Ext[ThisIndex,"Zmix"], type="l")
-		legend("topright", legend=unique(Zmix_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-	}
-	mtext("Zmix", side=3, line=0.5, outer=TRUE)
-}
 Zmix_fit <- calcGEV("Zmix", datCols="Zmix", fitBy="lakeid")
 Zmix_Params <- Zmix_fit[[1]]
 Zmix_gev <- Zmix_fit[[2]]
@@ -210,17 +116,6 @@ Zmix <- merge(Zmix_Params, Zmix_lvl, all=TRUE)
 LiExt_Ext <- aggregate(Data_X$LiExt[,"extcoef"], by=Data_X$LiExt[,c("year4", "lakeid")], FUN=max, na.rm=TRUE)
 names(LiExt_Ext) <- c("year4", "lakeid", "extcoef")
 LiExt_Ext[which(LiExt_Ext[,"extcoef"]==-Inf),"extcoef"] <- NA
-
-if(ShowPlots){
-	dev.new(width=6, height=5)
-	par(mfrow=c(3,3), mar=c(3,3,0.5,0.5), oma=c(0,0,2,0), ps=9)
-	for(i in 1:length(unique(LiExt_Ext[,"lakeid"]))){
-		ThisIndex <- which(LiExt_Ext[,"lakeid"]==unique(LiExt_Ext[,"lakeid"])[i])
-		plot(LiExt_Ext[ThisIndex,"year4"], LiExt_Ext[ThisIndex,"extcoef"], type="l")
-		legend("topright", legend=unique(LiExt_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-	}
-	mtext("Light Extinction", side=3, line=0.5, outer=TRUE)
-}
 
 LiExt_fit <- calcGEV("LiExt", datCols="extcoef", fitBy="lakeid")
 LiExt_Params <- LiExt_fit[[1]]
@@ -238,16 +133,6 @@ Secchi_Ext <- aggregate(Data_X$Secchi[,"Secchi"], by=Data_X$Secchi[,c("year4", "
 names(Secchi_Ext) <- c("year4", "lakeid", "Secchi")
 Secchi_Ext[which(Secchi_Ext[,"Secchi"]==-Inf),"Secchi"] <- NA
 
-if(ShowPlots){
-	dev.new(width=7, height=6)
-	par(mfrow=c(4,3), mar=c(3,3,0.5,0.5), oma=c(0,0,2,0), ps=9)
-	for(i in 1:length(unique(Secchi_Ext[,"lakeid"]))){
-		ThisIndex <- which(Secchi_Ext[,"lakeid"]==unique(Secchi_Ext[,"lakeid"])[i])
-		plot(Secchi_Ext[ThisIndex,"year4"], Secchi_Ext[ThisIndex,"Secchi"], type="l")
-		legend("topright", legend=unique(Secchi_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-	}
-	mtext("Secchi", side=3, line=0.5, outer=TRUE)
-}
 Secchi_fit <- calcGEV("Secchi", datCols="Secchi", fitBy="lakeid")
 Secchi_Params <- Secchi_fit[[1]]
 Secchi_gev <- Secchi_fit[[2]]
@@ -257,31 +142,12 @@ Secchi_vars <- as.character(unique(Secchi_Params$Variable))
 Secchi_lvl <- lvl(x=Data_X$Secchi, variables=Secchi_vars, fitby="lakeid", lvl2Thresh=setThresh)
 Secchi <- merge(Secchi_Params, Secchi_lvl, all=TRUE)
 
-
-
 # ========
 # = Phys =
 # ========
 AllPhys <- c("wtemp","o2","o2sat")
 Phys_Ext <- aggregate(Data_X$Phys[,AllPhys], by=Data_X$Phys[,c("year4", "lakeid")], FUN=max, na.rm=TRUE)
-if(ShowPlots){
-	for(j in 1:length(AllPhys)){
-		PhysName <- AllPhys[j]
-		dev.new(width=7, height=5)
-		par(mfrow=c(4,3), mar=c(3,3,0.5,0.5), oma=c(0,0,2,0), ps=9)
-		for(i in 1:length(unique(Phys_Ext[,"lakeid"]))){
-			ThisIndex <- which(Phys_Ext[,"lakeid"]==unique(Phys_Ext[,"lakeid"])[i])
-			if(all(is.na(Phys_Ext[ThisIndex,PhysName]))){
-				plot(1,1, type="l")
-				legend("topright", legend=unique(Phys_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-			}else{
-				plot(Phys_Ext[ThisIndex,"year4"], Phys_Ext[ThisIndex,PhysName], type="l")
-				legend("topright", legend=unique(Phys_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-			}
-		}
-		mtext(PhysName, side=3, line=0.5, outer=TRUE)
-	}
-}
+
 Phys_fit <- calcGEV("Phys", datCols=c("wtemp", "o2", "o2sat"), fitBy="lakeid")
 Phys_Params <- Phys_fit[[1]]
 Phys_gev <- Phys_fit[[2]]
@@ -298,25 +164,7 @@ Phys <- merge(Phys_Params, Phys_lvl, all=TRUE)
 AllIons <- c("cl","so4","ca", "mg", "na", "k", "fe", "mn", "cond")
 Ions_Ext <- aggregate(Data_X$Ions[,AllIons], by=Data_X$Ions[,c("year4", "lakeid")], FUN=max, na.rm=TRUE)
 Ions_Ext <- Inf2NA(Ions_Ext)
-if(ShowPlots){
-	for(j in 1:length(AllIons)){
-		IonName <- AllIons[j]
-		dev.new(width=7, height=5)
-		par(mfrow=c(4,3), mar=c(3,3,0.5,0.5), oma=c(0,0,2,0), ps=9)
-		for(i in 1:length(unique(Ions_Ext[,"lakeid"]))){
-			ThisIndex <- which(Ions_Ext[,"lakeid"]==unique(Ions_Ext[,"lakeid"])[i])
-		
-			if(all(is.na(Ions_Ext[ThisIndex,IonName]))){
-				plot(1,1, type="l")
-				legend("topright", legend=unique(Ions_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-			}else{
-				plot(Ions_Ext[ThisIndex,"year4"], Ions_Ext[ThisIndex,IonName], type="l")
-				legend("topright", legend=unique(Ions_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-			}
-		}
-		mtext(IonName, side=3, line=0.5, outer=TRUE)
-	}
-}
+
 #cond: AL, BM, SP, TB, and TR have time trend; FI, ME, MO, WI are NA.  CR and CB are stable.  CB maybe fat tail.
 # mn: No apparent temporal trends. AL, BM, CR, FI, SP all seem to have very high starting values.
 # fe: TB and maybe ME have downward trend.  BM, AL, and definitely SP have high starting value.
@@ -345,24 +193,6 @@ AllChem <- c("ph","alk","dic", "tic", "doc", "toc", "no3no2","nh4", "totnuf", "t
 Chem_Ext <- aggregate(Data_X$Chem[,AllChem], by=Data_X$Chem[,c("year4", "lakeid")], FUN=max, na.rm=TRUE)
 Chem_Ext <- Inf2NA(Chem_Ext)
 
-if(ShowPlots){
-	for(j in 1:length(AllChem)){
-		ChemName <- AllChem[j]
-		dev.new(width=7, height=5)
-		par(mfrow=c(4,3), mar=c(3,3,0.5,0.5), oma=c(0,0,2,0), ps=9)
-		for(i in 1:length(unique(Chem_Ext[,"lakeid"]))){
-			ThisIndex <- which(Chem_Ext[,"lakeid"]==unique(Chem_Ext[,"lakeid"])[i])
-			if(all(is.na(Chem_Ext[ThisIndex,ChemName]))){
-				plot(1,1, type="l")
-				legend("topright", legend=unique(Chem_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-			}else{
-				plot(Chem_Ext[ThisIndex,"year4"], Chem_Ext[ThisIndex,ChemName], type="l")
-				legend("topright", legend=unique(Chem_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-			}
-		}
-		mtext(ChemName, side=3, line=0.5, outer=TRUE)
-	}
-}
 #tpm: fairly spikey, TB looks like it might have a positive linear trend
 # brsiuf: very spikey CR, CB, AL look like maybe trend.
 # brsif: spikes, for some reason the scaling of the axes seems to be off for SP, TB, and TR (y axis goes to zero, values don't drop below 3k, e.g.)
@@ -425,45 +255,6 @@ Zoop_Ext[,"avg_length"] <- replace(Zoop_Ext[,"avg_length"], list=which(Zoop_Ext[
 Zoop_Ext[,"avg_zoop_mass"] <- replace(Zoop_Ext[,"avg_zoop_mass"], list=which(is.na(Zoop_Ext[,"avg_length"])), NA) #using the average length here b/c that's how mass is calc'd
 Zoop_Ext[,"tot_zoop_mass"] <- replace(Zoop_Ext[,"tot_zoop_mass"], list=which(is.na(Zoop_Ext[,"avg_length"])), NA)
 Zoop_Ext<- Inf2NA(Zoop_Ext) #_v8
-if(ShowPlots){
-	dev.new(width=7, height=5)
-	par(mfrow=c(4,3), mar=c(3,3,0.5,0.5), ps=9)
-	for(i in 1:length(unique(Zoop_Ext[,"lakeid"]))){
-		ThisIndex <- which(Zoop_Ext[,"lakeid"]==unique(Zoop_Ext[,"lakeid"])[i])
-		plot(Zoop_Ext[ThisIndex,"year4"], Zoop_Ext[ThisIndex,"density"], type="l")
-		legend("topright", legend=unique(Zoop_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-	}
-
-	dev.new(width=7, height=5)
-	par(mfrow=c(4,4), mar=c(3,3,0.5,0.5), ps=9)
-	Xlim_LakLev <- range(Zoop_Ext[,"year4"], na.rm=TRUE)
-	Ylim_LakLev <- range(Zoop_Ext[,"tot_zoop_mass"], na.rm=TRUE)
-	for(i in 1:length(unique(Zoop_Ext[,"lakeid"]))){
-		ThisIndex <- which(Zoop_Ext[,"lakeid"]==unique(Zoop_Ext[,"lakeid"])[i])
-		plot(Zoop_Ext[ThisIndex,"year4"], Zoop_Ext[ThisIndex,"tot_zoop_mass"], type="o")
-		legend("topright", legend=unique(Zoop_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-	}
-
-	dev.new(width=7, height=5)
-	par(mfrow=c(4,4), mar=c(3,3,0.5,0.5), ps=9)
-	Xlim_LakLev <- range(Zoop_Ext[,"year4"], na.rm=TRUE)
-	Ylim_LakLev <- range(Zoop_Ext[,"avg_zoop_mass"], na.rm=TRUE)
-	for(i in 1:length(unique(Zoop_Ext[,"lakeid"]))){
-		ThisIndex <- which(Zoop_Ext[,"lakeid"]==unique(Zoop_Ext[,"lakeid"])[i])
-		plot(Zoop_Ext[ThisIndex,"year4"], Zoop_Ext[ThisIndex,"avg_zoop_mass"], type="l")
-		legend("topright", legend=unique(Zoop_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-	}
-
-	dev.new(width=7, height=5)
-	par(mfrow=c(4,4), mar=c(3,3,0.5,0.5), ps=9)
-	Xlim_LakLev <- range(Zoop_Ext[,"year4"], na.rm=TRUE)
-	Ylim_LakLev <- range(Zoop_Ext[,"avg_length"], na.rm=TRUE)
-	for(i in 1:length(unique(Zoop_Ext[,"lakeid"]))){
-		ThisIndex <- which(Zoop_Ext[,"lakeid"]==unique(Zoop_Ext[,"lakeid"])[i])
-		plot(Zoop_Ext[ThisIndex,"year4"], Zoop_Ext[ThisIndex,"avg_length"], type="l")
-		legend("topright", legend=unique(Zoop_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-	}
-}
 
 Zoop_fit <- calcGEV("Zoop", fitBy="lakeid")
 Zoop_Params <- Zoop_fit[[1]]
@@ -504,25 +295,6 @@ Fish_ByGear_Ext <- aggregate(Data_X$Fish_ByGear[,AllFish_ByGear], by=Data_X$Fish
 Fish_ByGear_Ext <- Inf2NA(Fish_ByGear_Ext)
 Fish_ByGear_Ext <- subset(Fish_ByGear_Ext, gearid=="ELFISH") #I should eventually remove this once I can introduce gearid as a covariate
 
-if(ShowPlots){ #note that the peak in 2010 in BM max_Leng is the 1.3 m walleye lol
-	for(j in 1:length(AllFish_ByGear)){
-		Fish_ByGearName <- AllFish_ByGear[j]
-		dev.new(width=7, height=5)
-		par(mfrow=c(4,3), mar=c(3,3,0.5,0.5), oma=c(0,0,2,0), ps=9)
-		for(i in 1:length(unique(Fish_ByGear_Ext[,"lakeid"]))){
-			ThisIndex <- which(Fish_ByGear_Ext[,"lakeid"]==unique(Fish_ByGear_Ext[,"lakeid"])[i])
-			if(all(is.na(Fish_ByGear_Ext[ThisIndex,Fish_ByGearName]))){
-				plot(1,1, type="l")
-				legend("topright", legend=unique(Fish_ByGear_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-			}else{
-				plot(Fish_ByGear_Ext[ThisIndex,"year4"], Fish_ByGear_Ext[ThisIndex,Fish_ByGearName], type="l")
-				legend("topright", legend=unique(Fish_ByGear_Ext[,"lakeid"])[i], cex=0.8, bty="n")
-			}
-		}
-		mtext(Fish_ByGearName, side=3, line=0.5, outer=TRUE)
-	}
-}
- 
 Fish_ByGear_fit <- calcGEV("Fish_ByGear", fitBy="lakeid")
 Fish_ByGear_Params <- cbind("gearid"="EleFish", Fish_ByGear_fit[[1]])
 Fish_ByGear_gev <- Fish_ByGear_fit[[2]]
@@ -554,7 +326,7 @@ Fish2 <- merge(Fish_ByGear_Params2, Fish_ByGear2_lvl, all=TRUE)
 # = Put it all together (All_Params) =
 # ====================================
 
-All_Params <- rbind(cbind("Type"="Bio", Fish1[,-3]), cbind("Type"="Bio",  Zoop), cbind("Type"="Bio", Chl), cbind("Type"="Chem", Chem), cbind("Type"="Chem", Ions), cbind("Type"="Phys", Phys), cbind("Type"="Phys", Secchi), cbind("Type"="Phys", LiExt), cbind("Type"="Phys", Zmix),cbind("Type"="Phys", LakLev), cbind("Type"="Phys",  Ice[,-c(6,10,14)]), cbind("Type"="Met", Met), cbind("Type"="Cosmic", SunSpot))
+All_Params <- rbind(cbind("Type"="Bio", Fish1[,-3]), cbind("Type"="Bio",  Zoop), cbind("Type"="Bio", Chl), cbind("Type"="Chem", Chem), cbind("Type"="Chem", Ions), cbind("Type"="Phys", Phys), cbind("Type"="Phys", Secchi), cbind("Type"="Phys", LiExt), cbind("Type"="Phys", Zmix),cbind("Type"="Phys", LakLev), cbind("Type"="Phys",  Ice[,-c(6,10,14)]), cbind("Type"="Met", Met))
 
 All_Params <- All_Params[order(All_Params[,"sh_0"]),]
 

@@ -706,101 +706,6 @@ Ice <- rbind(Ice_Nrtn, Ice_Srtn)
 
 
 
-# ================
-# = Boat Traffic =
-# ================
-BoTraf000 <- read.csv("BoatTraffic.csv")
-BoTraf000[,"sampledate"] <- as.Date(BoTraf000[,"sampledate"])
-# ContDates <- data.frame("sampledate"=seq(as.Date("1976-04-11"), as.Date("2010-10-31"), by=1))
-# Spaced_BoTraf <- merge(BoTraf000, ContDates, all=TRUE)
-BoTraf000[,"Sun_Week"] <- format.Date(BoTraf000[,"sampledate"], format="%U")
-BoTraf000[,"Mon_Week"] <- format.Date(BoTraf000[,"sampledate"], format="%W")
-BoTraf000[,"daynum"] <- as.integer(format.Date(BoTraf000[,"sampledate"], format="%j"))
-BoTraf000[,"lakeid"] <- "ME_MO"
-BoTraf000 <- BoTraf000[,c("lakeid", "year4", "Mon_Week", "daynum", "sampledate", "total_boats")]
-BoTraf00 <- aggregate(BoTraf000[,c("sampledate", "daynum")], by=BoTraf000[,c("Mon_Week", "year4", "lakeid")], FUN=max, na.rm=TRUE) #the date at the end of the weekend
-BoTraf0 <- aggregate(BoTraf000[,"total_boats"], by=BoTraf000[,c("Mon_Week", "year4", "lakeid")], FUN=sum, na.rm=TRUE)
-names(BoTraf0) <- c("Mon_Week", "year4", "lakeid", "total_boats")
-BoTraf <- merge(BoTraf0, BoTraf00, all=TRUE)
-BoTraf <- BoTraf[order(BoTraf[,"sampledate"]),]
-BoTraf[,"Mon_Week"] <- as.integer(BoTraf[,"Mon_Week"])
-
-plot(BoTraf[,"sampledate"], BoTraf[,"total_boats"], type="o", pch=20)
-
-
-
-
-
-# ===============================================
-# = Boat Traffic (introduce NA's, weekly means)
-# ===============================================
-
-BoTraf2000 <- read.csv("BoatTraffic.csv")
-BoTraf2000[,"sampledate"] <- as.Date(BoTraf2000[,"sampledate"])
-ContDates <- data.frame("sampledate"=seq(as.Date("1976-04-11"), as.Date("2010-10-31"), by=1))
-BoTraf2000 <- merge(BoTraf2000, ContDates, all=TRUE)
-BoTraf2000[,"Sun_Week"] <- format.Date(BoTraf2000[,"sampledate"], format="%U")
-BoTraf2000[,"Mon_Week"] <- format.Date(BoTraf2000[,"sampledate"], format="%W")
-BoTraf2000[,"daynum"] <- as.integer(format.Date(BoTraf2000[,"sampledate"], format="%j"))
-BoTraf2000[,"year4"] <- as.integer(format.Date(BoTraf2000[,"sampledate"], format="%Y"))
-BoTraf2000[,"lakeid"] <- "ME_MO"
-BoTraf2000 <- BoTraf2000[,c("lakeid", "year4", "Mon_Week", "daynum", "sampledate", "total_boats")]
-BoTraf200 <- aggregate(BoTraf2000[,c("sampledate", "daynum")], by=BoTraf2000[,c("Mon_Week", "year4", "lakeid")], FUN=max, na.rm=TRUE) #the date at the end of the weekend
-BoTraf20 <- aggregate(BoTraf2000[,"total_boats"], by=BoTraf2000[,c("Mon_Week", "year4", "lakeid")], FUN=mean, na.rm=TRUE)
-names(BoTraf20) <- c("Mon_Week", "year4", "lakeid", "total_boats")
-BoTraf2 <- merge(BoTraf20, BoTraf200, all=TRUE)
-BoTraf2 <- BoTraf2[order(BoTraf2[,"sampledate"]),]
-BoTraf2[,"Mon_Week"] <- as.integer(BoTraf2[,"Mon_Week"])
-BoTraf2 <- subset(BoTraf2, !is.element(year4, c(1976, 2010)))
-
-# dev.new(width=7, height=5)
-# par(mar=c(4,4,0.5,0.5))
-# plot(BoTraf2[,"sampledate"], BoTraf2[,"total_boats"], type="o", pch=20, xlab="Date", ylab="Num. Boats (daily averages for each week)")
-# acf(BoTraf2[,"total_boats"])
-
-BoTraf3 <- aggregate(BoTraf2[,"total_boats"], by=list(BoTraf2[,"year4"]), max, na.rm=TRUE)
-names(BoTraf3) <- c("year", "total_boats")
-# dev.new(width=7, height=5)
-# par(mar=c(4,4,0.5,0.5))
-# plot(BoTraf3[,"year"], BoTraf3[,"total_boats"], type="o", pch=20, xlab="Year", ylab="Num. Boats (yearly peak of daily averages)")
-
-# Traffic <- BoTraf2[,"total_boats"]
-# plot(BoTraf2[,"sampledate"], scale(BoTraf2[,"total_boats"]), type="o", pch=20)
-# test <- arima(scale(BoTraf2[,"total_boats"]), order=c(1,0,0), seasonal=list(order=c(1,0,0), period=52))
-
-# =============
-# = Sun Spots =
-# =============
-SunSpots000 <- matrix(scan("DailySunspots_1818_to_2013.txt"), byrow=TRUE, ncol=5, dimnames=list(NULL, c("year4","month","dayOmonth","DecYear","SpotNum")))
-SpotDates <- paste(SunSpots000[,"year4"], sprintf("%02s", SunSpots000[,"month"]), sprintf("%02s", SunSpots000[,"dayOmonth"]), sep="-")
-SunSpots000 <- as.data.frame(SunSpots000)
-SunSpots000[,"sampledate"] <- as.Date(SpotDates)
-SunSpots000[,"daynum"] <- as.integer(format.Date(SunSpots000[,"sampledate"], format="%j"))
-
-SunSpots00 <- SunSpots000[-c(1:(which(!is.na(SunSpots000[,"SpotNum"]))[1]-1)),]
-SunSpots0_Dates <- aggregate(SunSpots00[,c("daynum", "DecYear", "sampledate")], by=SunSpots00[,c("year4", "month")], mean, na.rm=TRUE)
-SunSpots0 <- aggregate(SunSpots00[,"SpotNum"], by=SunSpots00[,c("year4", "month")], mean, na.rm=TRUE)
-names(SunSpots0) <- c("year4", "month", "SpotNum")
-SunSpots <- merge(SunSpots0_Dates, SunSpots0, all=TRUE)
-SunSpots <- SunSpots[order(SunSpots[,"sampledate"]),]
-
-SpotTS <- ts(data=SunSpots[,"SpotNum"], start=c(SunSpots[1,"year4"], SunSpots[1,"month"]), frequency=12)
-SpotStruc <- StructTS(SpotTS)
-SmoothSpotTS <- ts(rowSums(tsSmooth(SpotStruc)))
-tsp(SmoothSpotTS) <- tsp(SpotTS)
-SpotTS[74] <- SmoothSpotTS[74]
-
-SpotSpec <- spectrum(SpotTS[1:length(SpotTS)])
-PeakFreq <- (SpotSpec$freq[which.max(SpotSpec$spec)])
-SolarCycle <- 1/(PeakFreq*12)
-
-SunSpots[,"SpotNum"] <- as.integer(SpotTS)
-# arima(SpotTS, order=c(1,0,0), seasonal=list(order=c(1,0,0), period=12*SolarCycle))
-
-
-
-
-
 
 # =============================================
 # = Export data for Organization into extrema =
@@ -818,7 +723,7 @@ Chl[,"sampledate"] <- as.Date(Chl[,"sampledate"])
 Zoop[,"sampledate"] <- as.Date(Zoop[,"sampledate"])
 
 
-Data_X <- list("SunSpots"=SunSpots, "Met"=Met, "Ice"=Ice, "LakLev"=LakLev, "Zmix"=Zmix, "LiExt"=LiExt, "Secchi"=Secchi, "Phys"=Phys, "Ions"=Ions, "Chem"=Chem, "Chl"=Chl, "Zoop"=Zoop, "Fish"=Fish_GearSpec, "BoTraf"=BoTraf, "Fish_ByGear"=Fish_ByGear, "Fish_BySpec"=Fish_BySpec)
+Data_X <- list("Met"=Met, "Ice"=Ice, "LakLev"=LakLev, "Zmix"=Zmix, "LiExt"=LiExt, "Secchi"=Secchi, "Phys"=Phys, "Ions"=Ions, "Chem"=Chem, "Chl"=Chl, "Zoop"=Zoop, "Fish"=Fish_GearSpec, "Fish_ByGear"=Fish_ByGear, "Fish_BySpec"=Fish_BySpec)
 
 save(Data_X, file="/Data/OrganizedFatData_Read_Fat_Data.RData")
 
