@@ -17,6 +17,8 @@ library("reshape")
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Fat_dGEV.R")
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/CalcZoopBiomass.R")
 
+Inf2NA <- function(x) {x[x==-Inf | x==Inf] <- NA; x}
+
 manClean <- function(x, varCols){
 	x2 <- NULL
 	dev.new(width=10, height=4)
@@ -421,28 +423,17 @@ Fish[,"cpue3_WeiEff"] <- Fish[,"SumWei"]/Fish[,"effort"]
 # Fish[,"cpue4_LengEff"] <- (Fish[,"Nleng"]*Fish[,"mean_Leng"])/Fish[,"effort"]
 
 # TotFish <- merge(TotFish0_abun, TotFish0_size, all=TRUE, by=c("lakeid", "year4", "spname"))
-TotFish <- merge(Fish00_abun, TotFish0_size, all=TRUE, by=c("lakeid", "year4", "spname", "gearid"))
-TotFish[,"SumWei"] <- TotFish[,"Nwei"]*TotFish[,"mean_Wei"]
+TotFish0 <- merge(Fish00_abun, TotFish0_size, all=TRUE, by=c("lakeid", "year4", "spname", "gearid"))
+TotFish0[,"SumWei"] <- TotFish0[,"Nwei"]*TotFish0[,"mean_Wei"]
 # TotFish[,"SumLeng"] <- TotFish[,"Nleng"]*TotFish[,"mean_Leng"]
-TotFish[,"cpue3_WeiEff"] <- TotFish[,"SumWei"]/TotFish[,"effort"]
+TotFish0[,"cpue3_WeiEff"] <- TotFish0[,"SumWei"]/TotFish0[,"effort"]
 # TotFish[,"cpue4_LengEff"] <- (TotFish[,"Nleng"]*TotFish[,"mean_Leng"])/TotFish[,"effort"]
 
-TotFish <- cbind(TotFish, "Order"=NA, "Family"=NA, "Genus"=NA, "Species"=NA)
+# ==================================
+# = Write table with unique spname =
+# ==================================
+# fTax <- data.frame("spname"=as.character(unique(TotFish0[,"spname"])))
 
-
-
-# fTax <- data.frame("spname"=as.character(unique(TotFish[,"spname"])))
-# write.table(fTax, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/uniqueFishTaxa.txt", sep="\t", row.names=FALSE)
-
-fTax.id <- read.table(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/fatFishTaxa.txt", sep="\t", header=TRUE, colClasses="character")
-fTax.id[fTax.id==""] <- NA
-
-for(i in 1:nrow(fTax.id)){
-	ind <- TotFish[,"spname"] == fTax.id[i,"spname"]
-	TotFish[ind, c("Order","Family","Genus","Species")] <- fTax.id[i,c("order", "family", "genus", "species")]
-}
-
-uLake <- unique(TotFish[,"lakeid"])
 
 # The average CPUE (# individuals) for each gear type in each lake
 # lg_cpue1 <- aggregate(TotFish[,"cpue1_Sum"], by=list(TotFish[,"gearid"], TotFish[,"lakeid"]), mean, na.rm=TRUE)
@@ -469,9 +460,9 @@ uLake <- unique(TotFish[,"lakeid"])
 # in a year when Method A is missing, the time series for this particular taxon is still unbroken.
 
 # gear lake year
-gly <- TotFish[,c("lakeid","year4", "gearid")]
-
-gl.obs <- paste(TotFish[,"gearid"], TotFish[,"lakeid"], sep="")
+gly <- TotFish0[,c("lakeid","year4", "gearid")]
+uLake <- unique(TotFish0[,"lakeid"])
+gl.obs <- paste(TotFish0[,"gearid"], TotFish0[,"lakeid"], sep="")
 gl.valid <- c()
 for(i in 1:length(uLake)){
 	gearYear <- table(gly[gly[,1]==uLake[i],2], gly[gly[,1]==uLake[i],3])
@@ -483,48 +474,68 @@ for(i in 1:length(uLake)){
 	validNames <- names(propPres)[propPres>0.96]
 	gl.valid <- c(gl.valid, paste(validNames, as.character(uLake[i]), sep=""))
 }
-TotFish <- TotFish[gl.obs%in%gl.valid,]
+TotFish <- TotFish0[gl.obs%in%gl.valid,]
 
 
 
-# FishCats <- c("total_caught", "cpue1_Sum", "mean_Leng", "max_Leng", "min_Leng", "mean_Wei", "max_Wei", "min_Wei", "Nfish", "Nleng", "Nwei", "SumWei", "SumLeng", "cpue3_WeiEff", "cpue4_LengEff")
-FishCats1 <- c("total_caught", "cpue1_Sum", "Nfish", "Nleng", "Nwei", "SumWei", "cpue3_WeiEff")
-FishCats2 <- c("mean_Leng", "mean_Wei")
-FishCats3 <- c("max_Leng", "max_Wei")
-FishCats4 <- c("min_Leng", "min_Wei")
-
-# Inf2NA <- function(x) {x[which(x==-Inf | x==Inf, arr.ind=TRUE)] <- NA; x}
-Inf2NA <- function(x) {x[x==-Inf | x==Inf] <- NA; x}
+# ===========================================
+# = Aggregate spgyl dups, subset to metrics =
+# ===========================================
+FishCats1 <- c("total_caught", "cpue1_Sum", "cpue3_WeiEff")
+Fish_ByGearSpec <- aggregate(TotFish[, FishCats1], by=TotFish[,c("spname", "gearid", "year4", "lakeid")], sum, na.rm=TRUE)
 
 
-# ====================
-# = 27-Mar-2014 HERE =
-# ====================
-# ====================
-# = 28-Mar-2014 HERE =
-# ====================
-# (.RData saved on mac desktop)
+# ========================================================================
+# = Determine lake-years when species weren't caught due to missing gear =
+# ========================================================================
+# This part was tough
+# m1 shows all possible year-lake-gear-spname combinations, given past obs of year-lake and species-gear-lake combintations
+f1 <- Fish_ByGearSpec[!duplicated(paste(Fish_ByGearSpec[,"year4"], Fish_ByGearSpec[,"lakeid"])), c("year4","lakeid")]
+f4 <- Fish_ByGearSpec[!duplicated(paste(Fish_ByGearSpec[,"spname"], Fish_ByGearSpec[,"gearid"], Fish_ByGearSpec[,"lakeid"])), c("spname","gearid", "lakeid")]
+m1 <- merge(f1, f4, all=TRUE)
+m1.lyg <- apply(m1[,c("lakeid", "year4", "gearid")], 1, paste, collapse=" ")
 
-Fish_BySpec1 <- aggregate(TotFish[, FishCats1], by=TotFish[,c("spname", "year4", "lakeid")], sum, na.rm=TRUE)
-Fish_BySpec2 <- aggregate(TotFish[, FishCats2], by=TotFish[,c("spname", "year4", "lakeid")], mean, na.rm=TRUE)
-Fish_BySpec3 <- aggregate(TotFish[, FishCats3], by=TotFish[,c("spname", "year4", "lakeid")], max, na.rm=TRUE)
-Fish_BySpec4 <- aggregate(TotFish[, FishCats4], by=TotFish[,c("spname", "year4", "lakeid")], min, na.rm=TRUE)
-Fish_BySpec <- merge_recurse(list(Fish_BySpec1, Fish_BySpec2, Fish_BySpec3 , Fish_BySpec4), all.x=TRUE, all.y=TRUE)
-Fish_BySpec <- Inf2NA(Fish_BySpec)
+# f3 shows past combinations of year-gear-lake
+f3 <- Fish_ByGearSpec[!duplicated(paste(Fish_ByGearSpec[,"year4"], Fish_ByGearSpec[,"gearid"], Fish_ByGearSpec[,"lakeid"])), c("year4","gearid", "lakeid")]
+row.names(f3) <- NULL
+f3.lyg <- apply(f3[,c("lakeid", "year4", "gearid")], 1, paste, collapse=" ")
 
-Fish_ByGear1 <- aggregate(TotFish[, FishCats1], by=TotFish[,c("gearid", "year4", "lakeid")], sum, na.rm=TRUE)
-Fish_ByGear2 <- aggregate(TotFish[, FishCats2], by=TotFish[,c("gearid", "year4", "lakeid")], mean, na.rm=TRUE)
-Fish_ByGear3 <- aggregate(TotFish[, FishCats3], by=TotFish[,c("gearid", "year4", "lakeid")], max, na.rm=TRUE)
-Fish_ByGear4 <- aggregate(TotFish[, FishCats4], by=TotFish[,c("gearid", "year4", "lakeid")], min, na.rm=TRUE)
-Fish_ByGear <- merge_recurse(list(Fish_ByGear1, Fish_ByGear2, Fish_ByGear3, Fish_ByGear4), all.x=TRUE, all.y=TRUE)
-Fish_ByGear <- Inf2NA(Fish_ByGear)
+# given the possible lake-year-gear combos (m1.lyg), 
+# and the observed lake-year-gear combos (f3.lyg),
+# determine which lake-year-species (or lake-year-gear-species) combinations could be missing
+lygs.miss <- m1[!m1.lyg%in%f3.lyg,]
 
-Fish_GearSpec1 <- aggregate(TotFish[, FishCats1], by=TotFish[,c("gearid","spname", "year4", "lakeid")], sum, na.rm=TRUE)
-Fish_GearSpec2 <- aggregate(TotFish[, FishCats2], by=TotFish[,c("gearid","spname" ,"year4", "lakeid")], mean, na.rm=TRUE)
-Fish_GearSpec3 <- aggregate(TotFish[, FishCats3], by=TotFish[,c("gearid","spname", "year4", "lakeid")], max, na.rm=TRUE)
-Fish_GearSpec4 <- aggregate(TotFish[, FishCats4], by=TotFish[,c("gearid","spname" ,"year4", "lakeid")], min, na.rm=TRUE)
-Fish_GearSpec <- merge_recurse(list(Fish_GearSpec1, Fish_GearSpec2, Fish_GearSpec3, Fish_GearSpec4), all.x=TRUE, all.y=TRUE)
-Fish_GearSpec <- Inf2NA(Fish_GearSpec)
+
+# ===============================================================
+# = Add NA's for species who weren't caught b/c of missing gear =
+# ===============================================================
+Fish_ByGearSpec <- merge(Fish_ByGearSpec, lygs.miss, all=TRUE)
+
+
+# ======================================
+# = Sum Fish metrics across gear types =
+# ======================================
+Fish_BySpec <- aggregate(Fish_ByGearSpec[, FishCats1], by=Fish_ByGearSpec[,c("spname", "year4", "lakeid")], sum, na.rm=FALSE)
+
+
+
+
+# ==============================================
+# = Add taxonomic classification to data frame =
+# ==============================================
+fTax.id <- read.table(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/fatFishTaxa.txt", sep="\t", header=TRUE, colClasses="character")
+fTax.id[fTax.id==""] <- NA
+
+Fish_BySpec <- cbind(Fish_BySpec, "Order"=NA, "Family"=NA, "Genus"=NA, "Species"=NA)
+for(i in 1:nrow(fTax.id)){
+	ind <- Fish_BySpec[,"spname"] == fTax.id[i,"spname"]
+	Fish_BySpec[ind, c("Order","Family","Genus","Species")] <- fTax.id[i,c("order", "family", "genus", "species")]
+}
+
+
+
+
+
 
 
 # ==================
