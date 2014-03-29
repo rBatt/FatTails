@@ -183,18 +183,6 @@ Stationary <- function(x, coluY, coluX){
 	
 }
 
-# Stationary2 <- function(x, coluY, coluX){
-# 	tx <- 0:(length(x)-1)
-# 	Reg <- lm(x~tx)
-# 	TrendPval <- summary(Reg)$coef["tx","Pr(>|t|)"]
-# 	if(TrendPval>0.5){
-# 		return(x)
-# 	}else{
-# 		xd <- residuals(Reg) #+ mean(x[,coluY])
-# 		return(xd)
-# 	}
-# }
-
 
 Stationary2 <- function(x, coluY, coluX){
 	tx <- 0:(length(x)-1)
@@ -388,13 +376,21 @@ calcGEV <- function(nameVarbl, datCols=NULL, fitBy=NULL, fitForm=NULL, MUl=NULL,
 	for(j in 1:length(AllVarbl)){
 		VarblName <- AllVarbl[j]
 		Varbl_Ext <- get(paste(nameVarbl,"Ext",sep="_"))
+		
+		# ================================================================
+		# = Set number of for() iterations depending on fitBy or fitForm =
+		# ================================================================
 		if(is.null(fitBy)){
 			LoopThru <- "Formula" #need to change the formula arugment to just be responses, then paste it together with datCols[i] (i didn't write this thinking about multiple responses)
 		}else{
 			LoopThru <- unique(Varbl_Ext[,fitBy])
 		}
-		for(i in seq_along(LoopThru)){
-			
+		
+		
+		for(i in seq_along(LoopThru)){ # 1 iteration for formula, or number of factor levels for fitBy
+			# ==============================================
+			# = Fit GEV for each level of a factor (fitBy) =
+			# ==============================================
 			if(!is.null(fitBy)){
 				fitByID <- as.character(LoopThru[i])
 				ThisFitBy <- which(Varbl_Ext[,fitBy]==fitByID & !is.na(Varbl_Ext[,VarblName]))
@@ -405,10 +401,13 @@ calcGEV <- function(nameVarbl, datCols=NULL, fitBy=NULL, fitForm=NULL, MUl=NULL,
 				dRange <- range(Varbl_Ext[ThisFitBy,"year4"])
 				dDuration <- diff(dRange) + 1
 				
-				Tempo_gev <- gev.fit(ThisVarbl)[c("conv","nllh","mle","se")]
+				Tempo_gev <- gev.fit(ThisVarbl)[c("conv","nllh","mle","se")] # Fit GEV to this factor level
 			}
 			
 			
+			# ============================================
+			# = Fit GEV according to a formula (fitForm) =
+			# ============================================
 			if(!is.null(fitForm)){
 				ModForm <- with(Varbl_Ext, formula(fitForm))
 				AllVars <- all.vars(ModForm)
@@ -424,9 +423,12 @@ calcGEV <- function(nameVarbl, datCols=NULL, fitBy=NULL, fitForm=NULL, MUl=NULL,
 				dRange <- range(Varbl_Ext[,"year4"])
 				dDuration <- diff(dRange) + 1
 				
-				Tempo_gev <- gev.fit(ThisVarbl, ydat=TempoYdat, mul=MUl, sigl=SIGl, shl=SHl)[c("conv","nllh","mle","se")]
+				Tempo_gev <- gev.fit(ThisVarbl, ydat=TempoYdat, mul=MUl, sigl=SIGl, shl=SHl)[c("conv","nllh","mle","se")] # Fit GEV according to formula
 			}
 			
+			# =======================================================
+			# = Calculate t-statistic & p value for shape parameter =
+			# =======================================================
 			tstat <- Tempo_gev$mle/Tempo_gev$se
 			tstat2 <- (Tempo_gev$mle["sh_0"]-ifelse(tstat[3]>0, 0.5, -0.5))/(Tempo_gev$se["sh_0"]) #testing to see if the shape parameter is greater than 0.5
 		
@@ -441,6 +443,9 @@ calcGEV <- function(nameVarbl, datCols=NULL, fitBy=NULL, fitForm=NULL, MUl=NULL,
 		
 			TempoNames <- c(names(Tempo_gev$mle), paste("se_",names(Tempo_gev$se), sep=""), paste("p_",names(Tempo_gev$Pvalues), sep=""))
 		
+			# ==========================================================
+			# = Prepare function output (updated for each fitBy level) =
+			# ==========================================================
 			if(all(c(j,i)==1)){
 				tTempo_Params <- matrix(c(Tempo_gev$mle, Tempo_gev$se, Tempo_gev$Pvalues), nrow=1, dimnames=list(NULL, TempoNames)) 
 				Tempo_Params <- data.frame("fitBy"=LoopThru[i], "Variable"=VarblName, "Duration"=dDuration, "N"=Nobs, tTempo_Params)
@@ -466,30 +471,7 @@ SignifShape <- function(x, ...){
 	invisible(rs)
 }
 
-stable.fit <- function(x){
-	# alpha0 <- 0.75  # Stability: between 0 and 2
-	# beta0 <- 0 # Skewness: -1 to 1
-	# c0 <- 1 # Scale (also gamma): 0 to Inf
-	# mu0 <- 0 # Location (also delta): -Inf to Inf
-	# 
-	# guesses <- c(alpha0, beta0, c0, mu0)
-	# 
-	# stableNLL <- function(pars, x){
-	# 	if(pars[1]<0 | pars[1]>2 | pars[2]>1 | pars[2]<(-1) | pars[3]<0){
-	# 		return(10^10)
-	# 	}
-	# 	sum(-dstable(x, alpha=pars[1], beta=pars[2], gamma=pars[3], delta=pars[4], log=TRUE), na.rm=TRUE)
-	# }
-	
-	# stableFit <- optim(par=guesses, fn=stableNLL, x=x)
-	# stableFit$par
-	
-	# stableFit <- DEoptim(fn=stableNLL, lower=c(0,-1,0, -1E3), upper=c(2,1,1E3,1E3), control=list(NP=40, itermax=10, strategy=2, trace=FALSE), x=x)
-	# stableFit$optim$bestmem
-	
-	# stableFit <- GenSA(par=guesses, fn=stableNLL, upper=c(2,1,1E3,1E3), lower=c(0,-1,0, -1E3), control=list(verbose=FALSE, smooth=FALSE, temperature=5230*1), x=x)
-	# 	stableFit$par
-	
+stable.fit <- function(x){	
 	sFit <- stableFit(x, type="mle", doplot=FALSE)
 	sFit@fit$estimate
 }
@@ -503,7 +485,6 @@ stableTime <- function(lvl, a, nExts, TS_Duration){ #Added _v4
 	mu <- a[4]
 	
 	# if(xi < 0 & lvl > (mu-sc/xi)){return(NA)}
-	
 	# tx <- (1 + xi * (lvl - mu)/sc)^(-1/xi) #the t(x) from Wikipedia GEV article
 	#pdf <- (1/sc)*tx^(xi+1)*exp(-tx) #this is the pdf, if I ever want to use it
 	cdf <- pstable(lvl, alpha=alpha, beta=beta, gamma=cc, delta=mu) #this is the CDF, which gives the percentile for a certain return level
@@ -513,3 +494,6 @@ stableTime <- function(lvl, a, nExts, TS_Duration){ #Added _v4
 # Example
 # x= rnorm(100)
 # stableTime(3, a=stable.fit(x), nExts=100, TS_Duration=100)
+
+
+

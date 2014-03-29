@@ -17,41 +17,6 @@ library("reshape")
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Fat_dGEV.R")
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/CalcZoopBiomass.R")
 
-Inf2NA <- function(x) {x[x==-Inf | x==Inf] <- NA; x}
-
-manClean <- function(x, varCols){
-	x2 <- NULL
-	dev.new(width=10, height=4)
-	par(mar=c(3,3,3,0.5))
-	for(i in 1:length(varCols)){
-		tvar <- varCols[i]
-		for(l in 1:length(unique(x[,"lakeid"]))){
-			tlake <- unique(x[,"lakeid"])[l]
-			tindex <- x[,"lakeid"]==tlake
-			tdat <- x[tindex,tvar]
-			if(any(!is.na(tdat))){
-				epiInfo <- is.element(c("depth", "Zmix"), names(x))
-				if(all(epiInfo)){ #if there is information about the epi depth, color the points red for epi, and NA otherwise
-					MyRed <- rgb(t(col2rgb("red")), alpha=40, maxColorValue=255)
-					inEpi <- x[tindex,"depth"]<=x[tindex,"Zmix"] | is.na(x[tindex,"Zmix"]) & x[tindex,"depth"] <=2
-					plotCols <- c(NA, MyRed)[inEpi+1]
-				}else{
-					plotCols <- rgb(t(col2rgb("blue")), alpha=40, maxColorValue=255) #if the necessary columns for determining epi or not are missing, color blue
-				}
-				plot(tdat, main=paste(tvar, tlake), pch=21, bg=plotCols)
-				bad <- identify(tdat)
-				if(length(bad)>0){
-					x2 <- c(x2, paste(tlake, tvar, x[x[,"lakeid"]==tlake,tvar][bad]))
-					x[x[,"lakeid"]==tlake,tvar][bad] <- NA
-				}
-			}else{
-				next
-			}
-		}
-	}
-	dev.off()
-	return(list(x, x2))	
-}
 
 deemedBad <- list()
 
@@ -63,44 +28,10 @@ deemedBad <- list()
 
 
 # ======================
-# = flag2NA, added _v2 =
-# ======================
-flag2NA <- function(x, summarizeBad=TRUE){
-	flagNames <- names(x)[regexpr("^flag", names(x))==1] #which column names start with 'flag' ?
-	flagVars <- gsub("flag", "", flagNames) #what are the column names that have a corresponding "flag___" column?
-	hasFlag <- function(x){ #function to detect which elements contain an uppercase character (i.e., which have a flag value)
-		grep("[:ALPHA:]", x)
-	}
-	bad <- apply(x[,flagNames], 2, hasFlag) #for each flag column, which rows are flagged?
-	if(summarizeBad){
-		print(summary(bad))	
-	}
-	for(i in 1:length(flagVars)){
-		tbadRow <- do.call('$', list(bad, flagNames[i])) #which rows are bad in the ith flag column?
-		if(length(tbadRow)>0){
-			x[tbadRow, flagVars[i]] <- NA #replace those flagged elements in the parent column with NA
-		}
-	}
-	x #return the data frame with flagged values replaced with NA's
-}
-
-# ======================
 # = Physical Limnology =
 # ======================
 Phys000 <- read.csv("Phys_NrtnSrtn.csv")
 
-zmix <- function(x){
-		temp <- x[,"wtemp"]
-		depth <- x[,"depth"]
-        tempDiff <- temp[-length(temp)] - temp[-1]
-        depthDiff <- depth[-1] - depth[-length(depth)]
-        ratio <- tempDiff / depthDiff
-		zhat <- depth[which(ratio >= 2)][1]
-		# Zhat2 <- min(which(zhat>0))
-		# Z <- Zhat2
-		Z <- ifelse(!(zhat>0), NA, zhat)
-       return(Z)
-}
 Phys00 <- subset(Phys000, sta==1 & rep==1)
 Phys00 <- flag2NA(Phys00)
 Phys00_clean <- manClean(Phys00, c("wtemp", "o2", "o2sat", "frlight"))
@@ -121,10 +52,6 @@ Phys0[,"Mixing"] <- as.numeric(is.na(zd))
 Phys0[,"InMetaHypo"] <- as.numeric(Phys0[,"InEpi"]+Phys0[,"Mixing"] == 0)
 Phys0 <- subset(Phys0, InMetaHypo==0, select=c("lakeid", "year4", "daynum", "sampledate", "depth", "wtemp", "o2", "o2sat", "deck", "light", "frlight", "Zmix", "InEpi", "Mixing"))
 
-EpiMean <- function(x){
-	xnames <- names(x)[!is.element(names(x), c("lakeid", "year4", "daynum", "sampledate"))]
-	colMeans(x[,xnames], na.rm=TRUE)
-}
 
 Phys <- ddply(.data=Phys0, .variables=c("lakeid", "year4", "daynum", "sampledate"), .fun=EpiMean)
 
@@ -155,72 +82,22 @@ names(Chl000s) <- c("lakeid", "year4", "sampledate", "daynum", "depth", "rep", "
 
 # Chl000s <- manClean(Chl000s, "chlor")
 
-EpiMean2 <- function(x){
-	stopifnot(all(is.element(c("depth","Zmix"), colnames(x))))
-	xnames <- colnames(x)[!is.element(colnames(x), c("lakeid", "year4", "daynum", "sampledate"))]
-	x2 <- x[,xnames]
-
-	if(all(is.na(x2[,"Zmix"]))){ #if zmix is unknown, just return the shallowest values
-		if(is.null(nrow(x2))){return(data.frame(x2))} #if zmix is unknown and there is only one depth of values, just return this depth
-		
-		xnames2 <- colnames(x2)[!is.element(colnames(x2), c("depth", "Zmix"))]
-		if(all(apply(X=x2[,xnames2], MARGIN=2, FUN=is.na))){return(colMeans(x2, na.rm=TRUE))} #if every variable is NA for all depths, just return the mean of all columns (shortcut for getting the mean depth and retaining the format of the data frame)
-		shallDepths <- c()
-		# ShalVal <- data.frame("Zmix"=NA)
-		ShalVal <- matrix(data=NA, ncol=length(xnames), dimnames=list(NULL, xnames))
-		# ShalVal[,"Zmix"] <- NA #probably don't need this line
-		for(i in 1:length(xnames2)){ #this elaborate loop is necessary b/c the shallowest non-NA value might not be the same for each column
-			x_notNA_ind <- which(!is.na(x2[,xnames2[i]]))
-			if(length(x_notNA_ind)==0){ #if all of the values in this column (i.e., this variable) are NA, record an NA for the depth and for the variable
-				shallDepths[i] <- NA
-				ShalVal[,xnames2[i]] <- NA
-			}else{ #if this column contains non-NA values, record the shallowest depth at which the varialbe is non-NA, and record the variable's value at the aforementioned depth
-				x_notNA <- x2[x_notNA_ind,]
-				shallDepths[i] <- min(x_notNA[, "depth"]) # I'm intentionally leaving out na.rm=TRUE b/c none of these values should be NA
-				ShalVal[,xnames2[i]] <- x_notNA[which.min(x_notNA[, "depth"]), xnames2[i]]
-			}
-		}
-		UniqueShals <- unique(na.omit(shallDepths))
-		if(length(UniqueShals)==1){
-			DeepestShall <- UniqueShals
-		}else{
-			DeepestShall <- max(UniqueShals) #paste("<=", max(UniqueShals))
-		}
-		
-		ShalVal[,"depth"] <- DeepestShall
-		# ShalVal2 <- matrix(ShalVal, ncol=length(xnames), dimnames=list(NULL, xnames))
-		return(ShalVal) #if zmix is unknown and values are at multiple depths, 
-		# shall <- which.min(x2[,"depth"])
-		# x3 <- colMeans(x2[shall,], na.rm=TRUE)
-	}
-	
-	zd <- x2[,"Zmix"] - x2[,"depth"]
-	InEpi <- as.numeric(zd>0 & !is.na(zd)) #if zmix is known, and values were from epi, return the mean of the epi
-	if(any(InEpi==1)){
-		return(colMeans(x2[which(InEpi==1),], na.rm=TRUE))
-	}
-	return(colMeans(x2, na.rm=TRUE)) #if zmix is known, but no values were in the epi, just return the mean of all values that were recorded.
-}
-
-
 Chl000 <- merge(Chl000n, Chl000s, all=TRUE)
 Chl00 <- merge(Phys[,c("lakeid", "year4", "daynum", "sampledate", "Zmix")], Chl000, all=TRUE)
 Chl00 <- Chl00[, c("lakeid", "year4", "daynum", "sampledate", "Zmix", "rep", "depth", "chlor", "sta", "phaeo")]
-# Chl00 <- ddply(.data=Chl00, .variables=c("lakeid", "year4"), .fun=InterpZ) 
-length(which(is.na(Chl00[,"Zmix"])))
-# aggregate(Chl00[,"Zmix"], by=list(Chl00[,"daynum"], Chl00[,"year4"], Chl00[,"lakeid"]), FUN=mean, na.rm=TRUE)
-# aggregate(Phys[,"Zmix"], by=list(Phys[,"daynum"], Phys[,"year4"], Phys[,"lakeid"]), FUN=mean, na.rm=TRUE)
 Chl00 <- aggregate(Chl00[,c("Zmix", "chlor", "phaeo")], by=Chl00[,rev(c("lakeid", "year4", "daynum", "sampledate", "depth"))], FUN=mean, na.rm=TRUE)
 Chl0 <- ddply(.data=Chl00, .variables=c("lakeid", "year4", "daynum", "sampledate"), .fun=EpiMean2)
 Chl <- Chl0[,c("lakeid", "year4", "daynum", "sampledate", "depth", "chlor", "phaeo")]
 names(Chl) <- c("lakeid", "year4", "daynum", "sampledate", "depth_chlor", "chlor", "phaeo")
-# class(Chl[,"sampledate"]) <- "Date"
-
 
 # ====================
 # = Zooplankton Data =
 # ====================
 #not using flag2NA b/c these files don't have flag columns
+
+	# =====================
+	# = Southern Zoops #1 =
+	# =====================
 Zoop000s1 <- read.csv("ZoopDens_Old_Srtn.csv")#density recorded as individuals/m^2
 Zoop000s1_tow <- read.csv("ZoopDens_TowDepth_Old_Srtn.csv")#Waubesa = 9.75m; Kegonsa = 7.75m;
 Zoop000s1 <- merge(Zoop000s1, Zoop000s1_tow, all.x=TRUE)
@@ -237,13 +114,17 @@ Zoop00s1[,"density"] <- (Zoop000s1[,"density"]/Zoop000s1[,"towdepth"])*0.001 #co
 names(Zoop00s1) <- c("lakeid", "year4", "sampledate", "taxon", "species_code", "density", "avg_length", "comments", "towdepth")
 # Zoop00s1 <- manClean(Zoop00s1, c("density", "avg_length")) #no problems
 
-
+	# =====================
+	# = Southern Zoops #2 =
+	# =====================
 Zoop000s2 <- read.csv("ZoopDens_New_Srtn.csv")#density recorded as individuals/m^2
 Zoop00s2 <- Zoop000s2
 Zoop00s2[,"density"] <- (Zoop000s2[,"density"]/Zoop000s2[,"towdepth"])*0.001 #convert zooplankton density to individuals/L
 names(Zoop00s2) <- c("lakeid", "year4", "sampledate", "station", "towdepth", "species_code", "taxon", "density", "indiv_measured", "avg_length")
-# Zoop00s2 <- manClean(Zoop00s2, c("density", "avg_length")) #no problems
 
+	# ========================
+	# = Merge southern Zoops =
+	# ========================
 Zoop00s <- merge(Zoop00s1, Zoop00s2, all=TRUE)
 Zoop00s[,"daynum"] <- as.numeric(as.character(format.Date(Zoop00s[,"sampledate"], format="%j")))
 for(i in 1:length(unique(Zoop00s[,"taxon"]))){
@@ -253,7 +134,9 @@ for(i in 1:length(unique(Zoop00s[,"taxon"]))){
 Zoop00s[, "tot_zoop_mass"] <- Zoop00s[,"density"] * Zoop00s[,"avg_zoop_mass"]
 Zoop0s <- Zoop00s[,c("lakeid", "year4", "daynum", "sampledate", "taxon", "density", "avg_length", "avg_zoop_mass", "tot_zoop_mass")]
 
-
+	# ==================
+	# = Northern Zoops =
+	# ==================
 Zoop000n <- read.csv("ZoopDens_Nrtn.csv")#density recorded as individuals/Liter
 names(Zoop000n) <- c(c("lakeid", "year4", "sampledate", "station", "species_code", "taxon", "density", "indiv_measured", "avg_length"))
 Zoop000n[,"daynum"] <- as.numeric(as.character(format.Date(Zoop000n[,"sampledate"], format="%j")))
@@ -266,49 +149,40 @@ Zoop000n[,"daynum"] <- as.numeric(as.character(format.Date(Zoop000n[,"sampledate
 Zoop0n <- Zoop000n[,c("lakeid", "year4", "daynum", "sampledate", "taxon", "density", "avg_length", "avg_zoop_mass", "tot_zoop_mass")]
 # Zoop0n <- manClean(Zoop0n, c("avg_length", "avg_zoop_mass", "tot_zoop_mass")) #no problems
 
+	# =====================================
+	# = Merge northern and southern zoops =
+	# =====================================
 Zoop0 <- merge(Zoop0n, Zoop0s, all=TRUE) #this contains zooplankton information broken down by taxon
-Zoop <- aggregate(Zoop0[,c("density", "avg_length", "avg_zoop_mass", "tot_zoop_mass")], by=Zoop0[,c("year4", "daynum","sampledate", "lakeid")], FUN=sum, na.rm=TRUE)
 
-uLake <- as.character(unique(Zoop0[,"lakeid"]))
-uTax <- as.character(unique(Zoop0[,"taxon"]))
-uYear <- as.character(unique(Zoop0[,"year4"]))
-
-
-
-# # function will be applied to unique lake-taxon combinations
-# datNames=c("density","avg_length","avg_zoop_mass","tot_zoop_mass")
-# countAnnObs <- function(x, datNames){
-# 	cond <- function(x){sum(!is.na(x)&x>0)}
-# 	cFunc <- function(x, dN){
-# 		apply(x[,dN], 2, cond)		
-# 	}
-# 	annO <- ddply(x, "year4", cFunc, dN=datNames)
-# 	# nY <- length(unique(x[,"year4"]))
-# 	# muC <- apply(x[,datNames], 2, cond)/nY
-# 	nC <- apply(annO[,datNames], 2, cond)
-# 	nC
-# 	# avg number of dates per year the metrics were observed (for this lake-taxon combo)
-# 	# number of years the metrics were observed at least once
-# 	
-# }
-# nLake.annMax <- function(x, datNames, groupName="taxon", yearsNeeded=15){
-# 	cAO <- ddply(Zoop0, .variables=c("lakeid","taxon"), countAnnObs, datNames=c("density","avg_length","avg_zoop_mass","tot_zoop_mass"))
-# 	lI <- apply(cAO[,datNames], 2, function(x){x>yearsNeeded})
-# 	
-# } 
+	# ================================
+	# = Save unique zooplankton taxa =
+	# ================================
+# zTax <- data.frame("taxon"=as.character(unique(Zoop0[,"taxon"])))
+# write.table(zTax, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/uniqueZoopTaxa.txt", sep="\t", row.names=FALSE)
 
 
-# for(i in 1:datNames){
-# 	
-# }
-# test[lI[,1],]
+Zoop_ByTax <- aggregate(Zoop0[,Zoop_Cats], by=Zoop0[,Zoop_Factrs], FUN=Zoop_Sum)
+
+zTax.id <- read.table("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/fatZoopTaxa.txt", sep="\t", header=TRUE, colClasses="character")
+zTax.id[zTax.id==""] <- NA
+subPhy <- !is.na(zTax.id[,"subphylum"])
+zTax.id[subPhy,"phylum"] <- zTax.id[subPhy,"subphylum"]
+
+subClass <- !is.na(zTax.id[,"subclass"])
+zTax.id[subClass,"class"] <- zTax.id[subClass1,"class"]
 
 
-Zoop_Tax <- aggregate(Zoop0[,c("density", "avg_length", "avg_zoop_mass", "tot_zoop_mass")], by=Zoop0[,c("year4", "daynum","sampledate", "taxon", "lakeid")], FUN=sum, na.rm=TRUE)
-# class(Zoop[,"sampledate"]) <- "Date"
 
-zTax <- data.frame("taxon"=as.character(unique(Zoop_Tax[,"taxon"])))
-write.table(zTax, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/uniqueZoopTaxa.txt", sep="\t", row.names=FALSE)
+Zoop_Cats <- c("density", "avg_length", "avg_zoop_mass", "tot_zoop_mass")
+Zoop_Factrs <-  c("year4", "daynum","sampledate", "taxon", "lakeid")
+
+
+
+
+
+
+
+
 
 # ========
 # = Ions =
@@ -325,8 +199,7 @@ IonTypes <- c("cl", "so4", "ca", "mg", "na", "k", "fe", "mn", "cond")
 # nonflag <- names(Ions00)[!is.element(names(Ions00), IonFlags)]
 # Ions0 <- Ions00[,nonflag]
 #I need to take the average for the rep's and stations first
-allna <- function(x){all(is.na(x))}
-Ions_Not_All_NA_Ind <- which(!apply(Ions00[,c("cl", "so4", "ca", "mg", "na", "k", "fe", "mn", "cond")], MARGIN=1, FUN=allna))
+Ions_Not_All_NA_Ind <- which(!apply(Ions00[,c("cl", "so4", "ca", "mg", "na", "k", "fe", "mn", "cond")], MARGIN=1, FUN=function(x){all(is.na(x))}))
 Ions00 <- Ions00[Ions_Not_All_NA_Ind,]
 Ions0 <- aggregate(Ions00[,c("Zmix", "cl", "so4", "ca", "mg", "na", "k", "fe", "mn", "cond")], by=Ions00[,rev(c("lakeid", "year4", "daynum", "sampledate", "depth"))], FUN=mean, na.rm=TRUE)
 
@@ -336,19 +209,18 @@ deemedBad$Ions <- Ions0_clean[[2]]
 
 Ions <- ddply(.data=Ions0, .variables=c("lakeid", "year4", "daynum", "sampledate"), .fun=EpiMean2)
 names(Ions) <- c("lakeid", "year4", "daynum", "sampledate", "depth_ions", "zmix", "cl", "so4", "ca", "mg", "na", "k", "fe", "mn", "cond")
-# class(Ions[,"sampledate"]) <- "Date"
+
+
+
 
 # ==================
 # = Fish Abundance =
 # ==================
-# c("VGN019", "VGN025", "VGN032", "VGN038", "VGN051", "VGN064", "VGN089", "VGN127", "VGN")
-# gsub("[0123456789]", "", c("VGN019", "VGN025", "VGN032", "VGN038", "VGN051", "VGN064", "VGN089", "VGN127", "VGN"))
+# Read in fish abundance data
 Fish000_abun <- read.csv("Fish_Abun_NrtnSrtn.csv")
 Fish000_abun[,"gearid"] <- gsub("[0123456789]", "", Fish000_abun[,"gearid"]) #hell yeah, i learned a new function. (well, how to use reular expressions a bit better)
 Fish000_abun[,"gearid"] <- gsub("(?<=FYKNE)[LD]", "T", Fish000_abun[,"gearid"], perl=TRUE)
-# Fish000_abun[Fish000_abun[,"gearid"]=="CRAYTR","gearid"] <- "MINNOW"
 Fish000_abun[,"spname"] <- gsub(" ", "", Fish000_abun[,"spname"]) #remove white space from species names
-# BsSpecies <- c("GUPPY", "VIRILIS", "RUSTICUS", "PROPINQUUS", "UNIDCHUB", "UNIDDARTER", "UNIDENTIFIED", "UNIDMINNOW", "CRAYFISH", "DARTER", "LARVALFISH")
 BsSpecies <- c("GUPPY", "VIRILIS", "RUSTICUS", "PROPINQUUS", "UNIDENTIFIED", "CRAYFISH", "LARVALFISH")
 Fish00_abun <- subset(Fish000_abun, !is.element(spname, BsSpecies))
 
@@ -362,90 +234,35 @@ names(TotFish0_abun) <- c("gearid", "lakeid", "year4", "total_caught", "cpue_Sum
 # =============
 # = Fish Size =
 # =============
+# Read in Fish size data
 Fish000_size <- read.csv("Fish_LenWei_NrtnSrtn.csv")
 Fish000_size[,"spname"] <- gsub(" ", "", Fish000_size[,"spname"]) 
 Fish000_size[,"gearid"] <- gsub("[0123456789]", "", Fish000_size[,"gearid"])
 Fish000_size[,"gearid"] <- gsub("(?<=FYKNE)[LD]", "T", Fish000_size[,"gearid"], perl=TRUE)
-# Fish000_size[Fish000_size[,"gearid"]=="CRAYTR","gearid"] <- "MINNOW"
 Fish00_size <- subset(Fish000_size, !is.element(spname, BsSpecies))
 FixPike <- which(is.element(Fish00_size[,"spname"], "SILVERPIKE"))
 Fish00_size[FixPike, "spname"] <- "NORTHERNPIKE"
 
-SizSumry <- function(x){
-	Nfish <- length(x[,"spname"])
-	
-	exLeng <- x[,"length"][!is.na(x[,"length"])]
-	exWei <- x[,"weight"][!is.na(x[,"weight"])]
-	
-	Nleng <- length(exLeng)
-	Nwei <- length(exWei)
-	
-	if(Nleng==0){
-		maxLeng <- NA
-		minLeng <- NA
-	}else{
-		maxLeng <- max(exLeng, na.rm=TRUE)
-		minLeng <- min(exLeng, na.rm=TRUE)
-	}
-	
-	if(Nwei==0){
-		maxWei <- NA
-		minWei <- NA
-	}else{
-		maxWei <- max(exWei, na.rm=TRUE)
-		minWei <- min(exWei, na.rm=TRUE)
-	}
-	
-	sumryLeng <- c("mean_"=mean(exLeng, na.rm=TRUE), "max_"=maxLeng, "min_"=minLeng) #summary(x[,"length"])[[c(1,4,6)]]
-	names(sumryLeng) <- paste(names(sumryLeng), "Leng", sep="")
-	sumryWei <- c("mean_"=mean(exWei, na.rm=TRUE), "max_"=maxWei, "min_"=minWei) #summary(x[,"weight"])[[c(1,4,6)]]
-	names(sumryWei) <- paste(names(sumryWei), "Wei", sep="")
-	
-	x2names <- c(names(sumryLeng), names(sumryWei), "Nfish", "Nleng", "Nwei")
-	# x2 <- matrix(data=c(sumryLeng, sumryWei, Nfish, Nleng, Nwei), nrow=1, dimnames=list(NULL, x2names))
-	x2 <- c(sumryLeng, sumryWei, Nfish, Nleng, Nwei)
-	names(x2) <- x2names
-	return(x2)
-}
+# Summarize fish size data
 Fish0_size <- ddply(Fish00_size, .variables=c("lakeid", "year4", "spname"), .fun=SizSumry)
-# names(Fish0_size) <- c("lakeid", "year4", "sampledate", "spname", "sampletype", "depth", "rep", "indid", "weight", "sex", "fishpart", "spseq")
-
 TotFish0_size <- ddply(Fish00_size, .variables=c("lakeid", "year4", "spname", "gearid"), .fun=SizSumry)
-# names(TotFish0_size) <- c("lakeid", "year4", "sampledate", "gearid", "spname", "sampletype", "depth", "rep", "indid", "weight", "sex", "fishpart", "spseq")
 
 # ================
 # = Combine Fish =
 # ================
 Fish <- merge(Fish0_abun, Fish0_size, all=TRUE, by=c("lakeid", "year4", "spname"))
 Fish[,"SumWei"] <- Fish[,"Nwei"]*Fish[,"mean_Wei"]
-# Fish[,"SumLeng"] <- Fish[,"Nleng"]*Fish[,"mean_Leng"]
 Fish[,"cpue3_WeiEff"] <- Fish[,"SumWei"]/Fish[,"effort"]
-# Fish[,"cpue4_LengEff"] <- (Fish[,"Nleng"]*Fish[,"mean_Leng"])/Fish[,"effort"]
 
-# TotFish <- merge(TotFish0_abun, TotFish0_size, all=TRUE, by=c("lakeid", "year4", "spname"))
 TotFish0 <- merge(Fish00_abun, TotFish0_size, all=TRUE, by=c("lakeid", "year4", "spname", "gearid"))
 TotFish0[,"SumWei"] <- TotFish0[,"Nwei"]*TotFish0[,"mean_Wei"]
-# TotFish[,"SumLeng"] <- TotFish[,"Nleng"]*TotFish[,"mean_Leng"]
 TotFish0[,"cpue3_WeiEff"] <- TotFish0[,"SumWei"]/TotFish0[,"effort"]
-# TotFish[,"cpue4_LengEff"] <- (TotFish[,"Nleng"]*TotFish[,"mean_Leng"])/TotFish[,"effort"]
 
 # ==================================
 # = Write table with unique spname =
 # ==================================
 # fTax <- data.frame("spname"=as.character(unique(TotFish0[,"spname"])))
 
-
-# The average CPUE (# individuals) for each gear type in each lake
-# lg_cpue1 <- aggregate(TotFish[,"cpue1_Sum"], by=list(TotFish[,"gearid"], TotFish[,"lakeid"]), mean, na.rm=TRUE)
-# names(lg_cpue1) <- c("gearid", "lakeid", "muCPUE")
-# for(i in 1:length(uLake)){
-# 	tind <- lg_cpue1[,"lakeid"] == uLake[i]
-# 	lg_cpue1
-# }
-
-# The average CPUE (mass) for each gear type in each lake
-# lg_cpue3 <- aggregate(TotFish[,"cpue3_WeiEff"], by=list(TotFish[,"gearid"], TotFish[,"lakeid"]), mean, na.rm=TRUE)
-# names(lg_cpue3) <- c("gearid", "lakeid", "muCPUE")
 
 # ===========================================================
 # = Look for gears that were consistently used in each lake =
@@ -459,22 +276,19 @@ TotFish0[,"cpue3_WeiEff"] <- TotFish0[,"SumWei"]/TotFish0[,"effort"]
 # HOWEVER, if a particular taxon is only ever seen in Method B, then 
 # in a year when Method A is missing, the time series for this particular taxon is still unbroken.
 
-# gear lake year
-gly <- TotFish0[,c("lakeid","year4", "gearid")]
-uLake <- unique(TotFish0[,"lakeid"])
-gl.obs <- paste(TotFish0[,"gearid"], TotFish0[,"lakeid"], sep="")
-gl.valid <- c()
+
+gly <- TotFish0[,c("lakeid","year4", "gearid")] # gear lake year
+uLake <- unique(TotFish0[,"lakeid"]) # unique lakes
+gl.obs <- paste(TotFish0[,"gearid"], TotFish0[,"lakeid"], sep="") # observed combinations of gear-lake-year (non-unique)
+gl.valid <- c() # to store valid gear-lake combinations (gear observed for > 96% of years in that lake)
 for(i in 1:length(uLake)){
-	gearYear <- table(gly[gly[,1]==uLake[i],2], gly[gly[,1]==uLake[i],3])
-	gy <- gearYear[!apply(gearYear, 1, function(x)all(x==0 | !is.finite(x))),]
-	# print(gy)
-	# print(as.character(uLake[i]))
-	propPres <- apply(gy, 2, function(x){sum(x>0)/length(x)})
-	# print(apply(gy, 2, function(x){sum(x>0)/length(x)}))
-	validNames <- names(propPres)[propPres>0.96]
-	gl.valid <- c(gl.valid, paste(validNames, as.character(uLake[i]), sep=""))
+	gearYear <- table(gly[gly[,1]==uLake[i],2], gly[gly[,1]==uLake[i],3]) # count up the number of observations of each gear type in each year for this lake
+	gy <- gearYear[!apply(gearYear, 1, function(x)all(x==0 | !is.finite(x))),] # for this lake, which years didn't have any sampling (no gears observed)
+	propPres <- apply(gy, 2, function(x){sum(x>0)/length(x)}) # discounting years w/ no sampling, what proportion of years was each gear type used in this lake
+	validNames <- names(propPres)[propPres>0.96] # if a gear type was used in > 96% of years in this lake, it is a valid gear for this lake
+	gl.valid <- c(gl.valid, paste(validNames, as.character(uLake[i]), sep="")) # store & accumulate the valid gear-lake combinations
 }
-TotFish <- TotFish0[gl.obs%in%gl.valid,]
+TotFish <- TotFish0[gl.obs%in%gl.valid,] # remove any rows that used a non-valid gear type for that lake
 
 
 
@@ -516,8 +330,6 @@ Fish_ByGearSpec <- merge(Fish_ByGearSpec, lygs.miss, all=TRUE)
 # = Sum Fish metrics across gear types =
 # ======================================
 Fish_BySpec <- aggregate(Fish_ByGearSpec[, FishCats1], by=Fish_ByGearSpec[,c("spname", "year4", "lakeid")], sum, na.rm=FALSE)
-
-
 
 
 # ==============================================
@@ -635,16 +447,12 @@ deemedBad$Secchi <- Secchi0_clean[[2]]
 
 
 
-
-
-
 # ====================
 # = Light Extinction =
 # ====================
 LiExt000 <- read.csv("LightExt_Nrtn.csv", colClasses=c("factor", "integer", "integer", "factor", "numeric", "character", "character")) #WHY ONLY NORTHERN?
 LightNoFlag <- which(LiExt000[, "lightext_flag"]=="")
 LiExt <- LiExt000[LightNoFlag, c("lakeid", "year4", "daynum", "sampledate", "extcoef")]
-
 
 
 
@@ -658,62 +466,16 @@ OpenDuration_Nrtn <- as.integer(difftime(as.Date(Ice_Nrtn00[,"datelastopen"]), a
 Ice_Nrtn0 <- data.frame(Ice_Nrtn00[,c("lakeid", "sta", "year")], "DaysOpen"=OpenDuration_Nrtn)
 Ice_Nrtn <- aggregate(Ice_Nrtn0[,"DaysOpen"], by=Ice_Nrtn0[,rev(c("lakeid", "year"))], mean, na.rm=TRUE)
 names(Ice_Nrtn) <- c("year4", "lakeid", "DaysOpen")
-# Ice_Nrtn00[order(format.Date(as.Date(Ice_Nrtn00[,"datefirstopen"]), format="%j")),]
 
 Ice_Srtn000 <- read.csv("Ice_Srtn.csv")
-FixIceDates <- function(x){
-	# x <- x[complete.cases(x),]
-	on_NA <- is.na(x[,"iceon"])
-	x_on_NoNA <- x[!on_NA, c("lakeid", "season", "iceon", "ice_on", "ice_duration", "year4")]
-	off_NA <- is.na(x[,"iceoff"])
-	x_off_NoNA <- x[!off_NA, c("lakeid", "season", "iceoff", "ice_off", "ice_duration", "year4")]
-	
-	take4 <- function(x) paste(x[1:4], collapse="")
-	IceOn_Year <- as.integer(unlist(lapply(strsplit(as.character(x_on_NoNA[,"iceon"]), split=""), take4)))
-	IceOff_Year <- as.integer(unlist(lapply(strsplit(as.character(x_off_NoNA[,"iceoff"]), split=""), take4)))
-	
-	ensure2_month <- function(x){sprintf("%02s", x[1])}
-	ensure2_day <- function(x){sprintf("%02s", x[2])}
-	IceOn_Month <- unlist(lapply(strsplit(as.character(x_on_NoNA[,"ice_on"]), split="/"), ensure2_month))
-	IceOn_Day <- unlist(lapply(strsplit(as.character(x_on_NoNA[,"ice_on"]), split="/"), ensure2_day))
-	IceOff_Month <- unlist(lapply(strsplit(as.character(x_off_NoNA[,"ice_off"]), split="/"), ensure2_month))
-	IceOff_Day <- unlist(lapply(strsplit(as.character(x_off_NoNA[,"ice_off"]), split="/"), ensure2_day))
-	
-	Ice_On <- paste(IceOn_Year, IceOn_Month, IceOn_Day, sep="-")
-	Ice_Off <- paste(IceOff_Year, IceOff_Month, IceOff_Day, sep="-")
-	
-	x_on_NoNA[,"ice_on"] <- Ice_On
-	x_off_NoNA[,"ice_off"] <- Ice_Off
-	x2 <- merge(x_on_NoNA, x_off_NoNA, all=TRUE)
-	return(x2[,c("lakeid", "year4", "ice_on", "ice_off", "ice_duration")])
-}
+
+# Fix ice dates
 Ice_Srtn00 <- FixIceDates(Ice_Srtn000)
 
-
-CalcDaysOpen <- function(x){
-	# OffYears <- format.Date(as.Date(x[,"ice_off"]), "%Y")
-	OnYears <- x[,"year4"]
-	for(i in 1:length(OnYears)){
-		OffRow <- which(x[,"year4"]==(OnYears[i]-1))
-		if(length(OffRow)==0 || is.na(x[OffRow,"ice_off"]) || is.na(x[i,"ice_on"])){ #should maybe set to length(OffRow)!=1 || ...x
-			x[i,"DaysOpen"] <- NA
-		}else{
-			x[i,"DaysOpen"] <- as.integer(difftime(as.Date(x[i, "ice_on"]), as.Date(x[OffRow,"ice_off"])))
-		}
-	}
-	return(x)
-}
+# Calculate the days open
 Ice_Srtn0 <- ddply(.data=Ice_Srtn00, .variables="lakeid", .fun=CalcDaysOpen)
 Ice_Srtn <- Ice_Srtn0[,c("year4", "lakeid", "DaysOpen")]
 Ice <- rbind(Ice_Nrtn, Ice_Srtn)
-
-# Ice_Srtn0[order(format.Date(as.Date(Ice_Srtn0[,"ice_off"]), format="%j")),]
-
-# IceModel <- lm(DaysOpen~I(year4-1850)*lakeid, data=Ice)
-# summary(IceModel)
-# plot(Ice[,"year4"], Ice[,"DaysOpen"], col=Ice[,"lakeid"])
-
-
 
 
 
@@ -732,7 +494,6 @@ Ions[,"sampledate"] <- as.Date(Ions[,"sampledate"])
 Chem[,"sampledate"] <- as.Date(Chem[,"sampledate"])
 Chl[,"sampledate"] <- as.Date(Chl[,"sampledate"])
 Zoop[,"sampledate"] <- as.Date(Zoop[,"sampledate"])
-
 
 Data_X <- list("Met"=Met, "Ice"=Ice, "LakLev"=LakLev, "Zmix"=Zmix, "LiExt"=LiExt, "Secchi"=Secchi, "Phys"=Phys, "Ions"=Ions, "Chem"=Chem, "Chl"=Chl, "Zoop"=Zoop, "Fish"=Fish_GearSpec, "Fish_ByGear"=Fish_ByGear, "Fish_BySpec"=Fish_BySpec)
 
