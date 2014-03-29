@@ -153,32 +153,99 @@ Zoop0n <- Zoop000n[,c("lakeid", "year4", "daynum", "sampledate", "taxon", "densi
 	# = Merge northern and southern zoops =
 	# =====================================
 Zoop0 <- merge(Zoop0n, Zoop0s, all=TRUE) #this contains zooplankton information broken down by taxon
+names(Zoop0)[names(Zoop0)=="taxon"] <- "spname"
 
 	# ================================
 	# = Save unique zooplankton taxa =
 	# ================================
-# zTax <- data.frame("taxon"=as.character(unique(Zoop0[,"taxon"])))
+# zTax <- data.frame("spname"=as.character(unique(Zoop0[,"spname"])))
 # write.table(zTax, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/uniqueZoopTaxa.txt", sep="\t", row.names=FALSE)
 
+	# ==============================
+	# = Sum zooplankton by 'taxon' =
+	# ==============================
+Zoop_Cats <- c("density", "avg_length", "avg_zoop_mass", "tot_zoop_mass")
+Zoop_Factrs <-  c("year4", "daynum","sampledate", "spname", "lakeid")
+Zoop_ByTax0 <- aggregate(Zoop0[,Zoop_Cats], by=Zoop0[,Zoop_Factrs], FUN=Zoop_Sum)
 
-Zoop_ByTax <- aggregate(Zoop0[,Zoop_Cats], by=Zoop0[,Zoop_Factrs], FUN=Zoop_Sum)
 
+	# =========================================
+	# = Read in zoop taxonomic classification =
+	# =========================================
 zTax.id <- read.table("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/fatZoopTaxa.txt", sep="\t", header=TRUE, colClasses="character")
 zTax.id[zTax.id==""] <- NA
+
 subPhy <- !is.na(zTax.id[,"subphylum"])
 zTax.id[subPhy,"phylum"] <- zTax.id[subPhy,"subphylum"]
 
 subClass <- !is.na(zTax.id[,"subclass"])
-zTax.id[subClass,"class"] <- zTax.id[subClass1,"class"]
+zTax.id[subClass,"class"] <- zTax.id[subClass,"subclass"]
+
+subSpec <- !is.na(zTax.id[,"species"])
+zTax.id[subSpec,"species"] <- paste(substring(zTax.id[subSpec,"genus"], 1, 1), zTax.id[subSpec,"species"], sep=".")
 
 
+	# ===============================================
+	# = Combine taxonomic classification w/ metrics =
+	# ===============================================
+Zoop_ByTax <- cbind(Zoop_ByTax0, "Phylum"=NA, "Class"=NA, "Order"=NA, "Family"=NA, "Genus"=NA, "Species"=NA)
+for(i in 1:nrow(fTax.id)){
+	ind <- Zoop_ByTax[,"spname"] == zTax.id[i,"spname"]
+	Zoop_ByTax[ind, c("Phylum", "Class", "Order","Family","Genus","Species")] <- zTax.id[i,c("phylum", "class", "order", "family", "genus", "species")]
+}
 
-Zoop_Cats <- c("density", "avg_length", "avg_zoop_mass", "tot_zoop_mass")
-Zoop_Factrs <-  c("year4", "daynum","sampledate", "taxon", "lakeid")
+	# ====================================================
+	# = Create Zoop time series for each taxonomic level =
+	# ====================================================
+zf <- Zoop_Factrs[Zoop_Factrs!="spname"]
+zcf <- c(zf, Zoop_Cats)
+	
+# Zoop Species	
+zoop.species0 <- Zoop_ByTax[!is.na(Zoop_ByTax[,"Species"]), c(zcf, "Species")]
+zoop.species0s <- aggregate(zoop.species0[,Zoop_Cats], by=zoop.species0[,c("Species", zf)], Zoop_Sum) # don't need this step for species level
+names(zoop.species0s)[names(zoop.species0s)=="Species"] <- "taxID"
+zoop.species <- cbind(zoop.species0s, "taxLvl"="Species")
+
+# Zoop Genus	
+zoop.genus0 <- Zoop_ByTax[!is.na(Zoop_ByTax[,"Genus"]), c(zcf, "Genus")]
+zoop.genus0s <- aggregate(zoop.genus0[,Zoop_Cats], by=zoop.genus0[,c("Genus", zf)], Zoop_Sum)
+names(zoop.genus0s)[names(zoop.genus0s)=="Genus"] <- "taxID"
+zoop.genus <- cbind(zoop.genus0s, "taxLvl"="Genus")
+
+# Zoop Family	
+zoop.family0 <- Zoop_ByTax[!is.na(Zoop_ByTax[,"Family"]), c(zcf, "Family")]
+zoop.family0s <- aggregate(zoop.family0[,Zoop_Cats], by=zoop.family0[,c("Family", zf)], Zoop_Sum)
+names(zoop.family0s)[names(zoop.family0s)=="Family"] <- "taxID"
+zoop.family <- cbind(zoop.family0s, "taxLvl"="Family")
+
+# Zoop Order	
+zoop.order0 <- Zoop_ByTax[!is.na(Zoop_ByTax[,"Order"]), c(zcf, "Order")]
+zoop.order0s <- aggregate(zoop.order0[,Zoop_Cats], by=zoop.order0[,c("Order", zf)], Zoop_Sum)
+names(zoop.order0s)[names(zoop.order0s)=="Order"] <- "taxID"
+zoop.order <- cbind(zoop.order0s, "taxLvl"="Order")
+
+# Zoop Class	
+zoop.class0 <- Zoop_ByTax[!is.na(Zoop_ByTax[,"Class"]), c(zcf, "Class")]
+zoop.class0s <- aggregate(zoop.class0[,Zoop_Cats], by=zoop.class0[,c("Class", zf)], Zoop_Sum)
+names(zoop.class0s)[names(zoop.class0s)=="Class"] <- "taxID"
+zoop.class <- cbind(zoop.class0s, "taxLvl"="Class")
+
+# Zoop Phylum	
+zoop.phylum0 <- Zoop_ByTax[!is.na(Zoop_ByTax[,"Phylum"]), c(zcf, "Phylum")]
+zoop.phylum0s <- aggregate(zoop.phylum0[,Zoop_Cats], by=zoop.phylum0[,c("Phylum", zf)], Zoop_Sum)
+names(zoop.phylum0s)[names(zoop.phylum0s)=="Phylum"] <- "taxID"
+zoop.phylum <- cbind(zoop.phylum0s, "taxLvl"="Phylum")
+
+# Zoop All	
+zoop.all0 <- Zoop_ByTax[!is.na(Zoop_ByTax[,"spname"]), c(zcf, "spname")]
+zoop.all0s <- aggregate(zoop.all0[,Zoop_Cats], by=zoop.all0[,zf], Zoop_Sum)
+zoop.all <- cbind("taxID"="Zoop", zoop.all0s, "taxLvl"="All")
 
 
-
-
+	# ==================================================================
+	# = Combine zooplankton time series (were separated by tax. level) =
+	# ==================================================================
+Zoop <- rbind(zoop.all, zoop.phylum, zoop.class, zoop.order, zoop.family, zoop.genus, zoop.species)
 
 
 

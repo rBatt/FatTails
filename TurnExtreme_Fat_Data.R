@@ -251,6 +251,8 @@ AllZoop <- c("density", "avg_zoop_mass", "tot_zoop_mass", "avg_length")
 Zoop_Ext <- Zoop_Ext[order(Zoop_Ext[,"lakeid"], Zoop_Ext[,"year4"], Zoop_Ext[,"daynum"]),]
 Zoop_Ext <- subset(Zoop_Ext, lakeid!="FI" & lakeid!="WI")
 Zoop_Ext <- Inf2NA(aggregate(Zoop_Ext[,AllZoop], by=Zoop_Ext[,c("year4", "lakeid")], FUN=max, na.rm=TRUE))
+
+#
 Zoop_Ext[,"avg_length"] <- replace(Zoop_Ext[,"avg_length"], list=which(Zoop_Ext[,"avg_length"]==0), NA)
 Zoop_Ext[,"avg_zoop_mass"] <- replace(Zoop_Ext[,"avg_zoop_mass"], list=which(is.na(Zoop_Ext[,"avg_length"])), NA) #using the average length here b/c that's how mass is calc'd
 Zoop_Ext[,"tot_zoop_mass"] <- replace(Zoop_Ext[,"tot_zoop_mass"], list=which(is.na(Zoop_Ext[,"avg_length"])), NA)
