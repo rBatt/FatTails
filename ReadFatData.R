@@ -52,8 +52,11 @@ Phys0[,"Mixing"] <- as.numeric(is.na(zd))
 Phys0[,"InMetaHypo"] <- as.numeric(Phys0[,"InEpi"]+Phys0[,"Mixing"] == 0)
 Phys0 <- subset(Phys0, InMetaHypo==0, select=c("lakeid", "year4", "daynum", "sampledate", "depth", "wtemp", "o2", "o2sat", "deck", "light", "frlight", "Zmix", "InEpi", "Mixing"))
 
-
-Phys <- ddply(.data=Phys0, .variables=c("lakeid", "year4", "daynum", "sampledate"), .fun=EpiMean)
+AllPhys <- c( "wtemp", "o2", "o2sat", "frlight", "Zmix")
+Phys1 <- ddply(.data=Phys0, .variables=c("lakeid", "year4", "daynum", "sampledate"), .fun=EpiMean)
+Phys1 <- Phys1[,c("lakeid", "year4", "daynum", AllPhys)]
+Phys <- cbind("taxID"="Phys", "taxLvl"="Community", reshape2(Phys1, varying=AllPhys, times=AllPhys, v.names="Data", direction="long"))
+names(Phys) <- c("taxID", "taxLvl", "location", "year4", "daynum", "variable", "Data")
 
 
 # =======================
@@ -87,8 +90,11 @@ Chl00 <- merge(Phys[,c("lakeid", "year4", "daynum", "sampledate", "Zmix")], Chl0
 Chl00 <- Chl00[, c("lakeid", "year4", "daynum", "sampledate", "Zmix", "rep", "depth", "chlor", "sta", "phaeo")]
 Chl00 <- aggregate(Chl00[,c("Zmix", "chlor", "phaeo")], by=Chl00[,rev(c("lakeid", "year4", "daynum", "sampledate", "depth"))], FUN=mean, na.rm=TRUE)
 Chl0 <- ddply(.data=Chl00, .variables=c("lakeid", "year4", "daynum", "sampledate"), .fun=EpiMean2)
-Chl <- Chl0[,c("lakeid", "year4", "daynum", "sampledate", "depth", "chlor", "phaeo")]
-names(Chl) <- c("lakeid", "year4", "daynum", "sampledate", "depth_chlor", "chlor", "phaeo")
+Chl1 <- Chl0[,c("lakeid", "year4", "daynum", "chlor")]
+names(Chl1) <- c("location", "year4", "daynum", "chlor")
+
+Chl <- cbind("taxID"="Chl", "taxLvl"="Community", reshape2(Chl1, varying="chlor", times="chlor", v.name="Data", direction="long"))
+names(Chl) <- c("taxID", "taxLvl", "location", "year4", "daynum", "variable", "Data")
 
 # ====================
 # = Zooplankton Data =
@@ -164,7 +170,8 @@ names(Zoop0)[names(Zoop0)=="taxon"] <- "spname"
 	# ==============================
 	# = Sum zooplankton by 'taxon' =
 	# ==============================
-Zoop_Cats <- c("density", "avg_length", "avg_zoop_mass", "tot_zoop_mass")
+# Zoop_Cats <- c("density", "avg_length", "avg_zoop_mass", "tot_zoop_mass")
+Zoop_Cats <- c("density", "tot_zoop_mass")
 Zoop_Factrs <-  c("year4", "daynum","sampledate", "spname", "lakeid")
 Zoop_ByTax0 <- aggregate(Zoop0[,Zoop_Cats], by=Zoop0[,Zoop_Factrs], FUN=Zoop_Sum)
 
@@ -239,15 +246,16 @@ zoop.phylum <- cbind(zoop.phylum0s, "taxLvl"="Phylum")
 # Zoop All	
 zoop.all0 <- Zoop_ByTax[!is.na(Zoop_ByTax[,"spname"]), c(zcf, "spname")]
 zoop.all0s <- aggregate(zoop.all0[,Zoop_Cats], by=zoop.all0[,zf], Zoop_Sum)
-zoop.all <- cbind("taxID"="Zoop", zoop.all0s, "taxLvl"="All")
+zoop.all <- cbind("taxID"="Zoop", zoop.all0s, "taxLvl"="Community")
 
 
 	# ==================================================================
 	# = Combine zooplankton time series (were separated by tax. level) =
 	# ==================================================================
-Zoop <- rbind(zoop.all, zoop.phylum, zoop.class, zoop.order, zoop.family, zoop.genus, zoop.species)
-
-
+Zoop1 <- rbind(zoop.all, zoop.phylum, zoop.class, zoop.order, zoop.family, zoop.genus, zoop.species)
+Zoop <- reshape2(Zoop1, varying=Zoop_Cats, times=Zoop_Cats, v.name="Data", direction="long")
+names(Zoop) <- c("taxID", "year4", "daynum", "sampledate", "location", "taxLvl", "variable", "Data")
+Zoop <- Zoop[,names(Zoop)[names(Zoop)!="sampledate"]]
 
 
 
@@ -258,6 +266,7 @@ Ions000 <- flag2NA(read.csv("Ions_NrtnSrtn.csv")) #where are there so many rows 
 Ions00 <- merge(Ions000, Zmix, all.x=TRUE)
 # Ions00 <- merge(x=Ions00, y=Phys[,c("lakeid", "year4", "daynum", "sampledate", "Zmix")], all.x=TRUE) #I'm not sure why I merged with zmix and with Phys[].  I'll leave it for now, but I might need to do one or the other.
 IonTypes <- c("cl", "so4", "ca", "mg", "na", "k", "fe", "mn", "cond")
+
 # IonFlags <- paste("flag", IonTypes, sep="")
 # for(i in 1:length(IonFlags)){
 # 	badions <- which(Ions00[,IonFlags[i]]!="")
@@ -270,13 +279,24 @@ Ions_Not_All_NA_Ind <- which(!apply(Ions00[,c("cl", "so4", "ca", "mg", "na", "k"
 Ions00 <- Ions00[Ions_Not_All_NA_Ind,]
 Ions0 <- aggregate(Ions00[,c("Zmix", "cl", "so4", "ca", "mg", "na", "k", "fe", "mn", "cond")], by=Ions00[,rev(c("lakeid", "year4", "daynum", "sampledate", "depth"))], FUN=mean, na.rm=TRUE)
 
-Ions0_clean <- manClean(Ions0, IonTypes)
-Ions0 <- Ions0_clean[[1]]
-deemedBad$Ions <- Ions0_clean[[2]]
+# Ions0_clean <- manClean(Ions0, IonTypes)
+# Ions0 <- Ions0_clean[[1]]
+# deemedBad$Ions <- Ions0_clean[[2]]
+# 
+# deemedBad.ions <- which(is.na(Ions0_clean[[1]]))
+# write.table(deemedBad.ions, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/deemedBad.ions.txt", sep="\t", row.names=FALSE)
 
-Ions <- ddply(.data=Ions0, .variables=c("lakeid", "year4", "daynum", "sampledate"), .fun=EpiMean2)
-names(Ions) <- c("lakeid", "year4", "daynum", "sampledate", "depth_ions", "zmix", "cl", "so4", "ca", "mg", "na", "k", "fe", "mn", "cond")
+deemedBad.ions0 <- read.table("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/deemedBad.ions.txt", sep="\t", header=TRUE)[,]
+deemedBad.ions <- arrayInd(deemedBad.ions0, dim(Ions0), dimnames(Ions0))
+Ions0[deemedBad.ions] <- NA
 
+Ions1 <- ddply(.data=Ions0, .variables=c("lakeid", "year4", "daynum", "sampledate"), .fun=EpiMean2)
+names(Ions1) <- c("location", "year4", "daynum", "sampledate", "depth_ions", "zmix", "cl", "so4", "ca", "mg", "na", "k", "fe", "mn", "cond")
+Ions1 <- Ions1[,c("location","year4","daynum", IonTypes)]
+
+AllIons <- IonTypes
+Ions <- cbind("taxID"="Ions", "taxLvl"="Community", reshape2(Ions1, varying=AllIons, times=AllIons, v.name="Data", direction="long"))
+names(Ions) <- c("taxID", "taxLvl", "location", "year4", "daynum", "variable", "Data")
 
 
 
@@ -317,9 +337,9 @@ TotFish0_size <- ddply(Fish00_size, .variables=c("lakeid", "year4", "spname", "g
 # ================
 # = Combine Fish =
 # ================
-Fish <- merge(Fish0_abun, Fish0_size, all=TRUE, by=c("lakeid", "year4", "spname"))
-Fish[,"SumWei"] <- Fish[,"Nwei"]*Fish[,"mean_Wei"]
-Fish[,"cpue3_WeiEff"] <- Fish[,"SumWei"]/Fish[,"effort"]
+# Fish <- merge(Fish0_abun, Fish0_size, all=TRUE, by=c("lakeid", "year4", "spname"))
+# Fish[,"SumWei"] <- Fish[,"Nwei"]*Fish[,"mean_Wei"]
+# Fish[,"cpue3_WeiEff"] <- Fish[,"SumWei"]/Fish[,"effort"]
 
 TotFish0 <- merge(Fish00_abun, TotFish0_size, all=TRUE, by=c("lakeid", "year4", "spname", "gearid"))
 TotFish0[,"SumWei"] <- TotFish0[,"Nwei"]*TotFish0[,"mean_Wei"]
@@ -362,8 +382,10 @@ TotFish <- TotFish0[gl.obs%in%gl.valid,] # remove any rows that used a non-valid
 # ===========================================
 # = Aggregate spgyl dups, subset to metrics =
 # ===========================================
-FishCats1 <- c("total_caught", "cpue1_Sum", "cpue3_WeiEff")
-Fish_ByGearSpec <- aggregate(TotFish[, FishCats1], by=TotFish[,c("spname", "gearid", "year4", "lakeid")], sum, na.rm=TRUE)
+# FishCats1 <- c("total_caught", "cpue1_Sum", "cpue3_WeiEff")
+FishCats1 <- c("cpue1_Sum", "cpue3_WeiEff")
+FishFactrs <- c("spname", "gearid", "year4", "lakeid")
+Fish_ByGearSpec <- aggregate(TotFish[, FishCats1], by=TotFish[,FishFactrs], sum, na.rm=TRUE)
 
 
 # ========================================================================
@@ -396,7 +418,7 @@ Fish_ByGearSpec <- merge(Fish_ByGearSpec, lygs.miss, all=TRUE)
 # ======================================
 # = Sum Fish metrics across gear types =
 # ======================================
-Fish_BySpec <- aggregate(Fish_ByGearSpec[, FishCats1], by=Fish_ByGearSpec[,c("spname", "year4", "lakeid")], sum, na.rm=FALSE)
+Fish_BySpec0 <- aggregate(Fish_ByGearSpec[, FishCats1], by=Fish_ByGearSpec[,c("spname", "year4", "lakeid")], sum, na.rm=FALSE)
 
 
 # ==============================================
@@ -405,13 +427,59 @@ Fish_BySpec <- aggregate(Fish_ByGearSpec[, FishCats1], by=Fish_ByGearSpec[,c("sp
 fTax.id <- read.table(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/fatFishTaxa.txt", sep="\t", header=TRUE, colClasses="character")
 fTax.id[fTax.id==""] <- NA
 
-Fish_BySpec <- cbind(Fish_BySpec, "Order"=NA, "Family"=NA, "Genus"=NA, "Species"=NA)
+fsubSpec <- !is.na(fTax.id[,"species"])
+fTax.id[fsubSpec,"species"] <- paste(substring(fTax.id[fsubSpec,"genus"], 1, 1), fTax.id[fsubSpec,"species"], sep=".")
+
+Fish_BySpec <- cbind(Fish_BySpec0, "Order"=NA, "Family"=NA, "Genus"=NA, "Species"=NA)
 for(i in 1:nrow(fTax.id)){
 	ind <- Fish_BySpec[,"spname"] == fTax.id[i,"spname"]
 	Fish_BySpec[ind, c("Order","Family","Genus","Species")] <- fTax.id[i,c("order", "family", "genus", "species")]
 }
 
 
+
+# =================================================
+# = Create time series for each tax level of fish =
+# =================================================
+ff <- FishFactrs[!FishFactrs%in%c("spname","gearid")]
+fcf <- c(FishCats1, ff) # fish categories and factors
+
+# Fish Species	
+fish.species0 <- Fish_BySpec[!is.na(Fish_BySpec[,"Species"]), c(fcf, "Species")]
+fish.species0s <- aggregate(fish.species0[,FishCats1], by=fish.species0[,c("Species", ff)], sum) # don't need this step for species level
+names(fish.species0s)[names(fish.species0s)=="Species"] <- "taxID"
+fish.species <- cbind(fish.species0s, "taxLvl"="Species")
+
+# Fish Genus	
+fish.genus0 <- Fish_BySpec[!is.na(Fish_BySpec[,"Genus"]), c(fcf, "Genus")]
+fish.genus0s <- aggregate(fish.genus0[,FishCats1], by=fish.genus0[,c("Genus", ff)], sum)
+names(fish.genus0s)[names(fish.genus0s)=="Genus"] <- "taxID"
+fish.genus <- cbind(fish.genus0s, "taxLvl"="Genus")
+
+# Fish Family	
+fish.family0 <- Fish_BySpec[!is.na(Fish_BySpec[,"Family"]), c(fcf, "Family")]
+fish.family0s <- aggregate(fish.family0[,FishCats1], by=fish.family0[,c("Family", ff)], sum)
+names(fish.family0s)[names(fish.family0s)=="Family"] <- "taxID"
+fish.family <- cbind(fish.family0s, "taxLvl"="Family")
+
+# Fish Order	
+fish.order0 <- Fish_BySpec[!is.na(Fish_BySpec[,"Order"]), c(fcf, "Order")]
+fish.order0s <- aggregate(fish.order0[,FishCats1], by=fish.order0[,c("Order", ff)], sum)
+names(fish.order0s)[names(fish.order0s)=="Order"] <- "taxID"
+fish.order <- cbind(fish.order0s, "taxLvl"="Order")
+
+
+# Fish All	
+fish.all0 <- Fish_BySpec[!is.na(Fish_BySpec[,"spname"]), c(fcf, "spname")]
+fish.all0s <- aggregate(fish.all0[,FishCats1], by=fish.all0[,ff], sum)
+fish.all <- cbind("taxID"="Fish", fish.all0s, "taxLvl"="Community")
+
+# =============================================
+# = Combine fish time series into long format =
+# =============================================
+Fish0 <- rbind(fish.all, fish.order, fish.family, fish.genus, fish.species)
+Fish <- cbind("daynum"=1, reshape2(Fish0, varying=FishCats1, times=FishCats1, v.name="Data", direction="long"))
+names(Fish) <- c("daynum", "taxID", "year4", "location", "taxLvl", "variable", "Data")
 
 
 
@@ -437,15 +505,25 @@ Met00_Min[,"location"] <- "Minocqua"
 Met00_Min[,"snow_cm"] <- Met00_Min[,"snow_cm"]/10 #the minocqua snowfall was originally in mm
 
 Met0 <- merge(Met00_Mad, Met00_Min, all=TRUE)
-Met <- Met0[,c("location", "year4", "daynum", "sampledate", "max_air_temp", "min_air_temp", "ave_air_temp", "range_air_temp", "precip_mm", "snow_cm", "snow_depth_cm", "data_status")]
-# class(Met[,4]) <- "Date"
+Met1 <- Met0[,c("location", "year4", "daynum", "sampledate", "max_air_temp", "min_air_temp", "ave_air_temp", "range_air_temp", "precip_mm", "snow_cm", "snow_depth_cm", "data_status")]
 
+Met_Factrs <- c("location", "year4", "daynum")
+Met_Cats <- c("min_air_temp", "max_air_temp", "range_air_temp", "precip_mm", "snow_cm")
+Met1 <- Met1[,c(Met_Factrs, Met_Cats)]
+
+Met <- cbind("taxID"="Meteorological", "taxLvl"="Community", reshape2(Met1, varying=Met_Cats, times=Met_Cats, v.name="Data", direction="long"))
+names(Met) <- c("taxID", "taxLvl", "location", "year4", "daynum", "variable", "Data")
+
+
+# cbind("daynum"=1, reshape2(Fish0, varying=FishCats1, times=FishCats1, v.name="Data", direction="long"))
 # ==============
 # = Lake Level =
 # ==============
 LakLev000 <- read.csv("LakeLevel_Nrtn.csv") # WHY ONLY NORTHERN?; level is in "meters above sea level"
-LakLev <- LakLev000[,c("lakeid", "year4", "daynum", "sampledate", "llevel_elevation")]
-names(LakLev) <- c("lakeid", "year4", "daynum", "sampledate", "LakeLevel")
+LakLev1 <- LakLev000[,c("lakeid", "year4", "daynum", "llevel_elevation")]
+names(LakLev1) <- c("location", "year4", "daynum", "LakeLevel")
+LakLev <- cbind("taxID"="LakeLevel","taxLvl"="Community", reshape2(LakLev1, varying="LakeLevel", times="LakeLevel", v.name="Data", direction="long"))
+names(LakLev) <- c("taxID", "taxLvl","location","year4","daynum","variable","Data")
 
 
 # ======================
@@ -472,32 +550,47 @@ ChemTypes <- c("depth", "ph", "phair", "alk", "dic", "tic", "doc", "toc", "no3no
 
 #using flag2NA instead of my super fail method (which basically removed the first length(ChemTypes) rows...) reduced the number of negative values from 481 to 416... hmm.
 
-
+AllChem <- c("ph","alk","dic", "tic", "doc", "toc", "no3no2","nh4", "totnuf", "totpuf", "drsif", "brsiuf", "tpm")
 #average reps, stations
-Chem00 <- aggregate(Chem000[,c("ph", "phair", "alk", "dic", "tic", "doc", "toc", "no3no2", "no2", "nh4", "totnf", "totnuf", "totpf", "totpuf", "drsif", "brsif", "brsiuf", "tpm", "no3no2_sloh", "nh4_sloh", "kjdl_n_sloh", "totpuf_sloh", "drp_sloh", "drsif_sloh")], by=Chem000[, rev(c("lakeid", "year4", "daynum", "sampledate", "depth"))], FUN=mean, na.rm=TRUE)
+Chem00 <- aggregate(Chem000[,AllChem], by=Chem000[, rev(c("lakeid", "year4", "daynum", "sampledate", "depth"))], FUN=mean, na.rm=TRUE)
 Chem0 <- merge(Chem00, Zmix, by=c("lakeid", "year4", "daynum"), all.x=TRUE)
 # Chem0 <- merge(x=Chem00, y=Phys[,c("lakeid", "year4", "daynum", "sampledate", "Zmix")], by=c("lakeid", "year4", "daynum", "sampledate"), all.x=TRUE) #there is one more NA in Zmix when merging with Phys than when merging w/ Zmix.  Don't know why.
-Chem_Not_All_NA_Ind <- which(!apply(Chem0[,c("ph", "phair", "alk", "dic", "tic", "doc", "toc", "no3no2", "no2", "nh4", "totnf", "totnuf", "totpf", "totpuf", "drsif", "brsif", "brsiuf", "tpm", "no3no2_sloh", "nh4_sloh", "kjdl_n_sloh", "totpuf_sloh", "drp_sloh", "drsif_sloh")], MARGIN=1, FUN=allna))
+Chem_Not_All_NA_Ind <- which(!apply(Chem0[,AllChem], MARGIN=1, FUN=allna))
 Chem0 <- Chem0[Chem_Not_All_NA_Ind,]
 
-Chem0_clean <- manClean(Chem0, ChemTypes)
-Chem0 <- Chem0_clean[[1]]
-deemedBad$Chem <- Chem0_clean[[2]]
-
-Chem0_clean2 <- manClean(Chem0, ChemTypes)
-Chem0 <- Chem0_clean2[[1]]
-deemedBad$Chem2 <- Chem0_clean2[[2]]
-
-Chem0_clean3 <- manClean(Chem0, ChemTypes)
-Chem0 <- Chem0_clean3[[1]]
-deemedBad$Chem3 <- Chem0_clean3[[2]]
+# Chem0_clean <- manClean(Chem0, ChemTypes)
+# Chem0 <- Chem0_clean[[1]]
+# # which(is.na(Chem0_clean[[1]]), arr.ind=TRUE)
+# deemedBad$Chem <- Chem0_clean[[2]]
+# 
+# Chem0_clean2 <- manClean(Chem0, ChemTypes)
+# Chem0 <- Chem0_clean2[[1]]
+# # which(is.na(Chem0_clean2[[1]]), arr.ind=TRUE)
+# deemedBad$Chem2 <- Chem0_clean2[[2]]
+# 
+# Chem0_clean3 <- manClean(Chem0, ChemTypes)
+# Chem0 <- Chem0_clean3[[1]]
+# # which(is.na(Chem0_clean3[[1]]), arr.ind=TRUE)
+# deemedBad$Chem3 <- Chem0_clean3[[2]]
+# 
+# deemedBad.chem <- which(is.na(Chem0_clean3[[1]]))
+# write.table(deemedBad.chem, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/deemedBad.chem.txt", sep="\t", row.names=FALSE)
+# deemedBad.chem <- which(is.na(Chem0_clean3[[1]]))
+deemedBad.chem0 <- read.table("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/deemedBad.chem.txt", sep="\t", header=TRUE)[,]
+deemedBad.chem <- arrayInd(deemedBad.chem0, dim(Chem0), dimnames(Chem0))
+Chem0[deemedBad.chem] <- NA
 
 
 #average epilimnion
-Chem <- ddply(Chem0, .variables=c("lakeid", "year4", "daynum", "sampledate"), .fun=EpiMean2)
-names(Chem) <- c("lakeid", "year4", "daynum", "sampledate", names(Chem0)[!is.element(names(Chem0), c("lakeid", "year4", "daynum", "sampledate"))])
-names(Chem)[5] <- "depth_chem"
-# class(Chem[,4]) <- "Date"
+Chem1 <- ddply(Chem0, .variables=c("lakeid", "year4", "daynum", "sampledate"), .fun=EpiMean2)
+names(Chem1) <- c("lakeid", "year4", "daynum", "sampledate", names(Chem0)[!is.element(names(Chem0), c("lakeid", "year4", "daynum", "sampledate"))])
+names(Chem1)[5] <- "depth_chem"
+
+Chem1 <- Chem1[,c("lakeid", "year4", "daynum", AllChem)]
+Chem <- cbind("taxID"="Chem", "taxLvl"="Community", reshape2(Chem1, varying=AllChem, times=AllChem, v.names="Data", direction="long"))
+names(Chem) <- c("taxID", "taxLvl", "location", "year4", "daynum", "variable", "Data")
+
+
 
 # ==========
 # = Secchi =
@@ -507,11 +600,13 @@ Secchi00 <- aggregate(Secchi000[,c("secnview", "waveht", "cloud", "ice")], by=Se
 Sec_notNA <- which(!is.na(Secchi00[,"secnview"]))
 Secchi0 <- Secchi00[Sec_notNA, c("lakeid", "year4", "daynum", "sampledate", "secnview", "waveht", "cloud", "ice")]
 names(Secchi0) <- c("lakeid", "year4", "daynum", "sampledate", "Secchi", "waveht_secchi", "cloud_secchi", "ice_secchi")
-Secchi0_clean <- manClean(Secchi0, c("Secchi"))
-Secchi <- Secchi0_clean[[1]]
-deemedBad$Secchi <- Secchi0_clean[[2]]
+# Secchi0_clean <- manClean(Secchi0, c("Secchi"))
+# Secchi <- Secchi0_clean[[1]]
+# deemedBad$Secchi <- Secchi0_clean[[2]]
 
-
+Secchi0 <- Secchi0[,c("lakeid", "year4", "daynum", "Secchi")]
+Secchi <- cbind("taxID"="Secchi", "taxLvl"="Community", reshape2(Secchi0, varying="Secchi", times="Secchi", v.names="Data", direction="long"))
+names(Secchi) <- c("taxID", "taxLvl", "location", "year4", "daynum", "variable", "Data")
 
 
 # ====================
@@ -519,9 +614,9 @@ deemedBad$Secchi <- Secchi0_clean[[2]]
 # ====================
 LiExt000 <- read.csv("LightExt_Nrtn.csv", colClasses=c("factor", "integer", "integer", "factor", "numeric", "character", "character")) #WHY ONLY NORTHERN?
 LightNoFlag <- which(LiExt000[, "lightext_flag"]=="")
-LiExt <- LiExt000[LightNoFlag, c("lakeid", "year4", "daynum", "sampledate", "extcoef")]
-
-
+LiExt1 <- LiExt000[LightNoFlag, c("lakeid", "year4", "daynum", "extcoef")]
+LiExt <- cbind("taxID"="extcoef", "taxLvl"="Community", reshape2(LiExt1, varying="extcoef", times="extcoef", v.names="Data", direction="long"))
+names(LiExt) <- c("taxID", "taxLvl", "location", "year4", "daynum", "variable", "Data")
 
 
 # =======
@@ -542,27 +637,31 @@ Ice_Srtn00 <- FixIceDates(Ice_Srtn000)
 # Calculate the days open
 Ice_Srtn0 <- ddply(.data=Ice_Srtn00, .variables="lakeid", .fun=CalcDaysOpen)
 Ice_Srtn <- Ice_Srtn0[,c("year4", "lakeid", "DaysOpen")]
-Ice <- rbind(Ice_Nrtn, Ice_Srtn)
+Ice1 <- rbind(Ice_Nrtn, Ice_Srtn)
+Ice <- cbind("taxID"="Ice", "taxLvl"="Community","daynum"=1, reshape2(Ice1, varying="DaysOpen", times="DaysOpen", v.names="Data", direction="long"))
+names(Ice) <- c("taxID", "taxLvl", "daynum", "year4", "location", "variable", "Data")
 
 
+
+test <- rbind(Met, Phys, Ice, LakLev, LiExt, Secchi, Ions, Chem, Chl, Zoop, Fish)
 
 
 # =============================================
 # = Export data for Organization into extrema =
 # =============================================
-Met[,"sampledate"] <- as.Date(Met[,"sampledate"])
-LakLev[,"sampledate"] <- as.Date(LakLev[,"sampledate"])
-Zmix[,"sampledate"] <- as.Date(format.Date(as.POSIXct(paste(Zmix[,"year4"], sprintf("%03d",Zmix[,"daynum"]), sep="-"), format="%Y-%j"), format="%Y-%m-%d"))
-LiExt[,"sampledate"] <- as.Date(LiExt[,"sampledate"])
-Secchi[,"sampledate"] <- as.Date(Secchi[,"sampledate"])
-Phys[,"sampledate"] <- as.Date(Phys[,"sampledate"])
-names(Phys)[5] <- "depth_phys"
-Ions[,"sampledate"] <- as.Date(Ions[,"sampledate"])
-Chem[,"sampledate"] <- as.Date(Chem[,"sampledate"])
-Chl[,"sampledate"] <- as.Date(Chl[,"sampledate"])
-Zoop[,"sampledate"] <- as.Date(Zoop[,"sampledate"])
+# Met[,"sampledate"] <- as.Date(Met[,"sampledate"])
+# LakLev[,"sampledate"] <- as.Date(LakLev[,"sampledate"])
+# Zmix[,"sampledate"] <- as.Date(format.Date(as.POSIXct(paste(Zmix[,"year4"], sprintf("%03d",Zmix[,"daynum"]), sep="-"), format="%Y-%j"), format="%Y-%m-%d"))
+# LiExt[,"sampledate"] <- as.Date(LiExt[,"sampledate"])
+# Secchi[,"sampledate"] <- as.Date(Secchi[,"sampledate"])
+# Phys[,"sampledate"] <- as.Date(Phys[,"sampledate"])
+# names(Phys)[5] <- "depth_phys"
+# Ions[,"sampledate"] <- as.Date(Ions[,"sampledate"])
+# Chem[,"sampledate"] <- as.Date(Chem[,"sampledate"])
+# Chl[,"sampledate"] <- as.Date(Chl[,"sampledate"])
+# Zoop[,"sampledate"] <- as.Date(Zoop[,"sampledate"])
+# 
+# Data_X <- list("Met"=Met, "Ice"=Ice, "LakLev"=LakLev, "Zmix"=Zmix, "LiExt"=LiExt, "Secchi"=Secchi, "Phys"=Phys, "Ions"=Ions, "Chem"=Chem, "Chl"=Chl, "Zoop"=Zoop, "Fish"=Fish_GearSpec, "Fish_ByGear"=Fish_ByGear, "Fish_BySpec"=Fish_BySpec)
 
-Data_X <- list("Met"=Met, "Ice"=Ice, "LakLev"=LakLev, "Zmix"=Zmix, "LiExt"=LiExt, "Secchi"=Secchi, "Phys"=Phys, "Ions"=Ions, "Chem"=Chem, "Chl"=Chl, "Zoop"=Zoop, "Fish"=Fish_GearSpec, "Fish_ByGear"=Fish_ByGear, "Fish_BySpec"=Fish_BySpec)
-
-save(Data_X, file="/Data/OrganizedFatData_Read_Fat_Data.RData")
+# save(Data_X, file="/Data/OrganizedFatData_Read_Fat_Data.RData")
 

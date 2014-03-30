@@ -9,7 +9,7 @@
 rm(list=ls())
 graphics.off()
 setwd("/Users/battrd/Documents/School&Work/WiscResearch/FatTails")
-load("/Data/All_Params_TurnExtreme_Fat_Data.RData")
+load("Data/All_Params_TurnExtreme_Fat_Data.RData")
 source("ARMAFunctions.R")
 library("plyr")
 

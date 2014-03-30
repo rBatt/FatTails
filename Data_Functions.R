@@ -1,4 +1,14 @@
 
+# ===========================
+# = My version of reshape() =
+# ===========================
+reshape2 <- function(...){
+	a <- reshape(...)
+	row.names(a) <- NULL
+	a <- a[,!names(a)=="id"]
+	a
+}
+
 
 # ================================================
 # = Sum w/ removing NA's, except when all are NA =
@@ -149,6 +159,7 @@ manClean <- function(x, varCols){
 					plotCols <- rgb(t(col2rgb("blue")), alpha=40, maxColorValue=255) #if the necessary columns for determining epi or not are missing, color blue
 				}
 				plot(tdat, main=paste(tvar, tlake), pch=21, bg=plotCols)
+				abline(h=0)
 				bad <- identify(tdat)
 				if(length(bad)>0){
 					x2 <- c(x2, paste(tlake, tvar, x[x[,"lakeid"]==tlake,tvar][bad]))
