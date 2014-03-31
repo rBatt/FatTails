@@ -16,4 +16,5 @@
 
 # Ignore big data file
 FatTailsDataX.txt
-
+FatTailsDataFull.txt
+FatTailsDataMax.txt

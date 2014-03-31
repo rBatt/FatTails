@@ -173,15 +173,39 @@ PeakCycle <- function(Data, SearchFrac=0.028){
 # ==============================
 Inf2NA <- function(x) {x[which(x==-Inf | x==Inf, arr.ind=TRUE)] <- NA; x}
 
-Stationary <- function(x, coluY, coluX){
-	tx <- 0:(nrow(x)-1)
-	x2 <- x[,coluX]
-	Reg <- lm(x[,coluY]~tx*x2)
-	xd <- residuals(Reg) #+ mean(x[,coluY])
+# Stationary <- function(x, coluY, coluX){
+# 	tx <- 0:(nrow(x)-1)
+# 	x2 <- x[,coluX]
+# 	Reg <- lm(x[,coluY]~tx*x2)
+# 	xd <- residuals(Reg) #+ mean(x[,coluY])
+# 	
+# 	return(xd)
+# 	
+# }
+
+Stationary <- function(x){
+	if(is.null(dim(x))){
+		x1 <- 0:(length(x)-1)
+		y1 <- x
+	}else{
+		if(dim(x)[2]!=2){stop("dim of x must be 2, or x must be 1 dimensional")}
+		x1 <- x[,1] - min(x[,1], na.rm=TRUE)
+		y1 <- x[,2]
+	}
 	
-	return(xd)
+	if(sum(!is.na(y1))<5){return(x)}
+	res <- as.vector(residuals(lm(y1~x1, na.action=na.exclude))) + sum(y1, na.rm=TRUE)/length(y1)
 	
+	if(!is.null(dim(x))){
+		x[,2] <- res
+		return(x)
+	}else{
+		return(cbind(x1, res))
+	}
 }
+
+
+
 
 
 Stationary2 <- function(x, coluY, coluX){
@@ -249,6 +273,7 @@ lvl2 <- function(x, thresh=1.2){
 	x <- Stationary2(x) + mean(x, na.rm=TRUE)
 	thresh*max(x, na.rm=TRUE)
 }
+
 reshape2 <- function(...){
 	a <- reshape(...)
 	row.names(a) <- NULL
@@ -368,6 +393,16 @@ lnormTime <- function(x, Level=1){
 # ==========================
 # = The GEV Wrapper for Me =
 # ==========================
+GEV <- function(x){
+	tryCatch(
+		{
+			qdat <- x[,"Data"][!is.na(x[,"Data"])]
+			gev.fit(qdat)$mle[c("mu_0","sig_0","sh_0")]
+		}, 
+		error=function(cond)rep(NA,3)
+	)
+}
+
 calcGEV <- function(nameVarbl, datCols=NULL, fitBy=NULL, fitForm=NULL, MUl=NULL, SIGl=NULL, SHl=NULL){
 	if(is.null(fitBy)&is.null(fitForm) || !is.null(fitBy)&!is.null(fitForm)){stop("One & only one of fitBy and fitForm should be NULL")}
 	if(is.null(datCols)){datCols <- get(paste("All",nameVarbl,sep=""))}
@@ -495,5 +530,30 @@ stableTime <- function(lvl, a, nExts, TS_Duration){ #Added _v4
 # x= rnorm(100)
 # stableTime(3, a=stable.fit(x), nExts=100, TS_Duration=100)
 
+lvl_return <- function(x, level, returnFull=FALSE){ # New version to calculate return time (equiv to level 2)
+	lvl0 <- x[,"level"] #as.numeric(x[paste("Level",level, "_residual", sep="")])
+	a0 <- as.numeric(x[c("mu_0","sig_0","sh_0")])
+	nExts0 <- as.numeric(x["N"])
+	TS_Duration0 <- as.numeric(x["Duration"])
+	result <- lvlX_ReturnTime(lvl=lvl0, a=a0, nExts=nExts0, TS_Duration=TS_Duration0)
+	if(returnFull){
+		cbind(x, "Level2_time"=result)
+	}else{
+		result
+	}
+	
+}
 
+
+calc.level <- function(x, thresh=1.1){
+	# calculate the number of observations,
+	# the duration of the time series
+	# and the level 2 return level
+	noNA <- !is.na(x[,"Data"])
+	N <- sum(noNA)
+	Dur <- diff(range(x[noNA,"year4"]))+1
+	luse <- max(x[,"Data"], na.rm=TRUE)*thresh
+	return(data.frame("N"=N, "Duration"=Dur, "level"=luse))
+		
+}
 
