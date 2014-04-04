@@ -3,14 +3,16 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>TurnExtreme_Fat_Data.R</string>
+	<string>CalcZoopBiomass.R</string>
 	<key>documents</key>
 	<array>
 		<dict>
 			<key>filename</key>
 			<string>CalcZoopBiomass.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-31T00:12:40Z</date>
+			<date>2014-03-31T19:06:44Z</date>
+			<key>selected</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -62,11 +64,15 @@
 		</dict>
 		<dict>
 			<key>filename</key>
+			<string>fatPlots.R</string>
+			<key>lastUsed</key>
+			<date>2014-03-31T19:06:44Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
 			<string>TurnExtreme_Fat_Data.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-31T00:12:42Z</date>
-			<key>selected</key>
-			<true/>
+			<date>2014-03-31T16:47:32Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -84,7 +90,7 @@
 			<key>filename</key>
 			<string>fatPlot_Functions.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-31T00:00:32Z</date>
+			<date>2014-03-31T16:44:30Z</date>
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
@@ -126,14 +132,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>10</integer>
-				<key>line</key>
 				<integer>0</integer>
+				<key>line</key>
+				<integer>31</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>7</integer>
+			<integer>29</integer>
 		</dict>
 		<key>Data_Functions.R</key>
 		<dict>
@@ -226,14 +232,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>85</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>184</integer>
+				<integer>165</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>158</integer>
+			<integer>52</integer>
 		</dict>
 		<key>fatARMA_Figures.R</key>
 		<dict>
@@ -284,30 +290,28 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>43</integer>
+				<integer>4</integer>
 				<key>line</key>
-				<integer>34</integer>
+				<integer>40</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>14</integer>
-			<key>selectFrom</key>
+			<integer>23</integer>
+		</dict>
+		<key>fatPlots.R</key>
+		<dict>
+			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>38</integer>
+				<integer>64</integer>
 				<key>line</key>
-				<integer>34</integer>
+				<integer>45</integer>
 			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>43</integer>
-				<key>line</key>
-				<integer>34</integer>
-			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>26</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
@@ -316,6 +320,7 @@
 		<string>Data_Functions.R</string>
 		<string>CalcZoopBiomass.R</string>
 		<string>TurnExtreme_Fat_Data.R</string>
+		<string>fatPlots.R</string>
 		<string>fatPlot_Functions.R</string>
 		<string>FatTails_Functions.R</string>
 		<string>ARMAFunctions.R</string>
@@ -327,6 +332,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{-0, 558}, {1761, 860}}</string>
+	<string>{{10, 334}, {1186, 544}}</string>
 </dict>
 </plist>

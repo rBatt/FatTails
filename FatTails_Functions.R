@@ -296,98 +296,27 @@ convNeg <- function(x){ #changing in _v8 (09-Dec-2013) to also change 0's to NA
 	}
 }
 
-lvlmean <- function(x, Log=FALSE){
-	if(sum(!is.na(x))<3){return(NA)}
-	x <- Stationary2(x) + mean(x, na.rm=TRUE)
-	if(Log){
-		x <- Stationary2(x) + mean(x, na.rm=TRUE)
-		cx <- convNeg(x)
-		lx <- log(cx)
-		mx <- mean(lx, na.rm=TRUE) #note that this line was returning NA in cases where x contained 0's; this has now been fixed via update to convNeg (_v8)
-		return(mx)
+musd <- function(x){
+	if(!is.null(dim(x))){
+		x <- x[,"Data"]
 	}
-	mean(x, na.rm=TRUE)
+	px <- x>0
+	lmu <- mean(log(x[px]), na.rm=TRUE)
+	lsd <- sd(log(x[px]), na.rm=TRUE)
+	nmu <- mean(x, na.rm=TRUE)
+	nsd <- sd(x, na.rm=TRUE)
+	data.frame("logMean"=lmu, "logSd"=lsd, "mean"=nmu, "sd"=nsd)
+	
 }
 
-lvlsd <- function(x, Log=FALSE){
-	if(sum(!is.na(x))<3){return(NA)}
-	x <- Stationary2(x) + mean(x, na.rm=TRUE)
-	if(Log){
-		x <- Stationary2(x) + mean(x, na.rm=TRUE)
-		cx <- convNeg(x)
-		lx <- log(cx)
-		sx <- sd(lx, na.rm=TRUE)
-		return(sx)
-	}
-	sd(x, na.rm=TRUE)
+normTime <- function(x, Level=2){
+	RetQ <- pnorm(x[,"level"], x[,"mean"], x[,"sd"])
+	data.frame("Level2_normTime"=1/((1-RetQ)*(x[,"N"]/x[,"Duration"])))
 }
 
-lvlObs <- function(x){
-	sum(!is.na(x))
-}
-
-lvl <- function(x, fitby, variables, lvl2Thresh=1.2){
-	# stopifnot(is.list(fitby))
-	if(!is.null(fitby)){
-		one0 <- aggregate(x[,variables], by=list("fitBy"=x[,fitby]), FUN=lvl1)
-		two0 <- aggregate(x[,variables], by=list("fitBy"=x[,fitby]), FUN=lvl2, thresh=lvl2Thresh)
-		mean0 <- aggregate(x[,variables], by=list("fitBy"=x[,fitby]), FUN=lvlmean)
-		sd0 <- aggregate(x[,variables], by=list("fitBy"=x[,fitby]), FUN=lvlsd)
-		obs0 <- aggregate(x[,variables], by=list("fitBy"=x[,fitby]), FUN=lvlObs)
-		lmean0 <- aggregate(x[,variables], by=list("fitBy"=x[,fitby]), FUN=lvlmean, Log=TRUE)
-		lsd0 <- aggregate(x[,variables], by=list("fitBy"=x[,fitby]), FUN=lvlsd, Log=TRUE)
-	}else{
-		one0 <- data.frame(lvl1(x[,variables])); names(one0) <- variables
-		two0 <- data.frame(lvl2(x[,variables])); names(two0) <- variables
-		mean0 <- data.frame(lvlmean(x[,variables])); names(mean0) <- variables
-		sd0 <- data.frame(lvlsd(x[,variables])); names(sd0) <- variables
-		obs0 <- data.frame(lvlObs(x[,variables])); names(obs0) <- variables
-		lmean0 <- data.frame(lvlmean(x[,variables], Log=TRUE)); names(lmean0) <- variables
-		lsd0 <- data.frame(lvlsd(x[,variables], Log=TRUE)); names(lsd0) <- variables
-
-	}
-	if(length(variables)==1 & !is.null(fitby)){
-		names(one0)[2] <- variables
-		names(two0)[2] <- variables
-		names(mean0)[2] <- variables
-		names(sd0)[2] <- variables
-		names(obs0)[2] <- variables
-		names(lmean0)[2] <- variables
-		names(lsd0)[2] <- variables
-	}
-	
-	one <- reshape2(one0, varying=variables, direction="long", v.names="Level1", times=variables, timevar="Variable")
-	two <- reshape2(two0, varying=variables, direction="long", v.names="Level2", times=variables, timevar="Variable")
-	mean1 <- reshape2(mean0, varying=variables, direction="long", v.names="mean", times=variables, timevar="Variable")
-	sd1 <- reshape2(sd0, varying=variables, direction="long", v.names="sd", times=variables, timevar="Variable")
-	obs1 <- reshape2(obs0, varying=variables, direction="long", v.names="nObs", times=variables, timevar="Variable")
-	lmean1 <- reshape2(lmean0, varying=variables, direction="long", v.names="logMean", times=variables, timevar="Variable")
-	lsd1 <- reshape2(lsd0, varying=variables, direction="long", v.names="logSd", times=variables, timevar="Variable")
-	
-	# rlvl <- merge(merge(one, two), merge(mean1, sd1))
-	m1 <- merge(one, two)
-	m2 <- merge(mean1, sd1)
-	m3 <- merge(lmean1, lsd1)
-	
-	ma <- merge(m1, m2)
-	mb <- merge(m3, obs1)
-	
-	rlvl <- merge(ma, mb)
-	# rlvl <- merge_all(one, two, mean1, sd1, obs1, by=c(""))
-	
-	return(rlvl)
-}
-
-normTime <- function(x, Level=1){
-	lvlX <- paste("Level",Level,sep="")
-	RetQ <- pnorm(x[,lvlX], x[,"mean"], x[,"sd"])
-	1/((1-RetQ)*(x[,"nObs"]/x[,"Duration"]))
-}
-
-lnormTime <- function(x, Level=1){
-	lvlX <- paste("Level",Level,sep="")
-	RetQ <- plnorm(x[,lvlX], x[,"logMean"], x[,"logSd"])
-	1/((1-RetQ)*(x[,"nObs"]/x[,"Duration"]))
+lnormTime <- function(x, Level=2){
+	RetQ <- plnorm(x[,"level"], x[,"logMean"], x[,"logSd"])
+	data.frame("Level2_logNormTime"=1/((1-RetQ)*(x[,"N"]/x[,"Duration"])))
 }
 
 # ==========================
@@ -397,9 +326,12 @@ GEV <- function(x){
 	tryCatch(
 		{
 			qdat <- x[,"Data"][!is.na(x[,"Data"])]
-			gev.fit(qdat)$mle[c("mu_0","sig_0","sh_0")]
+			qgev <- gev.fit(qdat)
+			c(qgev$mle[c("mu_0","sig_0","sh_0")], "se"=qgev$se["sh_0"])
+			# rvs <- c(qgev$mle[c("mu_0","sig_0","sh_0")], "se"=qgev$se["sh_0"])
+			# data.frame("mu_0"=rvs[1], "sig_0"=rvs[2], "sh_0"=rvs[3], "se.sh_0"=revs[4])
 		}, 
-		error=function(cond)rep(NA,3)
+		error=function(cond)rep(NA,4)
 	)
 }
 
@@ -549,11 +481,17 @@ calc.level <- function(x, thresh=1.1){
 	# calculate the number of observations,
 	# the duration of the time series
 	# and the level 2 return level
-	noNA <- !is.na(x[,"Data"])
+	noNA <- is.finite(x[,"Data"])
 	N <- sum(noNA)
 	Dur <- diff(range(x[noNA,"year4"]))+1
 	luse <- max(x[,"Data"], na.rm=TRUE)*thresh
 	return(data.frame("N"=N, "Duration"=Dur, "level"=luse))
 		
+}
+
+# mu = 1.246274171
+# se = 0.37323413
+fattestSig <- function(mu, se){
+	qnorm(p=0.05, mean=mu, sd=se)
 }
 

@@ -100,7 +100,9 @@ Chl000s <- read.csv("Chla_Srtn.csv")
 Chl000s[,"daynum"] <- as.numeric(as.character(format.Date(Chl000s[,"sampledate"], format="%j")))
 nummean <- function(x){mean(as.numeric(x))}
 Chl000s[,"depth"] <- unlist(lapply(strsplit(as.character(Chl000s[,"depth_range_m"]), split="-"), FUN=nummean))
-BadChlorS <- which(is.element(Chl000s[,"flag_fluor"], c("C", "E", "CE", "EC")) | Chl000s[,"correct_chl_fluor"]<0)
+useUncorr <- Chl000s[,"flag_fluor"]%in%c("C", "CE", "EC")
+Chl000s[useUncorr,"correct_chl_fluor"] <- Chl000s[useUncorr,"uncorrect_chl_fluor"] 
+BadChlorS <- which(is.element(Chl000s[,"flag_fluor"], c("E", "CE", "EC")) | Chl000s[,"correct_chl_fluor"]<0)
 Chl000s[BadChlorS,"correct_chl_fluor"] <- NA
 Chl000s <- Chl000s[,c("lakeid", "year4", "sampledate", "daynum", "depth", "rep", "correct_chl_fluor")]
 names(Chl000s) <- c("lakeid", "year4", "sampledate", "daynum", "depth", "rep", "chlor")

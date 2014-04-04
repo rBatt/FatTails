@@ -30,26 +30,45 @@ threshObs <- 15
 # =======================
 # = Read in time series =
 # =======================
-data.max <- read.table(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/FatTailsDataMax.txt", sep="\t", header=TRUE)
+data.max0 <- read.table(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/FatTailsDataMax.txt", sep="\t", header=TRUE)
+
+
+# =================================
+# = Subset the zoop and fish data =
+# =================================
+rmMass <- !data.max0[,"variable"]%in%c("tot_zoop_mass","cpue3_WeiEff")
+rmHigher <- (!data.max0[,"variable"]%in%c("density","cpue1_Sum")) | (data.max0[,"variable"]%in%c("density","cpue1_Sum") & data.max0[,"taxLvl"]=="Genus")
+data.max <- data.max0[rmMass&rmHigher,]
 
 
 # ===================
 # = make stationary =
 # ===================
-data.stat0 <- ddply(data.max, c("Type","taxLvl","taxID","location","variable"), function(x)Stationary(x[,c("year4","Data")]))
+data.stat00 <- ddply(data.max, c("Type","taxLvl","taxID","location","variable"), function(x)Stationary(x[,c("year4","Data")]))
 
 
 # ============================================
 # = Remove time series with less than 15 obs =
 # ============================================
-data.stat0N <- ddply(data.stat0, c("Type","taxLvl","taxID","location","variable"), function(x)data.frame("N"=nrow(x)))
-data.stat <- merge(data.stat0, data.stat0N, all=TRUE)
-data.stat <- data.stat[data.stat[,"N"]>=threshObs,]
+data.stat0N <- ddply(data.stat00, c("Type","taxLvl","taxID","location","variable"), function(x)data.frame("N"=sum(is.finite(x[,"Data"]))))
+data.stat0 <- merge(data.stat00, data.stat0N, all=TRUE)
+data.stat <- data.stat0[data.stat0[,"N"]>=threshObs,]
+row.names(data.stat) <- NULL
+data.stat[,"taxID"] <- factor(as.character(data.stat[,"taxID"]))
+
 
 # =======================================
 # = Calculate Return level, duration, N =
 # =======================================
 data.stat2 <- Inf2NA(ddply(data.stat, c("Type","taxLvl","taxID","location","variable"), calc.level))
+# data.stat2 <- data.stat2[data.stat2[,"N"]>=threshObs,]
+
+
+# ===================================
+# = Calculate mean sd (and for log) =
+# ===================================
+data.stat3 <- ddply(data.stat, c("Type","taxLvl","taxID","location","variable", "N"), musd)
+data.stat1 <- merge(data.stat2, data.stat3, all=TRUE)
 
 
 # ===========
@@ -63,10 +82,27 @@ data.gev[,"taxLvl"] <- factor(data.gev[,"taxLvl"], levels=c("Community","Phylum"
 # ==========================================
 # = Calculate return times, combine w/ GEV =
 # ==========================================
-data.fat00 <- merge(data.gev, data.stat2, all.x=TRUE)
-data.fat0 <- ddply(data.fat00, c("Type","taxLvl","taxID","location","variable"), lvl_return, returnFull=TRUE)
-data.fat <- data.fat0[!is.na(data.fat0[,"sh_0"]),]
+data.fat00 <- merge(data.gev, data.stat1, all.x=TRUE, all.y=FALSE)
+
+# Return time calculated from GEV
+data.fat01 <- ddply(data.fat00, c("Type","taxLvl","taxID","location","variable"), lvl_return, returnFull=TRUE)
+
+# Calculate times for normal and log-normal
+data.fat02a <- ddply(data.fat00, c("Type","taxLvl","taxID","location","variable"), normTime)
+data.fat02b <- ddply(data.fat00, c("Type","taxLvl","taxID","location","variable"), lnormTime)
+data.fat02 <- merge(data.fat02a, data.fat02b, all=TRUE)
+
+# combine l/norm times w/ gev time
+data.fat03 <- merge(data.fat01, data.fat02, all=TRUE)
+
+
+
+data.fat <- data.fat03[!is.na(data.fat03[,"sh_0"]),]
 row.names(data.fat) <- NULL
+data.fat[,"shape.sig"] = fattestSig(mu=data.fat[,"sh_0"], se=data.fat[,"se.sh_0"])
+
+
+
 
 
 #Split into Bio
@@ -163,48 +199,6 @@ for(i in 1:length(uztax2)){
 	}
 	
 }
-
-# =======================
-# = Some quick plotting =
-# =======================
-# V = "density"
-# D = zoop.gev
-# Stat = "sh_0"
-# taxCol = "Phylum"
-dev.new()
-par(mfrow=c(2,2), mar=c(3,3,0.5,0.5), mgp=c(1.5, 0.4, 0), tcl=-0.25, family="Times", cex=1)
-plotTax(D=zoop.gev, V="density", Stat="sh_0", taxCol="Phylum", legendTitle="# Individuals", ylim=c(-0.5, 1.5))
-ztLab <- c("Spec","Genus","Fam","Ord","Class","Phy","Comm")
-text(1:length(ztLab), par("usr")[3]-0.09, labels=ztLab, pos=1, xpd=TRUE, srt=45)
-mtext(bquote(xi), side=2, line=1.5)
-
-plotTax(D=zoop.gev, V="tot_zoop_mass", Stat="sh_0", taxCol="Phylum", ylim=c(-1.5, 2), legendTitle="Biomass")
-text(1:length(ztLab), par("usr")[3]-0.09, labels=ztLab, pos=1, xpd=TRUE, srt=45)
-mtext(bquote(xi), side=2, line=1.5)
-
-plotTax(D=fish.gev, V="cpue1_Sum", Stat="sh_0", taxCol="Community", legendTitle="# Individuals")
-ftLab <- c("Spec","Genus","Fam","Ord","Comm")
-text(1:length(ftLab), par("usr")[3]-0.09, labels=ftLab, pos=1, xpd=TRUE, srt=45)
-mtext(bquote(xi), side=2, line=1.5)
-
-plotTax(D=fish.gev, V="cpue3_WeiEff", Stat="sh_0", taxCol="Community", legendTitle="Biomass")
-text(1:length(ftLab), par("usr")[3]-0.09, labels=ftLab, pos=1, xpd=TRUE, srt=45)
-mtext(bquote(xi), side=2, line=1.5)
-
-
-dev.new()
-density.gev <- bio.gev[bio.gev[,"variable"]=="density",]
-density.gev[,"taxID"] <- as.character(density.gev[,"taxID"])
-boxplot(sh_0~taxLvl, data=density.gev)
-
-dev.new()
-boxplot(sh_0~taxID, data=density.gev[density.gev[,"taxLvl"]=="Order",])
-
-dev.new()
-bioComm.gev <- bio.gev[bio.gev[,"taxLvl"]=="Community",]
-bioComm.gev[,"taxID"] <- factor(bioComm.gev[,"taxID"])
-boxplot(sh_0~taxID, data=bioComm.gev)
-
 
 
 
