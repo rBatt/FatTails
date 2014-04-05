@@ -1,5 +1,6 @@
 
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
+library("beanplot")
 
 # =======================
 # = Some quick plotting =
@@ -43,8 +44,9 @@ axis(side=1, at=1:4, labels=c("Bio","Chem","Phys","Met"))
 mtext(bquote(xi~~from~~GEV), side=2, line=1.5)
 
 boxplot(log10(Level2_time)~Type, data=data.fat, outline=FALSE, ylab="", xaxt="n", yaxt="n")
-wtLab <- pretty(log10(data.fat[,"Level2_time"]))
-axis(side=2, at=wtLab, labels=10^wtLab)
+wtBase <- pretty(log10(data.fat[,"Level2_time"]))
+wtLab <- parse(text=paste(10,wtBase,sep="^"))
+axis(side=2, at=wtBase, labels=wtLab)
 axis(side=1, at=1:4,labels=c("Bio","Chem","Phys","Met"))
 mtext(bquote(Waiting~Time~(years)), side=2, line=1.5)
 dev.off()
@@ -65,24 +67,68 @@ dev.off()
 
 
 
+# ==============================================
+# = Compare Waiting Times across Distributions =
+# ==============================================
+dTimes <- c("Level2_time","Level2_normTime","Level2_logNormTime")
+cutoff <- 0.35
+boundLog <- data.fat[,"sh_0"]<= -cutoff
+bound <- data.fat[boundLog,]
+fatLog <- data.fat[,"sh_0"] > cutoff
+fat <- data.fat[fatLog,]
+thinLog <- data.fat[,"sh_0"] > -cutoff & data.fat[,"sh_0"] < cutoff #!boundLog & !fatLog
+thin <- data.fat[thinLog,]
 
-dev.new()
+cLine <- rainbow(n=3, v=0.8, s=1)
+cFill <- rgb(t(col2rgb(cLine, alpha=TRUE)), alpha=40, maxColorValue=255)
 
-boxplot(sh_0~taxLvl, data=density.gev)
+# dev.new(width=3.5, height=6)
+png(paste("Figures","compareTimes.png",sep="/"), width=3.5, height=6, units="in", res=300, bg="white")
+par(mfrow=c(3,1), mar=c(0.5, 1.25, 0.25, 0.25), mgp=c(1, 0.3, 0), tcl=-0.3, cex=1, ps=10, family="Times", oma=c(1.5,1,0,0), xpd=T)
+pDens(bound, xaxt="n", xlab="")
+axis(1, labels=FALSE)
+text(8, 0.95, bquote(Bounded~(xi<=-.(cutoff))))
+text(8, c(0.4, 0.5, 0.6), c("GEV", "Normal", "Log-Normal"), col=cLine)
+pDens(thin, xaxt="n", xlab="")
+axis(1, labels=FALSE)
+text(8, 0.95, bquote(Thin~(-.(cutoff)<xi~phantom()<.(cutoff))))
+pDens(fat, xaxt="n", xlab="")
+xat <- axTicks(1)
+xlab <- parse(text=paste(10,xat,sep="^"))
+axis(side=1, at=xat, labels=xlab)
+text(8, 0.95, bquote(Fat~(xi>=.(cutoff))))
+mtext("Waiting Time (years)", side=1, outer=TRUE, line=0.5)
+mtext("Relative Density", side=2, line=0.0, outer=TRUE)
+dev.off()
 
-dev.new()
-boxplot(sh_0~taxID, data=density.gev[density.gev[,"taxLvl"]=="Order",])
 
-dev.new()
+# ================
+# = Try Beanplot =
+# ================
+bLine <- rainbow(n=5, v=0.8, s=1)
+bFill <- rgb(t(col2rgb(bLine, alpha=TRUE)), alpha=40, maxColorValue=255)
+beanCol <- list(c(bFill[1]),
+				c(bFill[2]),
+				c(bFill[3]),
+				c(bFill[4])
+				)
 
-boxplot(sh_0~taxID, data=bioComm.gev)
+# dev.new(width=3.5, height=6)
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/fatBeanXiWaiting.png", res=150, units="in", height=6, width=3.5)
+par(mfrow=c(2,1), mar=c(2,2.5,0.5,0.5), ps=10, cex=1, mgp=c(2, 0.4, 0), tcl=-0.3, family="Times")
+beanplot(sh_0~Type, data=data.fat, ylab="", yaxt="n", xaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5)
+axis(side=2)
+axis(side=1, at=1:4, labels=c("Bio","Chem","Phys","Met"))
+mtext(bquote(xi~~from~~GEV), side=2, line=1.5)
 
-dev.new()
-boxplot(sh_0~Type, data.fat, outline=FALSE, ylab=expression(xi))
+beanplot(log10(Level2_time)~Type, data=data.fat[is.finite(data.fat[,"Level2_time"]),], log="", ylab="", xaxt="n", yaxt="n", border=bLine, col=beanCol, ll=0.01)
+wtBase <- axTicks(2)
+wtLab <- parse(text=paste(10,wtBase,sep="^"))
+axis(side=2, at=wtBase, labels=wtLab)
+axis(side=1, at=1:4,labels=c("Bio","Chem","Phys","Met"))
+mtext(bquote(Waiting~Time~(years)), side=2, line=1.5)
+dev.off()
 
-
-dev.new()
-boxplot(log10(Level2_time)~Type, data.fat, outline=FALSE, ylab=bquote(log[10]*Waiting~Time))
 
 
 

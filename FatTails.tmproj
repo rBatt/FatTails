@@ -3,16 +3,14 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>CalcZoopBiomass.R</string>
+	<string>Data_Functions.R</string>
 	<key>documents</key>
 	<array>
 		<dict>
 			<key>filename</key>
 			<string>CalcZoopBiomass.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-31T19:06:44Z</date>
-			<key>selected</key>
-			<true/>
+			<date>2014-04-05T16:08:25Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -60,7 +58,9 @@
 			<key>filename</key>
 			<string>Data_Functions.R</string>
 			<key>lastUsed</key>
-			<date>2014-03-31T00:12:42Z</date>
+			<date>2014-04-05T16:08:25Z</date>
+			<key>selected</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -127,28 +127,14 @@
 				<integer>706</integer>
 			</dict>
 		</dict>
-		<key>CalcZoopBiomass.R</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>31</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>29</integer>
-		</dict>
 		<key>Data_Functions.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>59</integer>
+				<integer>29</integer>
 				<key>line</key>
-				<integer>138</integer>
+				<integer>2</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -318,7 +304,6 @@
 	<array>
 		<string>ReadFatData.R</string>
 		<string>Data_Functions.R</string>
-		<string>CalcZoopBiomass.R</string>
 		<string>TurnExtreme_Fat_Data.R</string>
 		<string>fatPlots.R</string>
 		<string>fatPlot_Functions.R</string>

@@ -38,35 +38,24 @@ ARMApqREMLfunct <- function(pars, nX, pea, queue){
 
 		B <- diagExtend(p,-1)
 		B[1,1:p] <- b
-		# eigs <- eigen(B)$values
 		eigB <- max(abs(eigen(B)$values))
  
 		if(eigB>=1 | max(abs(a))>10){
-			# print("bad Eig")
-			# flush.console()
 			return(badRes)
 		}
 		## solve for stationary distribution
 		##deal with case of no MA terms separsately
-# ==============
-# = TEST 1 START =
-# ==============
-		if (q > 0){ #LINE 45
-			# A <- array(0,dim=c(k,q))
+
+		if (q > 0){ 
 			A <- matrix(0, nrow=k, ncol=q)
-			# A[1,1:q] <- a[2:(q+1)]
-			A[1,] <- a[-1] # CHANGED
+			A[1,] <- a[-1]
 			if(k > 1){
 				B <- diagExtend(k,-1)
 				B[1,1:p] <- b
 			}else{
 				B <- matrix(b)
 			}
-			
-			# CC <- matrix(c(B, A), ncol=q+k) # CHANGED
-			# otherPart <- matrix(c(rep(0,k*q), diagExtend(q,1)), nrow=k, byrow=TRUE) # CHANGED *then* EDITED (before, nrow=q)
-			# CC <- rbind(CC,otherPart)
-			
+
 			CC <- cbind(B,A)
 			otherPart <- rbind(array(0,dim=c(k,q)), diagExtend(q,1))
 			CC <- rbind(CC,t(otherPart))
@@ -78,32 +67,15 @@ ARMApqREMLfunct <- function(pars, nX, pea, queue){
 			Ve[1,k+1] <- 1
 			Ve[k+1,1] <- 1
 			Ve[k+1,k+1] <- 1
-						
-			# sizeVe <- dim(Ve)
-			# vecVe <- array(Ve,dim=c(sizeVe[1]*sizeVe[2],1))
+
 			vecVe <- matrix(Ve, ncol=1)
-			# vecVe <- c(Ve) # This should work ... always ... # CHANGED
 			C <- solve(diag(1,(k+q)^2) - kronecker(CC,CC))%*%vecVe
-			# C <- array(C,dim=c(k+q,k+q))
 			C <- matrix(C, nrow=k+q)
 			Vstationary <- C[1:k,1:k]
 		}else{
-# ============
-# = TEST 1 END =
-# ============
 
-# ================
-# = TEST 2 START =
-# ================
-		   ##this is parsticular example of issue when p=1
-# ================
-# = TEST 3 START =
-# ================
 			if(p > 1){
 				B <- diagExtend(p,-1)
-				# sizeB <- ncol(B)
-				# B[1,1:sizeB] <- b
-				# B[1,1:p] <- b
 				B[1,] <- b
 			}else{
 				B <- matrix(b)
@@ -112,20 +84,12 @@ ARMApqREMLfunct <- function(pars, nX, pea, queue){
 			Ve <- matrix(0, nrow=p, ncol=p)
 			Ve[1,1] <- 1
 			vecVe <- matrix(Ve, ncol=1)
-# ==============
-# = TEST 3 END =
-# ==============
-	#Test 4 = do not wrap kronecker() in matrix()
-			# C <- solve(diag(1,(p+q)^2) - matrix(kronecker(B,B)))%*%vecVe
+
 			C <- solve(diag(1,(p+q)^2) - kronecker(B,B))%*%vecVe
-	#End test 4
-			# Vstationary <- array(C,dim=c(p+q,p+q))
+
 			Vstationary <- matrix(C, ncol=p+q, nrow=p+q)
 		}
-# ==============
-# = TEST 2 END =
-# ==============
- 
+		
 		## solve for V_T
     
 		##MA component
@@ -137,9 +101,7 @@ ARMApqREMLfunct <- function(pars, nX, pea, queue){
 				AA <- AA + a[i+1]*diagExtend(q+1,-i)
 			}
 			AA <- t(AA)%*%AA
-			# aa <- AA[1,1:ncol(AA)]
 			aa <- AA[1,]
-			# AA <- array(0,dim=c(nObs,nObs))
 			AA <- matrix(0, ncol=nObs, nrow=nObs)
 			for (i in 1:q){ # iterate through MA again
 				AA <- AA + aa[i+1]*diagExtend(nObs,-i)
@@ -174,7 +136,6 @@ ARMApqREMLfunct <- function(pars, nX, pea, queue){
     
 		invV <- solve(V)
     
-		# U <- array(1,dim=c(nObs,1))
 		U <- matrix(1, nrow=nObs, ncol=1)
 		tU <- t(U)
 		uVu <- tU%*%invV%*%U
@@ -191,13 +152,9 @@ ARMApqREMLfunct <- function(pars, nX, pea, queue){
 
 
 		if(abs(Im(LL)) > 10^-6){
-			# print('bad imag')
-			# flush.console()
 			return(badRes)
 		}
 		if(is.na(LL)){
-			# print('missing ll')
-			# flush.console()
 			return(badRes)
 		}
 		
@@ -208,12 +165,19 @@ ARMApqREMLfunct <- function(pars, nX, pea, queue){
 	) # end tryCatch function call
 } ## end ARMApqREMLfunct
 
+
+# ===========================================================================
+# = Place 1's on diagonal, or on superdiagonal 'offset' rows above diagonal =
+# ===========================================================================
 diagExtend <- function(size, offset=0){ 
 	M <- matrix(0, size, size)
 	M[row(M)+offset == col(M)] <- 1
 	return(M)
 }
 
+# ========================
+# = Calculate eigenvalue =
+# ========================
 Eig <- function(b){
 	nb <- length(b)
 	B <- diagExtend(nb,-1)
@@ -223,10 +187,16 @@ Eig <- function(b){
 	return(eigs)
 }
 
+# ====================================
+# = Calculate period from eigenvalue =
+# ====================================
 Period <- function(Eigs){
 	(2*pi)/Im(Eigs)[1]
 }
 
+# ===========================
+# = Calculate corrected AIC =
+# ===========================
 AICc <- function(nll, Kay, N){
 	L <- exp(-nll)
 	AIC <- 2*Kay - 2*log(L)
@@ -235,9 +205,9 @@ AICc <- function(nll, Kay, N){
 }
 
 
-# ====================
-# = Down to business =
-# ====================
+# =============================================================================
+# = Intermediate ARMA fitting function (above ARMApqREMLfunct, below ARMAfit) =
+# =============================================================================
 OptAll <- function(pq, Xs, pMax=3, qMax=3, Method){
 	Pea <- pq[1]
 	Queue <- pq[2]
@@ -283,6 +253,8 @@ OptAll <- function(pq, Xs, pMax=3, qMax=3, Method){
 # = WRAPPER to fit all ARMA (call OptAll) =
 # =========================================
 ARMAfit <- function(X0, dName, pMax=3, qMax=3, Method){
+	if(!library("GenSA", logical.return=TRUE)){stop("install package 'GenSA'")}
+	if(!library("DEoptim", logical.return=TRUE)){stop("install package 'DEoptim'")}
 	X <- X0[,dName]
 	pqO <- as.matrix(expand.grid("P"=1:pMax, "Q"=0:qMax))
 	colnames(pqO) <- NULL
@@ -385,11 +357,6 @@ getSE <- function(fat, data){
 			# eigs <- eigen(B)$values
 			eigB <- max(abs(eigen(B)$values))
 
-			# if(eigB>=1 | max(abs(a))>10){
-			# 	# print("bad Eig")
-			# 	# flush.console()
-			# 	return(badRes)
-			# }
 			## solve for stationary distribution
 			##deal with case of no MA terms separsately
 
@@ -704,14 +671,154 @@ fWeighted <- function(x){
 	}
 }
 
+# ==================================================================================================
+# = Calculate return level for a data frame containing ARMA residuals (labeled as Level2_residual) =
+# ==================================================================================================
 lvl_return_res <- function(x, level=1){ # Called by fatARMA_Summary
 	lvl0 <- as.numeric(x[paste("Level",level, "_residual", sep="")])
 	a0 <- as.numeric(x[c("residual_mu_0","residual_sig_0","residual_sh_0")])
 	nExts0 <- as.numeric(x["N"])
 	TS_Duration0 <- as.numeric(x["Duration"])
 	result <- lvlX_ReturnTime(lvl=lvl0, a=a0, nExts=nExts0, TS_Duration=TS_Duration0)
-	# names(result) <- NULL
-	# row.names(result) <- NULL
 	result
+}
+
+
+
+# ===============================================================
+# = Which element corresponds to a given quantile (probability) =
+# ===============================================================
+which.quantile <- function (x, probs, na.rm = FALSE){
+  if (! na.rm & any (is.na (x)))
+  return (rep (NA_integer_, length (probs)))
+
+  o <- order (x)
+  n <- sum (! is.na (x))
+  o <- o [seq_len (n)]
+
+  nppm <- n * probs - 0.5
+  j <- floor(nppm)
+  h <- ifelse((nppm == j) & ((j%%2L) == 0L), 0, 1)
+  j <- j + h
+
+  j [j == 0] <- 1
+  o[j]
+}
+
+# =======================================================
+# = Modify arima.sim to allow nonstationary simulations =
+# =======================================================
+arima.sim2 <- function (model, n, rand.gen = rnorm, innov = rand.gen(n, ...), 
+    n.start = NA, start.innov = rand.gen(n.start, ...), ...) 
+{
+    if (!is.list(model)) 
+        stop("'model' must be list")
+    if (n <= 0L) 
+        stop("'n' must be strictly positive")
+    p <- length(model$ar)
+    if (p) {
+        minroots <- min(Mod(polyroot(c(1, -model$ar))))
+		# CHANGED removed this stop to permit nonstationary simulation
+        # if (minroots <= 1) 
+        #     stop("'ar' part of model is not stationary")
+    }
+    q <- length(model$ma)
+    if (is.na(n.start)) 
+		#CHANGED added the max(), because the logic breaks if minroots is <= 1
+        n.start <- p + q + ifelse(p > 0, ceiling(6/log(max(minroots, 1.1))), 
+            0)
+    if (n.start < p + q) 
+        stop("burn-in 'n.start' must be as long as 'ar + ma'")
+    d <- 0
+    if (!is.null(ord <- model$order)) {
+        if (length(ord) != 3L) 
+            stop("'model$order' must be of length 3")
+        if (p != ord[1L]) 
+            stop("inconsistent specification of 'ar' order")
+        if (q != ord[3L]) 
+            stop("inconsistent specification of 'ma' order")
+        d <- ord[2L]
+        if (d != round(d) || d < 0) 
+            stop("number of differences must be a positive integer")
+    }
+    if (!missing(start.innov) && length(start.innov) < n.start) 
+        stop(sprintf(ngettext(n.start, "'start.innov' is too short: need %d point", 
+            "'start.innov' is too short: need %d points"), n.start), 
+            domain = NA)
+    x <- ts(c(start.innov[seq_len(n.start)], innov[1L:n]), start = 1 - 
+        n.start)
+    if (length(model$ma)) {
+        x <- filter(x, c(1, model$ma), sides = 1L)
+        x[seq_along(model$ma)] <- 0
+    }
+    if (length(model$ar)) 
+        x <- filter(x, model$ar, method = "recursive")
+    if (n.start > 0) 
+        x <- x[-(seq_len(n.start))]
+    if (d > 0) 
+        x <- diffinv(x, differences = d)
+    as.ts(x)
+}
+
+
+# ======================================================================================
+# = Simulate a variety of ARMA time series and fit GEV to maxima (1 maximum per nYear) =
+# ======================================================================================
+myFatSim <- function(x, nYear=35){
+	N <- x[,"N"]
+	# AR Coefficients
+	if(x[,"P"]>=1){
+		arC <- runif(-1, 1, n=(x[,"P"]))
+		Lambda <- max(abs(Eig(arC)))
+		minRoot <- min(Mod(polyroot(c(1, -arC))))
+	}else{
+		arC <- NULL
+		Lambda <- NA
+		minRoot <- NA
+	}
+
+	# MA Coefficients
+	if(x[,"Q"]>=1){
+		maC <- runif(min=-1, max=1, n=(x[,"Q"]))
+	}else{
+		maC <- NULL
+	}
+	
+	simOrder <- c(x[,"P"], 0, x[,"Q"])
+	
+	
+	fullTS <- rep(NA, N*nYear)
+	maxTS <- rep(NA, nYear)
+	
+	simResid <- switch(as.character(x[,"Distribution"]),
+		normal=rnorm(N*nYear, 0, 1),
+		t=rt(N*nYear, 5),
+		cauchy=rcauchy(n=N*nYear),
+		lnorm=rlnorm(N*nYear, sdlog=0.65)
+	)
+	maxResid <- rep(NA, nYear)
+	
+	for(i in 1:nYear){
+		simIndex <- (i*N-(N-1)):(i*N)
+		tsimResid <- simResid[simIndex]
+		maxResid[i] <- max(tsimResid)
+
+		tsimTS <- c(arima.sim2(model=list(order=simOrder, ar=arC, ma=maC), n=N, innov=tsimResid, start.innov=rep(0,1E4)))
+		
+		fullTS[simIndex] <- tsimTS
+		maxTS[i] <- simIndex[which.max(tsimTS)]
+	}
+	
+	gevRes <- gev.fit2(fullTS[maxTS])$mle[c("sh_0", "mu_0", "sig_0")]
+	Xi_resid <- gev.fit2(maxResid)$mle["sh_0"]
+	Order <- x[,"P"] + x[,"Q"]
+	
+	arC2 <- c("AR1"=NA,"AR2"=NA,"AR3"=NA)
+	arC2[0:x[,"P"]] <- arC
+	maC2 <- c("MA1"=NA,"MA2"=NA,"MA3"=NA)
+	maC2[0:x[,"Q"]] <- maC
+	
+	adf <- data.frame(x, "Order"=Order, "Lambda"=Lambda, "minRoot"=minRoot, t(arC2), t(maC2), "Xi"=gevRes["sh_0"], "mu"=gevRes["mu_0"], "sig"=gevRes["sig_0"], "residXi"=Xi_resid)
+	list("summary"=adf, "fullTS"=fullTS, "maxTS"=maxTS)
 }
 

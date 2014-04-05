@@ -1,14 +1,7 @@
-#Ryan Batt
-#24-April-2013
-#Modified from Katz et al. 2005, Coles 2001
-	#changed the way that initial values were guessed (they had used the equations for Xi=0, I used equations for Xi < 1 b/c our guess for Xi is 0.1)
-	#I changed the likelihood penalty for having y<=0 or sc<=0; originally 10^6.  Changed to increase the penalty as y or sc became more negative.
-	# Note to self: use model.matrix(), to get the ydat matrix --- very helpful for turning a column of factors (w/ n levels) into a matrix with n columns that contains 0 or 1
-# _v0.2 (02-May-2013): Added names to the estimates in the output
 
-#FatTail_Functions_v6.R (07-Sept-2013): Skipped version 5.  Added in mean and sd into the lvl function.
-#_v7 (09-Dec-2013) I noticed some problems with returning NA from the lvl() function, because in the stationary2 function problems with log(0) are not accounted for. This was especially problematic for the zooplankton data, which for some reason contained a lot of 0's that seem like they should have been NA's.
-	
+# =================================
+# = Core function for fitting GEV =
+# =================================	
 gev.fit <- function (xdat, ydat = NULL, mul = NULL, sigl = NULL, shl = NULL, mulink = identity, siglink = identity, shlink = identity, show = FALSE, method = "Nelder-Mead", maxit = 10000, ...){
 
     z <- list() #these are going to be aspects of the output, more later
@@ -119,9 +112,7 @@ gev.fit <- function (xdat, ydat = NULL, mul = NULL, sigl = NULL, shl = NULL, mul
 
 
 
-# ====================
-# = Extrema Functions =
-# ====================
+
 # ================================
 # = Method of independent storms =
 # ================================
@@ -149,6 +140,7 @@ MIS <- function(x, Thresh=NULL, quant=0.9){
 # = Find the peak of a cycle via wavelet =
 # ========================================
 PeakCycle <- function(Data, SearchFrac=0.028){
+	if(!library("wmtsa", logical.return=TRUE)){stop("install package 'wmtsa'")}
 	# using package "wmtsa"
 	#the SearchFrac parameter just controls how much to look to either side 
 	#of wavCWTPeaks()'s estimated maxima for a bigger value
@@ -173,16 +165,10 @@ PeakCycle <- function(Data, SearchFrac=0.028){
 # ==============================
 Inf2NA <- function(x) {x[which(x==-Inf | x==Inf, arr.ind=TRUE)] <- NA; x}
 
-# Stationary <- function(x, coluY, coluX){
-# 	tx <- 0:(nrow(x)-1)
-# 	x2 <- x[,coluX]
-# 	Reg <- lm(x[,coluY]~tx*x2)
-# 	xd <- residuals(Reg) #+ mean(x[,coluY])
-# 	
-# 	return(xd)
-# 	
-# }
 
+# ============================
+# = Remove linear time trend =
+# ============================
 Stationary <- function(x){
 	if(is.null(dim(x))){
 		x1 <- 0:(length(x)-1)
@@ -204,31 +190,9 @@ Stationary <- function(x){
 	}
 }
 
-
-
-
-
-Stationary2 <- function(x, coluY, coluX){
-	tx <- 0:(length(x)-1)
-	Reg <- lm(x~tx)
-	TrendPval <- summary(Reg)$coef["tx","Pr(>|t|)"]
-	xd <- residuals(Reg) #+ mean(x[,coluY])
-	return(xd)
-}
-
-Stationary3 <- function(x){
-	tx <- 0:(length(x[,2])-1)
-	Reg <- lm(x[,2]~tx)
-	# TrendPval <- summary(Reg)$coef["tx","Pr(>|t|)"]
-	xd <- residuals(Reg) + mean(x[,2], na.rm=TRUE)
-	xNew <- x
-	xNew[,2] <- xd
-	return(xNew)
-}
-
-# =================
-# = GEV Functions =
-# =================
+# ========================================
+# = Basic waiting time functions for GEV =
+# ========================================
 ReturnLevel <- function(RetQ, mu, sc, xi){
 	mu-(sc/xi)*(1-(-log(RetQ))^(-xi)) 	
 }
@@ -244,8 +208,24 @@ xYr_Lvl <- function(RetTime, nExts, TS_Duration, mu, sc, xi){
 	mu-(sc/xi)*(1-(-log(RetQ))^(-xi))
 }
 
+# ======================================================
+# = Calculate the 1.1*max(x) return level for data.stat =
+# ======================================================
+calc.level <- function(x, thresh=1.1){
+	# calculate the number of observations,
+	# the duration of the time series
+	# and the level 2 return level
+	noNA <- is.finite(x[,"Data"])
+	N <- sum(noNA)
+	Dur <- diff(range(x[noNA,"year4"]))+1
+	luse <- max(x[,"Data"], na.rm=TRUE)*thresh
+	return(data.frame("N"=N, "Duration"=Dur, "level"=luse))
+		
+}
 
-
+# =============================================================
+# = Calculate waiting time for a given return level (for GEV) =
+# =============================================================
 lvlX_ReturnTime <- function(lvl, a, nExts, TS_Duration){ #Added _v4
 	if(any(is.na(c(lvl,a)) | is.nan(c(lvl,a)))){return(NA)}
 	
@@ -261,19 +241,26 @@ lvlX_ReturnTime <- function(lvl, a, nExts, TS_Duration){ #Added _v4
 	1/((1-cdf)*(nExts/TS_Duration))
 }
 
-
-lvl1 <- function(x){
-	if(sum(!is.na(x))<3){return(NA)}
-	x <- Stationary2(x) + mean(x, na.rm=TRUE)
-	mean(x, na.rm=TRUE)+2*sd(x, na.rm=TRUE)
+# =================================================
+# = wrapper for calculating waiting time from GEV =
+# =================================================
+lvl_return <- function(x, level, returnFull=FALSE){ # New version to calculate return time (equiv to level 2)
+	lvl0 <- x[,"level"] #as.numeric(x[paste("Level",level, "_residual", sep="")])
+	a0 <- as.numeric(x[c("mu_0","sig_0","sh_0")])
+	nExts0 <- as.numeric(x["N"])
+	TS_Duration0 <- as.numeric(x["Duration"])
+	result <- lvlX_ReturnTime(lvl=lvl0, a=a0, nExts=nExts0, TS_Duration=TS_Duration0)
+	if(returnFull){
+		cbind(x, "Level2_time"=result)
+	}else{
+		result
+	}
+	
 }
 
-lvl2 <- function(x, thresh=1.2){
-	if(sum(!is.na(x))<3){return(NA)}
-	x <- Stationary2(x) + mean(x, na.rm=TRUE)
-	thresh*max(x, na.rm=TRUE)
-}
-
+# ============================================
+# = Convenient changes to reshape() function =
+# ============================================
 reshape2 <- function(...){
 	a <- reshape(...)
 	row.names(a) <- NULL
@@ -281,21 +268,10 @@ reshape2 <- function(...){
 	a
 }
 
-convNeg <- function(x){ #changing in _v8 (09-Dec-2013) to also change 0's to NA
-	a <- !is.na(x) & is.finite(x) #also adding the finite stipulation, although I think that is.finite() more than covers !is.na().
-	n <- length(x[a])
-	if(sum(x[a]<=0)<(0.2*n)){
-		xr <- x
-		xr[x<=0] <- NA
-		return(xr)
-	}else{
-		return(NA)
-		# m0 <- min(x, na.rm=TRUE)
-		# xr <- (exp(1)-m0) + x
-		# return(xr)
-	}
-}
 
+# =============================================
+# = Estimate mu and sd for normal + lognormal =
+# =============================================
 musd <- function(x){
 	if(!is.null(dim(x))){
 		x <- x[,"Data"]
@@ -309,11 +285,17 @@ musd <- function(x){
 	
 }
 
+# =================================================
+# = calculate waiting time from level in data.stat =
+# =================================================
 normTime <- function(x, Level=2){
 	RetQ <- pnorm(x[,"level"], x[,"mean"], x[,"sd"])
 	data.frame("Level2_normTime"=1/((1-RetQ)*(x[,"N"]/x[,"Duration"])))
 }
 
+# =================================================
+# = calculate waiting time from level in data.stat =
+# =================================================
 lnormTime <- function(x, Level=2){
 	RetQ <- plnorm(x[,"level"], x[,"logMean"], x[,"logSd"])
 	data.frame("Level2_logNormTime"=1/((1-RetQ)*(x[,"N"]/x[,"Duration"])))
@@ -335,114 +317,19 @@ GEV <- function(x){
 	)
 }
 
-calcGEV <- function(nameVarbl, datCols=NULL, fitBy=NULL, fitForm=NULL, MUl=NULL, SIGl=NULL, SHl=NULL){
-	if(is.null(fitBy)&is.null(fitForm) || !is.null(fitBy)&!is.null(fitForm)){stop("One & only one of fitBy and fitForm should be NULL")}
-	if(is.null(datCols)){datCols <- get(paste("All",nameVarbl,sep=""))}
-	Tempo_gev <- list()
-	AllVarbl <- datCols
-	for(j in 1:length(AllVarbl)){
-		VarblName <- AllVarbl[j]
-		Varbl_Ext <- get(paste(nameVarbl,"Ext",sep="_"))
-		
-		# ================================================================
-		# = Set number of for() iterations depending on fitBy or fitForm =
-		# ================================================================
-		if(is.null(fitBy)){
-			LoopThru <- "Formula" #need to change the formula arugment to just be responses, then paste it together with datCols[i] (i didn't write this thinking about multiple responses)
-		}else{
-			LoopThru <- unique(Varbl_Ext[,fitBy])
-		}
-		
-		
-		for(i in seq_along(LoopThru)){ # 1 iteration for formula, or number of factor levels for fitBy
-			# ==============================================
-			# = Fit GEV for each level of a factor (fitBy) =
-			# ==============================================
-			if(!is.null(fitBy)){
-				fitByID <- as.character(LoopThru[i])
-				ThisFitBy <- which(Varbl_Ext[,fitBy]==fitByID & !is.na(Varbl_Ext[,VarblName]))
-				if(length(ThisFitBy)<5){next}
-				ThisVarbl <- Varbl_Ext[ThisFitBy,VarblName]
-				ThisVarbl <- as.vector(Stationary2(ThisVarbl)) + mean(ThisVarbl)
-				Nobs <- length(ThisVarbl)
-				dRange <- range(Varbl_Ext[ThisFitBy,"year4"])
-				dDuration <- diff(dRange) + 1
-				
-				Tempo_gev <- gev.fit(ThisVarbl)[c("conv","nllh","mle","se")] # Fit GEV to this factor level
-			}
-			
-			
-			# ============================================
-			# = Fit GEV according to a formula (fitForm) =
-			# ============================================
-			if(!is.null(fitForm)){
-				ModForm <- with(Varbl_Ext, formula(fitForm))
-				AllVars <- all.vars(ModForm)
-				RespName <- head(AllVars, 1)
-				PredNames <- tail(AllVars, -1)
-				TempoFullMat <- model.matrix(ModForm)
-				colnames(TempoFullMat) <- AllVars
-				ThisVarbl <- as.vector(Varbl_Ext[,RespName])
-				ThisVarbl_NoNA <- which(!is.na(ThisVarbl))
-				ThisVarbl <- ThisVarbl[ThisVarbl_NoNA]
-				TempoYdat <- matrix(TempoFullMat[, PredNames], ncol=length(PredNames), dimnames=list(NULL, PredNames)) #i think model.matrix automatically removes the NA rows
-				Nobs <- length(ThisVarbl)
-				dRange <- range(Varbl_Ext[,"year4"])
-				dDuration <- diff(dRange) + 1
-				
-				Tempo_gev <- gev.fit(ThisVarbl, ydat=TempoYdat, mul=MUl, sigl=SIGl, shl=SHl)[c("conv","nllh","mle","se")] # Fit GEV according to formula
-			}
-			
-			# =======================================================
-			# = Calculate t-statistic & p value for shape parameter =
-			# =======================================================
-			tstat <- Tempo_gev$mle/Tempo_gev$se
-			tstat2 <- (Tempo_gev$mle["sh_0"]-ifelse(tstat[3]>0, 0.5, -0.5))/(Tempo_gev$se["sh_0"]) #testing to see if the shape parameter is greater than 0.5
-		
-			pvalue <- c()
-			for(k in 1:length(tstat)){
-				pvalue[k] <- pt(tstat[k], df=Nobs-1, lower.tail=(tstat[k]<0))
-			}
-			pvalue2 <-  pt(tstat2, df=Nobs-1, lower.tail=(tstat2<0))#the p-value to see if shape is greater than 0.5
-			Tempo_gev$Dates <- c("Nobs"=Nobs, "Dates"=dRange, "Duration"=dDuration)
-			Tempo_gev$Pvalues <- c(pvalue, pvalue2)
-			names(Tempo_gev$Pvalues) <- c(names(Tempo_gev$mle), "sh_0.5")
-		
-			TempoNames <- c(names(Tempo_gev$mle), paste("se_",names(Tempo_gev$se), sep=""), paste("p_",names(Tempo_gev$Pvalues), sep=""))
-		
-			# ==========================================================
-			# = Prepare function output (updated for each fitBy level) =
-			# ==========================================================
-			if(all(c(j,i)==1)){
-				tTempo_Params <- matrix(c(Tempo_gev$mle, Tempo_gev$se, Tempo_gev$Pvalues), nrow=1, dimnames=list(NULL, TempoNames)) 
-				Tempo_Params <- data.frame("fitBy"=LoopThru[i], "Variable"=VarblName, "Duration"=dDuration, "N"=Nobs, tTempo_Params)
-				# LoopThru, "Variable"=VarblName, 
-			}else{
-				tTempo_Params <- matrix(c(Tempo_gev$mle, Tempo_gev$se, Tempo_gev$Pvalues), nrow=1, dimnames=list(NULL, TempoNames))
-				Tempo_Params <- rbind(Tempo_Params, data.frame("fitBy"=LoopThru[i], "Variable"=VarblName, "Duration"=dDuration, "N"=Nobs, tTempo_Params))
-				# LoopThru, "Variable"=VarblName, 
-			}
-		}
-	}
-	return(list(Tempo_Params, Tempo_gev))
-}
 
-
-SignifShape <- function(x, ...){
-	cneg <- as.integer(x[,"sh_0"]<0&x[,"p_sh_0"]<0.05)*-1
-	c1 <- as.integer(x[,"sh_0"]>0&x[,"p_sh_0"]<0.05)
-	c2 <- as.integer(x[,"sh_0"]>0.5&x[,"p_sh_0.5"]<0.05)
-	cmat <- matrix(c(cneg, c1, c2), ncol=3)
-	rs <- rowSums(cmat)
-	plot(x[,"sh_0"], col=c("blue","black","red", "red")[rs+2], pch=ifelse((rs+2)>3, 10, 21), ylab="Shape", ...)
-	invisible(rs)
-}
-
-stable.fit <- function(x){	
+# ========================================================
+# = Fit the stable distribution using package stabledist =
+# ========================================================
+stable.fit <- function(x){
+	if(!library("fBasics", logical.return=TRUE)){stop("install package 'fBasics'")}
 	sFit <- stableFit(x, type="mle", doplot=FALSE)
 	sFit@fit$estimate
 }
 
+# ==================================================
+# = Calculate waiting time for stable distribution =
+# ==================================================
 stableTime <- function(lvl, a, nExts, TS_Duration){ #Added _v4
 	if(any(is.na(c(lvl,a)) | is.nan(c(lvl,a)))){return(NA)}
 	
@@ -458,39 +345,10 @@ stableTime <- function(lvl, a, nExts, TS_Duration){ #Added _v4
 	1/((1-cdf)*(nExts/TS_Duration))
 }
 
-# Example
-# x= rnorm(100)
-# stableTime(3, a=stable.fit(x), nExts=100, TS_Duration=100)
 
-lvl_return <- function(x, level, returnFull=FALSE){ # New version to calculate return time (equiv to level 2)
-	lvl0 <- x[,"level"] #as.numeric(x[paste("Level",level, "_residual", sep="")])
-	a0 <- as.numeric(x[c("mu_0","sig_0","sh_0")])
-	nExts0 <- as.numeric(x["N"])
-	TS_Duration0 <- as.numeric(x["Duration"])
-	result <- lvlX_ReturnTime(lvl=lvl0, a=a0, nExts=nExts0, TS_Duration=TS_Duration0)
-	if(returnFull){
-		cbind(x, "Level2_time"=result)
-	}else{
-		result
-	}
-	
-}
-
-
-calc.level <- function(x, thresh=1.1){
-	# calculate the number of observations,
-	# the duration of the time series
-	# and the level 2 return level
-	noNA <- is.finite(x[,"Data"])
-	N <- sum(noNA)
-	Dur <- diff(range(x[noNA,"year4"]))+1
-	luse <- max(x[,"Data"], na.rm=TRUE)*thresh
-	return(data.frame("N"=N, "Duration"=Dur, "level"=luse))
-		
-}
-
-# mu = 1.246274171
-# se = 0.37323413
+# ===============================================================
+# = The largest Xi that the estimated Xi is signif greater than =
+# ===============================================================
 fattestSig <- function(mu, se){
 	qnorm(p=0.05, mean=mu, sd=se)
 }

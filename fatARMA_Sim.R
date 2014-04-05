@@ -1,241 +1,157 @@
-# Simulate ARMA time series of varying order and noise, determine if their Xi values differ.
-#_v0 (21-Jan-2014)
-#_v2 (27-Jan-2014) Changing arima.sim() to allow for non-stationary simulations. This is desirable to simulate a wider variety of time series, as all of the stationary ARMA time series were thin-tailed or had bounded tails.
-rm(list=ls())
+# This script will generate a set of ARMA models (see Options below), then analyze the 'annual' maxima using GEV, then ends w/ a plot
 
+# The simulations simulate a few short ARMA time series.
+# Each short series represents dynamics within a year – the maximum of each short ARMA series is an annual maxima
+# GEV is fit to the maxima
+
+# I look across all of the ARMA series that were simulated, and pick the 1 w/ the thinnest and the 1 w/ the fattest tail
+# I use these two sets of time series to illustrate the concept of our method:
+	# Start with a full time series (all of the short ARMA series concatenated) [Panels A&B, gray lines]
+	# Take annual maxima of those time series (max of each short series) [Panels A&B, colored circles]
+	# The "parent" distribution is the distribution of the full time series (Panels C&D, gray polygon)
+	# The empirical distribution taken from the annual maxima (i.e., maxima of parent) are the blue/ red polygons in Panels C&D
+	# To get an estimate of tailedness, fit the GEV to the time series of maxima
+	# The distributions of the GEV fit to the 2 example time series are shown in Panel E
+	# The red distribution is fat-tailed (xi = 0.34), the blue distribution is thin-tailed (xi = -0.42)
+
+
+# =================
+# = Load packages =
+# =================
+library("evir")
 library("plyr")
 
+# =========================
+# = Set working directory =
+# =========================
 setwd("/Users/battrd/Documents/School&Work/WiscResearch/FatTails")
 
-load("/Data/fatARMA.RData") #this is the data file containing the completed ARMA analysis. Note that _v2 is the same as _v1, because tonyARMA_short _v4 and _v5 compute the ARMA the same, but differ in the way they compute the sigma metrics. fatARMA_vX.RData only contains the ARMA fit, not the sigma metrics.
-load("/Data/All_Params_TurnExtreme_Fat_Data.RData")
-load("finalFrame.RData")
-
-source("FatTails_Functions.R") #the logStat function in tonyARMA_short needs the Inf2NA function
+# ================
+# = Load scripts =
+# ================
 source("ARMAFunctions.R") #also loads GenSA and DEoptim packages
-source("/Users/Battrd/Documents/School&Work/WiscResearch/dscat_v0.R")
+source("fatPlot_Functions.R")
 
-# simPars <- expand.grid(P=0:3, Q=0:3, SD=seq(1,40, by=3), Distribution=c("normal", "t"), Rep=1:5)
-simPars <- expand.grid(P=0:2, Q=0:1, Distribution=c("normal", "t", "cauchy"), Rep=1:5, N=c(50, 100, 200))
-
-which.quantile <- function (x, probs, na.rm = FALSE){
-  if (! na.rm & any (is.na (x)))
-  return (rep (NA_integer_, length (probs)))
-
-  o <- order (x)
-  n <- sum (! is.na (x))
-  o <- o [seq_len (n)]
-
-  nppm <- n * probs - 0.5
-  j <- floor(nppm)
-  h <- ifelse((nppm == j) & ((j%%2L) == 0L), 0, 1)
-  j <- j + h
-
-  j [j == 0] <- 1
-  o[j]
-}
-
-# =======================================================
-# = Modify arima.sim to allow nonstationary simulations =
-# =======================================================
-arima.sim2 <- function (model, n, rand.gen = rnorm, innov = rand.gen(n, ...), 
-    n.start = NA, start.innov = rand.gen(n.start, ...), ...) 
-{
-    if (!is.list(model)) 
-        stop("'model' must be list")
-    if (n <= 0L) 
-        stop("'n' must be strictly positive")
-    p <- length(model$ar)
-    if (p) {
-        minroots <- min(Mod(polyroot(c(1, -model$ar))))
-		# CHANGED removed this stop to permit nonstationary simulation
-        # if (minroots <= 1) 
-        #     stop("'ar' part of model is not stationary")
-    }
-    q <- length(model$ma)
-    if (is.na(n.start)) 
-		#CHANGED added the max(), because the logic breaks if minroots is <= 1
-        n.start <- p + q + ifelse(p > 0, ceiling(6/log(max(minroots, 1.1))), 
-            0)
-    if (n.start < p + q) 
-        stop("burn-in 'n.start' must be as long as 'ar + ma'")
-    d <- 0
-    if (!is.null(ord <- model$order)) {
-        if (length(ord) != 3L) 
-            stop("'model$order' must be of length 3")
-        if (p != ord[1L]) 
-            stop("inconsistent specification of 'ar' order")
-        if (q != ord[3L]) 
-            stop("inconsistent specification of 'ma' order")
-        d <- ord[2L]
-        if (d != round(d) || d < 0) 
-            stop("number of differences must be a positive integer")
-    }
-    if (!missing(start.innov) && length(start.innov) < n.start) 
-        stop(sprintf(ngettext(n.start, "'start.innov' is too short: need %d point", 
-            "'start.innov' is too short: need %d points"), n.start), 
-            domain = NA)
-    x <- ts(c(start.innov[seq_len(n.start)], innov[1L:n]), start = 1 - 
-        n.start)
-    if (length(model$ma)) {
-        x <- filter(x, c(1, model$ma), sides = 1L)
-        x[seq_along(model$ma)] <- 0
-    }
-    if (length(model$ar)) 
-        x <- filter(x, model$ar, method = "recursive")
-    if (n.start > 0) 
-        x <- x[-(seq_len(n.start))]
-    if (d > 0) 
-        x <- diffinv(x, differences = d)
-    as.ts(x)
-}
+# =============================
+# = Define Simulation Options =
+# =============================
+nPerYear <- 10 # number of observations per "year"
+Ps <- 1 # vector of the orders of AR to simulate (e.g., 1:2 would simulate time series that were AR(1), and that were AR(2))
+Qs <- 0:1 # vector of MA orders
+chooseDists <- c("normal", "lnorm") # vector of distributions – can be "normal", "cauchy", "lnorm", and "t"
+nReps <- 5 # number of reps to do for each combination of P, Q, and Distribution
+simPars <- expand.grid(P=Ps, Q=Qs, Distribution=chooseDists, Rep=1:nReps, N=c(nPerYear)) # set up combinations of simulation options
 
 
+# ===============================================
+# = Simulate ARMA time series and calculate GEV =
+# ===============================================
+set.seed(449) # Set seed for random number generator
+simXi0 <- dlply(.data=simPars, .variables=c("P","Q","Distribution","Rep", "N"), .fun=myFatSim) # conduct simulations and GEV analysis
+reorgSum <- function(x)x$summary # convenience function to pull out the 'summary' output from simXi0
+reorgFull <- function(x)x$fullTS # convenience function to pull out the 'fullTS' output from simXi0
+reorgMax <- function(x)x$maxTS # convenience function to pull out the 'maxTS' output from simXi0
+
+simXi <- ldply(simXi0, .fun=reorgSum) # pull out summary
+simXiFull <- t(ldply(simXi0, .fun=reorgFull)[,-(1:5)]) # pull out full time series and drop useless columns
+row.names(simXiFull) <- NULL
+simXiMax <- t(ldply(simXi0, .fun=reorgMax)[,-(1:5)]) # pull out time series maxima
+row.names(simXiMax) <- NULL
+
+statSim <- simXi[,"Lambda"]<1 # subset to stationary time series
+simXiS <- simXi[statSim,]
+
+# ===================================================================
+# = Grab the thinnest and fattest time series (that are stationary) =
+# ===================================================================
+fattestI <- which.max(simXiS[,"Xi"])
+thinnestI <- which.min(simXiS[,"Xi"])
+
+ffTS <- simXiFull[,fattestI] # Fattest full time series
+fmTS <- simXiMax[,fattestI] # Fattest max time series
+tfTS <- simXiFull[,thinnestI] # Thinnest full time series
+tmTS <- simXiMax[,thinnestI] # Thinnest max time series
 
 
-myFatSim <- function(x){
-	N <- x[,"N"]
-	# AR Coefficients
-	if(x[,"P"]>=1){
-		arC <- runif(-1, 1, n=(x[,"P"]))
-		Lambda <- max(abs(Eig(arC)))
-		minRoot <- min(Mod(polyroot(c(1, -arC))))
-	}else{
-		arC <- NULL
-		Lambda <- NA
-		minRoot <- NA
-	}
+# ========================
+# = Prepare for plotting =
+# ========================
+# Calculate densities for GEV fit (Panel E)
+adat <- c(tfTS[tmTS], ffTS[fmTS]) # adat is 'all data' – both thin and fat maxima time series
+ma <- min(adat) # find the smallest value of the maxima
+dSeq <- seq(ma-sign(ma)*1.5*ma, max(adat)*1.1, by=0.1) # create a sequence of values over which to calculate the density
+fatGEV <- dgev(dSeq, xi=simXiS[fattestI,"Xi"], simXiS[fattestI,"mu"], simXiS[fattestI,"sig"]) # probs for fat time series using GEV fit (package 'evir')
+fatGEV[!is.finite(fatGEV)] <- 0 
+thinGEV <- dgev(dSeq, xi=simXiS[thinnestI,"Xi"], simXiS[thinnestI,"mu"], simXiS[thinnestI,"sig"]) # probs for thin time series
+thinGEV[!is.finite(thinGEV)] <- 0
 
-	# MA Coefficients
-	if(x[,"Q"]>=1){
-		maC <- runif(min=-1, max=1, n=(x[,"Q"]))
-	}else{
-		maC <- NULL
-	}
-	
-	simOrder <- c(x[,"P"], 0, x[,"Q"])
-	if(x[,"Distribution"]=="normal"){
-		simResid <- rnorm(N, 0, 1)
-		simTS <- c(arima.sim2(model=list(order=simOrder, ar=arC, ma=maC), n=N, innov=simResid, start.innov=rep(0,1E4)))
-		# simTS <- c(arima.sim2(model=list(order=simOrder, ar=arC, ma=maC), n=50, sd=x[,"SD"]))
-	}
-	if(x[,"Distribution"]=="t"){
-		simResid <- rt(N, 5)
-		simTS <- c(arima.sim2(model=list(order=simOrder, ar=arC, ma=maC), n=N, innov=simResid, start.innov=rep(0,1E4)))
-		# simTS <- c(arima.sim2(model=list(order=simOrder, ar=arC, ma=maC), n=50, rand.gen=rt, df=x[,"SD"]))
-	}
-	if(x[,"Distribution"]=="cauchy"){
-		simResid <- rcauchy(n=N)
-		simTS <- c(arima.sim2(model=list(order=simOrder, ar=arC, ma=maC), n=N, innov=simResid, start.innov=rep(0,1E4)))
-		# simTS <- c(arima.sim2(model=list(order=simOrder, ar=arC, ma=maC), n=50, rand.gen=rt, df=x[,"SD"]))
-	}
-	
-	
-	# Xi <- tryCatch({gev.fit(simTS)$mle["sh_0"]}, error=function(cond)NA)
-	Xi <- gev.fit2(simTS)$mle["sh_0"]
-	Xi_resid <- gev.fit2(simResid)$mle["sh_0"]
-	Order <- x[,"P"] + x[,"Q"]
-	# data.frame(x, "Xi"=Xi, "Lambda"=Lambda, "Order"=Order, "minRoot"=minRoot)
-	
-	arC2 <- c("AR1"=NA,"AR2"=NA,"AR3"=NA)
-	arC2[0:x[,"P"]] <- arC
-	maC2 <- c("MA1"=NA,"MA2"=NA,"MA3"=NA)
-	maC2[0:x[,"Q"]] <- maC
-	
-	adf <- data.frame(x, "Order"=Order, "Lambda"=Lambda, "minRoot"=minRoot, t(arC2), t(maC2), "Xi"=Xi, "xiResid"=Xi_resid)
-	list("summary"=adf, "data"=simTS)
-}
+# Prepare the Xi values to be plotted on figure (Panel E)
+tXi <- round(simXiS[thinnestI,"Xi"], 2)
+fXi <- round(simXiS[fattestI,"Xi"], 2)
+tLabXi <- parse(text=paste("xi", tXi, sep=" = "))
+fLabXi <- parse(text=paste("xi", fXi, sep=" = "))
 
-# simXi <- ddply(.data=simPars, .variables=c("P","Q","SD"), .fun=myFatSim)
+# ===============================
+# = Plot Example w/ reversed xy =
+# ===============================
+# Set up figure space
+dev.new(width=3.5, height=5) # open graphical device
+cols1 <- rep(rep(1:3, each=3), 4) # first set of columns for layout matrix
+cols2 <- rep(rep(c(4,5,3), each=3), 3) # second set of column for layout matrix
+lmat <- matrix(c(cols1, cols2), ncol=7) # create layout matrix
+layout(lmat) # define graphical device layout
+par(mar=c(2.5,0.0,0.5,0.1), oma=c(0, 2, 0, 0.25), ps=10, cex=1, mgp=c(1, 0.3, 0), tcl=-0.25, family="Times") # set graphical parameters
 
+# Plot thin-tailed time series
+ylim1 <- range(tfTS)*c(1, 1.15)
+plot(tfTS, type="l", col="gray", xlab="", xaxt="n", ylab="", ylim=ylim1, bty="l")
+text(0.025*length(tfTS), y=max(tfTS)*1.05, "A", font=2)
+ats1 <- axTicks(1)
+labs1 <- ats1/nPerYear
+axis(side=1, labels=labs1, at=ats1)
+points(tmTS, tfTS[tmTS], col="blue")
+mtext("y", side=2, line=1.25)
+mtext("time", side=1, line=1.25)
 
+# Plot fat-tailed time series
+ylim2 <- range(ffTS)*c(1, 1.15)
+plot(ffTS, type="l", col="gray", xlab="", ylab="", xaxt="n", ylim=ylim2, bty="l")
+text(0.025*length(ffTS), y=max(ffTS)*1.05, "B", font=2)
+ats2 <- axTicks(1)
+labs2 <- ats2/nPerYear
+axis(side=1, labels=labs2, at=ats2)
+points(fmTS, ffTS[fmTS], col="red")
+mtext("y", side=2, line=1.25)
+mtext("time", side=1, line=1.25)
 
-simXi0 <- dlply(.data=simPars, .variables=c("P","Q","Distribution","Rep", "N"), .fun=myFatSim)
-reorgSum <- function(x)x$summary
-reorgData <- function(x)x$data
+# Plot GEV densities
+colorPoly(quants=dSeq, dents=list(thinGEV,fatGEV), cols=c("blue", "red"), bty="l")
+cm0 <- min(dSeq)
+text(x=cm0+sign(cm0)*cm0*0.05, y=max(c(thinGEV,fatGEV))*0.95, "E", font=2)
+mtext("density", side=2, line=1.25)
+mtext("y", side=1, line=1.25)
+cma0 <- max(dSeq)
+text(x=cma0*0.5, y=max(c(thinGEV,fatGEV))*0.75, bquote(xi~"="~.(tXi)), pos=4, col="blue")
+text(x=cma0*0.5, y=max(c(thinGEV,fatGEV))*0.58, bquote(xi~"="~.(fXi)), pos=4, col="red")
 
-simXi <- ldply(simXi0, .fun=reorgSum)
-simXiData <- t(ldply(simXi0, .fun=reorgData)[,-(1:3)])
+# Plot empirical densities for thin-tailed
+colorDens(vals=list(tfTS, tfTS[tmTS]), cols=c("gray","blue"), revxy=TRUE, yaxt="n", bty="n", limX=ylim1)
+cm1 <- min(tfTS)
+text(y=cm1+sign(cm1)*cm1*0.15, x=0.25*max(density(tfTS)$y, density(tfTS[tmTS])$y), "C", font=2)
+mtext("density", side=1, line=1.25)
 
-
-# dev.new(height=5, width=7)
-# par(mfrow=c(2,3), mar=c(3,3,0.5,0.5), ps=9, tcl=-0.45, mgp=c(1.5, 0.5, 0))
-# hist(simXi[,"Xi"], main="", ylab=bquote(xi))
-# plot(simXi[simXi["Distribution"]=="normal","SD"], simXi[simXi["Distribution"]=="normal","Xi"], xlab="sd", ylab=bquote(xi))
-# plot(simXi[simXi["Distribution"]=="t","SD"], simXi[simXi["Distribution"]=="t","Xi"], xlab="df", ylab=bquote(xi))
-# plot(simXi[,"Lambda"], simXi[,"Xi"], ylab=bquote(xi), xlab=bquote(lambda))
-# plot(log10(simXi[,"minRoot"]), simXi[,"Xi"])
-# fatI <- simXi[,"Xi"] > 0
-# plot(log10(simXi[fatI,"minRoot"]), simXi[fatI,"Xi"])
-
-# for(i in 1:2){
-# 	tDistrib <- c("normal", "t")[i]
-# 	mainName <- c("Normal Errors", "Student's T Errors")[i]
-# 	tsimXi <- simXi[simXi[,"Distribution"]==tDistrib,]
-# 	dev.new(height=5, width=7)
-# 	par(mfrow=c(2,3), mar=c(3,3,0.5,0.5), ps=10, tcl=-0.45, mgp=c(1.5, 0.5, 0), oma=c(0.1, 0.1, 1, 0.1))
-# 	hist(tsimXi[,"Xi"], main="", ylab=bquote(xi))
-# 	plot(tsimXi[,"SD"], tsimXi[,"Xi"], xlab="sd", ylab=bquote(xi))
-# 	plot(tsimXi[,"Lambda"], tsimXi[,"Xi"], ylab=bquote(xi), xlab=bquote(lambda))
-# 	plot(log10(tsimXi[,"minRoot"]), tsimXi[,"Xi"])
-# 	fatI <- tsimXi[,"Xi"] > 0
-# 	plot(log10(tsimXi[fatI,"minRoot"]), tsimXi[fatI,"Xi"])
-# 	mtext(mainName, line=0, outer=TRUE)
-# }
+# Plot empirical densities for fat-tailed
+cm2 <- min(ffTS)
+colorDens(vals=list(ffTS, ffTS[fmTS]), cols=c("gray","red"), revxy=TRUE, yaxt="n", bty="n", limX=ylim2)
+text(y=cm2+sign(cm2)*cm2*0.15, x=0.25*max(density(ffTS)$y, density(ffTS[fmTS])$y), "D", font=2)
+mtext("density", side=1, line=1.25)
 
 
 
 
-# 
-# 
-# plotFats <- function(qxi, distrib, ...){
-# 	# ind <- simXi[,"Distribution"]==distrib & !is.na(simXi[,"Xi"])
-# 	# ind <- simXi[,"Distribution"]==distrib & !is.na(simXi[,"Xi"] & simXi[,"minRoot"]>10)
-# 	ind <- simXi[,"Distribution"]==distrib & !is.na(simXi[,"Xi"]) & (simXi[,"minRoot"]>0.9 | is.na(simXi[,"minRoot"]))
-# 	
-# 	foci <- c(0,0.01, 0.05, 0.1, 0.5, 0.9, 0.95, 0.99, 1)[qxi]
-# 	
-# 	# indQuo <- which.quantile(1:sum(ind), (qxi-1)/8) #floor(sum(ind)/9)*qxi
-# 	# indQuo <- which.quantile(1:sum(ind), (qxi-1)/8) #floor(sum(ind)/9)*qxi
-# 	indQuo <- which.quantile(1:sum(ind), foci) #floor(sum(ind)/9)*qxi
-# 	closestI <- order(simXi[ind,"Xi"])[indQuo]
-# 	closestXi <- round(simXi[ind,][closestI,"Xi"],2)
-# 	plot(simXiData[,ind][,closestI], ..., ylab="", xlab="Time", main=bquote(xi==.(closestXi)), type="l")
-# }
-# dev.new(height=7, width=7)
-# par(mfrow=c(3,3), mar=c(3,3,1.5,0.5), ps=9, tcl=-0.45, mgp=c(1.5, 0.5, 0))
-# for(i in c(1:9)){
-# 	plotFats(i, distrib="normal")
-# }
-# 
-# 
-# 
-# plotFats2 <- function(qxi, distrib, ...){
-# 	ind <- simXi[,"Distribution"]==distrib
-# 	closestI <- which.quantile(simXi[ind,"Xi"], qxi, na.rm=TRUE)
-# 	closestXi <- round(simXi[ind,][closestI,"Xi"],2)
-# 	plot(simXiData[,ind][,closestI], ..., ylab="", xlab="Time", main=bquote(xi==.(closestXi)), type="l")
-# }
-# dev.new(height=7, width=7)
-# par(mfrow=c(3,3), mar=c(3,3,1.5,0.5), ps=9, tcl=-0.45, mgp=c(1.5, 0.5, 0))
-# smalls <- c(0,1E-3,1E-2,1E-1)
-# for(i in c(smalls, 0.5, 1-rev(smalls))){
-# 	plotFats2(i, distrib="normal")
-# }
 
 
-# what were the minimum roots of the ARMA time series for which the Xi calculation failed? All were nonstationary.
-# failI <- is.na(simXi[,"Xi"])
-# dev.new()
-# hist(simXi[failI,"minRoot"])
 
-summary(lm(Xi~xiResid*Lambda, data=simXi))
-summary(lm(Xi~xiResid*Lambda, data=simXi[simXi[,"minRoot"]>1,]))
-
-summary(lm(Xi~xiResid+Distribution, data=simXi))
-
-plot(simXi[,"xiResid"], simXi[, "Xi"])
-plot(simXi[simXi[,"minRoot"]>1, "xiResid"], simXi[simXi[,"minRoot"]>1, "Xi"]); abline(a=0, b=1)
 
 
 
