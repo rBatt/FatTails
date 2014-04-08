@@ -199,3 +199,5 @@ for(i in 1:length(uztax2)){
 	}
 	
 }
+
+save.image(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data.RData")
