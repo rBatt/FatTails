@@ -281,4 +281,3 @@ CalcDaysOpen <- function(x){
 
 
 
-

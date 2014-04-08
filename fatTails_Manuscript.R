@@ -41,7 +41,7 @@ summary(aov(lm(sh_0~Type+location, data=data.fat, weights=xiWeights)))
 
 
 fGen <- fish.gev[fish.gev[,"taxLvl"]=="Genus",]
-summary(lmer(sh_0~ Family + (1|Order/Genus), data=fGen))
+summary(lmer(sh_0~ Family + (1|Orde/Genus), data=fGen))
 
 
 

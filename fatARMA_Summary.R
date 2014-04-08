@@ -23,12 +23,12 @@ setwd("/Users/battrd/Documents/School&Work/WiscResearch/FatTails")
 
 load("/DatafatARMA.RData") #this is the data file containing the completed ARMA analysis. Note that _v2 is the same as _v1, because tonyARMA_short _v4 and _v5 compute the ARMA the same, but differ in the way they compute the sigma metrics. fatARMA_vX.RData only contains the ARMA fit, not the sigma metrics.
 # load("fatARMA_noStat_v3.RData") # note that there isn't a 'stationary' version of _v3 ... the change in _v3 was to leave in the linear trend. I am being redundant in renaming the objects and .RData files in addition to the version number to avoid confusion (running this analysis takes so long, it would suck to overwrite something etc).
-load("/Data/All_Params_TurnExtreme_Fat_Data.RData")
-load("/DatafinalFrame.RData")
+# load("/Data/All_Params_TurnExtreme_Fat_Data.RData")
+load("/Data/finalFrame.RData")
 
 source("FatTails_Functions.R") #the logStat function in tonyARMA_short needs the Inf2NA function
 source("ARMAFunctions.R") #also loads GenSA and DEoptim packages
-source("/Users/Battrd/Documents/School&Work/WiscResearch/dscat_v0.R")
+# source("/Users/Battrd/Documents/School&Work/WiscResearch/dscat_v0.R")
 
 eiNota <- bquote(sigma[E]^2~'/'~sigma[infinity]^2)
 ieNota <- bquote(sigma[infinity]~'/'~sigma[E])

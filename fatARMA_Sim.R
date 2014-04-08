@@ -29,8 +29,8 @@ setwd("/Users/battrd/Documents/School&Work/WiscResearch/FatTails")
 # ================
 # = Load scripts =
 # ================
-source("ARMAFunctions.R") #also loads GenSA and DEoptim packages
-source("fatPlot_Functions.R")
+source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/ARMAFunctions.R") #also loads GenSA and DEoptim packages
+# source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
 
 # =============================
 # = Define Simulation Options =
