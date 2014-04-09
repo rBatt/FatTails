@@ -24,10 +24,16 @@ finalFrame0[(!phRows)&big0,"Data"] <- log(finalFrame0[(!phRows)&big0,"Data"])
 
 finalFrame <- finalFrame0 # used to be the step where I took the log and made it stationary – already done.
 
+# buildFrame <- list()
+# uVar <- unique(finalFrame[,"variable"])
+# for(i in 1:length(uVar)){
+# 	tFrame <- finalFrame[finalFrame[,"variable"]==uVar[i],]
+# 	buildFrame[[i]] <- ddply(.data=tFrame, .variables=c("variable", "location"), .fun=ARMAfit, dName="Data", .parallel=TRUE, .progress="none", Method="Evolve", .paropts=list(.export=fnNames, .packages=pkgNames))
+# }
 # ==================
 # = Create fatARMA =
 # ==================
-if(runARMA){
+if(runARMA){ 
 	if(Sys.info()["sysname"]=="Windows"){
 		nC <- floor(detectCores()*0.75)
 		registerDoParallel(cores=nC)
