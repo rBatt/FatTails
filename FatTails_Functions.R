@@ -370,16 +370,16 @@ stableTime <- function(lvl, a, nExts, TS_Duration){ #Added _v4
 # = The largest Xi that the estimated Xi is signif greater than =
 # ===============================================================
 fattestSig <- function(mu, se){
-	sxi <- as.integer(sign(mu))
-	if(sxi==1L){
-		signifXi <- qnorm(p=0.05, mean=mu, sd=se)
-	}else{
-		signifXi <- qnorm(p=0.05, mean=mu, sd=se, lower.tail=FALSE)
-	}
-	if(sxi==sign(signifXi)){
-		signifXi
-	}else{
-		0
-	}
+	sxi <- as.integer(sign(mu)) # sign of the mu
+	posI <- sxi==1L # index of positive estimates
+	negI <- sxi==-1L # index of negative estimates
+	outXi <- rep(NA, length(mu)) # vector to store output
+
+	outXi[posI] <- qnorm(p=0.05, mean=mu[posI], sd=se[posI]) # use lower tail when xi is positive (value that xi is greater than)
+	outXi[negI] <- qnorm(p=0.05, mean=mu[negI], sd=se[negI], lower.tail=FALSE) # use upper when neg (value that xi is smaller than)
+
+	zeroI <- as.integer(sign(outXi))!=sxi # if the sign of qnorm() value is different than the sign of xi, xi is not different from 0
+	outXi[zeroI] <- 0 # so replace those outputs with 0's
+	outXi
 }
 

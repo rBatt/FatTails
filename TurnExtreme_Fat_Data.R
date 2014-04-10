@@ -5,6 +5,7 @@ setwd("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails")
 # library("wmtsa")
 library("reshape")
 source("FatTails_Functions.R")
+source("Data_Functions.R")
 
 setThresh <- 1.1
 threshObs <- 15
@@ -28,48 +29,51 @@ data.max00 <- read.table(file="/Users/Battrd/Documents/School&Work/WiscResearch/
 # = Subset the zoop and fish data =
 # =================================
 rmMass <- !data.max00[,"variable"]%in%c("tot_zoop_mass","cpue3_WeiEff")
-rmHigher <- (!data.max00[,"variable"]%in%c("density","cpue1_Sum")) | (data.max00[,"variable"]%in%c("density","cpue1_Sum") & data.max00[,"taxLvl"]=="Genus")
+rmHigher <- (!data.max00[,"variable"]%in%c("density","cpue1_Sum")) | (data.max00[,"variable"]%in%c("density","cpue1_Sum") & data.max00[,"taxLvl"]%in%c("Species","Genus","Family","Order","Class","Phylum"))
 data.max0 <- data.max00[rmMass&rmHigher,]
 
 # =================================
 # = Add in NA's for missing years =
 # =================================
-data.max <- ddply(data.max0, c("Type","taxLvl","taxID","location","variable"), fillMiss)
+data.max.full <- ddply(data.max0, c("Type","taxLvl","taxID","location","variable"), fillMiss)
+data.max <- sub.gen(data.max.full)
 
 # ===================
 # = make stationary =
 # ===================
-data.stat00 <- ddply(data.max, c("Type","taxLvl","taxID","location","variable"), function(x)Stationary(x[,c("year4","Data")]))
+data.stat00 <- ddply(data.max.full, c("Type","taxLvl","taxID","location","variable"), function(x)Stationary(x[,c("year4","Data")]))
 
 # ============================================
 # = Remove time series with less than 15 obs =
 # ============================================
 data.stat0N <- ddply(data.stat00, c("Type","taxLvl","taxID","location","variable"), function(x)data.frame("N"=sum(is.finite(x[,"Data"]))))
 data.stat0 <- merge(data.stat00, data.stat0N, all=TRUE)
-data.stat <- data.stat0[data.stat0[,"N"]>=threshObs,]
-row.names(data.stat) <- NULL
-data.stat[,"taxID"] <- factor(as.character(data.stat[,"taxID"]))
+data.stat.full <- data.stat0[data.stat0[,"N"]>=threshObs,]
+row.names(data.stat.full) <- NULL
+data.stat.full[,"taxID"] <- factor(as.character(data.stat.full[,"taxID"]))
+
+data.stat <- sub.gen(data.stat.full)
 
 
 # =======================================
 # = Calculate Return level, duration, N =
 # =======================================
-data.stat2 <- Inf2NA(ddply(data.stat, c("Type","taxLvl","taxID","location","variable"), calc.level))
+data.stat2 <- Inf2NA(ddply(data.stat.full, c("Type","taxLvl","taxID","location","variable"), calc.level))
 # data.stat2 <- data.stat2[data.stat2[,"N"]>=threshObs,]
 
 
 # ===================================
 # = Calculate mean sd (and for log) =
 # ===================================
-data.stat3 <- ddply(data.stat, c("Type","taxLvl","taxID","location","variable", "N"), musd)
+data.stat3 <- ddply(data.stat.full, c("Type","taxLvl","taxID","location","variable", "N"), musd)
 data.stat1 <- merge(data.stat2, data.stat3, all=TRUE)
 
 
 # ===========
 # = Fit GEV =
 # ===========
-data.gev0 <- ddply(data.stat, c("Type","taxLvl","taxID","location","variable"), GEV)
-data.gev <- data.gev0
+data.gev <- ddply(data.stat.full, c("Type","taxLvl","taxID","location","variable"), GEV)
+# data.gev <- data.gev0
 data.gev[,"Type"] <- factor(data.gev[,"Type"], levels=c("Biological", "Chemical", "Physical", "Meteorological"))
 data.gev[,"taxLvl"] <- factor(data.gev[,"taxLvl"], levels=c("Community","Phylum","Class","Order","Family","Genus","Species"))
 
@@ -91,13 +95,11 @@ data.fat03 <- merge(data.fat01, data.fat02, all=TRUE)
 
 
 
-data.fat <- data.fat03[!is.na(data.fat03[,"sh_0"]),]
-row.names(data.fat) <- NULL
-data.fat[,"shape.sig"] = fattestSig(mu=data.fat[,"sh_0"], se=data.fat[,"se.sh_0"])
-data.fat <- data.fat[!is.na(data.fat[,"se.sh_0"]),]
-
-
-
+data.fat.full <- data.fat03[!is.na(data.fat03[,"sh_0"]),]
+row.names(data.fat.full) <- NULL
+data.fat.full[,"shape.sig"] = fattestSig(mu=data.fat.full[,"sh_0"], se=data.fat.full[,"se.sh_0"])
+data.fat.full <- data.fat.full[!is.na(data.fat.full[,"se.sh_0"]),]
+data.fat <- sub.gen(data.fat.full)
 
 #Split into Bio
 bio.gev <- data.gev[data.gev[,"Type"]=="Biological",]
@@ -132,24 +134,25 @@ tlvls <- factor(c("Community","Phylum", "Class", "Order", "Family", "Genus", "Sp
 	# ===============================================
 	# = Combine Zooplankt classification w/ metrics =
 	# ===============================================
-zoop.gev <- cbind(zoop.gev0, "Community"=NA, "Phylum"=NA, "Class"=NA, "Order"=NA, "Family"=NA, "Genus"=NA, "Species"=NA)
-uztax <- as.character(unique(zoop.gev[,"taxID"]))
+zoop.gev.full <- cbind(zoop.gev0, "Community"=NA, "Phylum"=NA, "Class"=NA, "Order"=NA, "Family"=NA, "Genus"=NA, "Species"=NA)
+uztax <- as.character(unique(zoop.gev.full[,"taxID"]))
 uztax2 <- uztax #[!uztax%in%"Zoop"]
 for(i in 1:length(uztax2)){
-	gevI <- zoop.gev[,"taxID"]==uztax2[i]
-	tlev <- unique(zoop.gev[gevI,"taxLvl"])
+	gevI <- zoop.gev.full[,"taxID"]==uztax2[i]
+	tlev <- unique(zoop.gev.full[gevI,"taxLvl"])
 	
 	getID <- as.character(tlvls[as.numeric(tlvls) <= as.numeric(tlev)])
 	
 	idI <- zTax.id[,as.character(tlev)] == as.character(uztax2[i]) & !is.na(zTax.id[,as.character(tlev)])
 	
 	if(length(getID)>1){
-		zoop.gev[gevI, getID] <- zTax.id[idI,getID][1,]	
+		zoop.gev.full[gevI, getID] <- zTax.id[idI,getID][1,]	
 	}else{
-		zoop.gev[gevI, getID] <- zTax.id[idI,getID][1]	
+		zoop.gev.full[gevI, getID] <- zTax.id[idI,getID][1]	
 	}
 	
 }
+zoop.gev <- sub.gen(zoop.gev.full)
 
 
 # =============================
@@ -175,23 +178,24 @@ flvls <- factor(c("Community","Order", "Family", "Genus", "Species"), levels=c("
 	# ===============================================
 	# = Combine taxonomic classification w/ metrics =
 	# ===============================================
-fish.gev <- cbind(fish.gev0, "Community"=NA, "Order"=NA, "Family"=NA, "Genus"=NA, "Species"=NA)
-uztax <- as.character(unique(fish.gev[,"taxID"]))
+fish.gev.full <- cbind(fish.gev0, "Community"=NA, "Order"=NA, "Family"=NA, "Genus"=NA, "Species"=NA)
+uztax <- as.character(unique(fish.gev.full[,"taxID"]))
 uztax2 <- uztax #[!uztax%in%"Fish"]
 for(i in 1:length(uztax2)){
-	gevI <- as.character(fish.gev[,"taxID"])==uztax2[i]
-	tlev <- unique(fish.gev[gevI,"taxLvl"])
+	gevI <- as.character(fish.gev.full[,"taxID"])==uztax2[i]
+	tlev <- unique(fish.gev.full[gevI,"taxLvl"])
 	
 	getID <- as.character(flvls[as.numeric(flvls) <= as.numeric(tlev)])
 	
 	idI <- fTax.id[,as.character(tlev)] == as.character(uztax2[i]) & !is.na(fTax.id[,as.character(tlev)])
 	
 	if(length(getID)>1){
-		fish.gev[gevI, getID] <- fTax.id[idI,getID][1,]	
+		fish.gev.full[gevI, getID] <- fTax.id[idI,getID][1,]	
 	}else{
-		fish.gev[gevI, getID] <- fTax.id[idI,getID][1]	
+		fish.gev.full[gevI, getID] <- fTax.id[idI,getID][1]	
 	}
 	
 }
+fish.gev <- sub.gen(fish.gev.full)
 
 save.image(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data.RData")

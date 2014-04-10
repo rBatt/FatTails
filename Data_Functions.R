@@ -271,7 +271,16 @@ CalcDaysOpen <- function(x){
 
 
 
-
+# =========================
+# = Subset to Genus level =
+# =========================
+# Remove species, family, order, class, phylum
+sub.gen <- function(x){
+	if(!any(colnames(x)=="taxLvl")){
+		stop("no taxLvl column")
+	}
+	x[!x[,"taxLvl"]%in%c("Species","Family","Order","Class","Phylum"),]
+}
 
 
 

@@ -36,8 +36,10 @@ plotTax <- function(D, V, Stat, taxCol, legendTitle=NULL, ...){
 		if(l==nrow(Ds)){
 			points(1:length(shapes), colMeans(holdAll, na.rm=TRUE), pch=20, cex=3)
 			legLabs <- unique(as.factor(Ds[,taxCol]))[unique(colFac)]
+			legLabs <- gsub("formes$","",legLabs)
+			legCex <- ifelse(length(legLabs)>8, 0.75, 1)
 			nColumnLeg <- max(min(3, floor(length(legLabs)/3)),1)
-			legend("topright", legend=legLabs, col=Cols2[unique(colFac)], lty="solid", title=legendTitle, ncol=nColumnLeg)
+			legend("topright", legend=legLabs, col=Cols2[unique(colFac)], lty="solid", title=legendTitle, ncol=nColumnLeg, x.intersp=0.5, y.intersp=0.85, cex=legCex, xpd=NA, pt.cex=1/legCex, pt.lwd=5)
 		}	
 	}
 }
