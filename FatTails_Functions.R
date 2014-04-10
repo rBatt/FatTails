@@ -370,6 +370,16 @@ stableTime <- function(lvl, a, nExts, TS_Duration){ #Added _v4
 # = The largest Xi that the estimated Xi is signif greater than =
 # ===============================================================
 fattestSig <- function(mu, se){
-	qnorm(p=0.05, mean=mu, sd=se)
+	sxi <- as.integer(sign(mu))
+	if(sxi==1L){
+		signifXi <- qnorm(p=0.05, mean=mu, sd=se)
+	}else{
+		signifXi <- qnorm(p=0.05, mean=mu, sd=se, lower.tail=FALSE)
+	}
+	if(sxi==sign(signifXi)){
+		signifXi
+	}else{
+		0
+	}
 }
 
