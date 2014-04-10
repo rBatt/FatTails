@@ -108,5 +108,18 @@ boxplot(residual_sh_0~Type, data=fatARMA1)
 # = Merge ARMA+GEV Analysis w/ Original GEV Analysis =
 # ====================================================
 data.2 <- merge(data.fat, fatARMA1, all.x=TRUE)
+
+# ============================
+# = Add ARMA Variance Ratios =
+# ============================
+InfE <- data.2[,"sigInf"]/data.2[,"sigE"]
+Einf <- (data.2[,"sigE"])^2/(data.2[,"sigInf"])^2
+
+data.2[,"InfE"] <- InfE
+data.2[,"Einf"] <- Einf
+
+# =============
+# = Save data =
+# =============
 save(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data2.RData", data.2)
 

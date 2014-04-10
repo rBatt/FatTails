@@ -44,4 +44,10 @@ fGen <- fish.gev[fish.gev[,"taxLvl"]=="Genus",]
 summary(lmer(sh_0~ Family + (1|Orde/Genus), data=fGen))
 
 
+# =========================
+# = Screenshot regression =
+# =========================
+summary(lm(sh_0~Type*residual_sh_0, data=data.2))
+
+
 

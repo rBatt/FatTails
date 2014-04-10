@@ -1,8 +1,15 @@
 
 
 load("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data.RData")
+load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data2.RData")
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
 library("beanplot")
+
+eiNota <- bquote(sigma[E]^2~'/'~sigma[infinity]^2)
+ieNota <- bquote(sigma[infinity]~'/'~sigma[E])
+lNota <- bquote(ave*.~abs(~~abs(~~lambda~~phantom())~~phantom()))
+lNota2 <- bquote(abs(~~abs(~~lambda~~phantom())~~phantom()))
+
 
 # =======================
 # = Some quick plotting =
@@ -104,9 +111,9 @@ mtext("Relative Density", side=2, line=0.0, outer=TRUE)
 dev.off()
 
 
-# ================
-# = Try Beanplot =
-# ================
+# ==============================
+# = Xi / Waiting Time Beanplot =
+# ==============================
 bLine <- rainbow(n=5, v=0.8, s=1)
 bFill <- rgb(t(col2rgb(bLine, alpha=TRUE)), alpha=40, maxColorValue=255)
 beanCol <- list(c(bFill[1]),
@@ -129,6 +136,19 @@ wtLab <- parse(text=paste(10,wtBase,sep="^"))
 axis(side=2, at=wtBase, labels=wtLab)
 axis(side=1, at=1:4,labels=c("Bio","Chem","Phys","Met"))
 mtext(bquote(Waiting~Time~(years)), side=2, line=1.5)
+dev.off()
+
+
+# =============================
+# = ARMA Residual Xi Beanplot =
+# =============================
+# dev.new(width=3.5, height=3.5)
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/ARMAxi_beanplot.png", res=150, units="in", height=3.5, width=3.5)
+par(mfrow=c(1,1), mar=c(2,2.5,0.5,0.5), ps=10, cex=1, mgp=c(2, 0.4, 0), tcl=-0.3, family="Times")
+beanplot(residual_sh_0~Type, data=data.2, ylab="", yaxt="n", xaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5)
+axis(side=2)
+axis(side=1, at=1:4, labels=c("Bio","Chem","Phys","Met"))
+mtext(bquote(xi~~of~~ARMA~Residuals), side=2, line=1.5)
 dev.off()
 
 # =========================
@@ -209,6 +229,51 @@ colorDens(vals=list(ffTS, ffTS[fmTS]), cols=c("gray","red"), revxy=TRUE, yaxt="n
 text(y=cm2+sign(cm2)*cm2*0.15, x=0.25*max(density(ffTS)$y, density(ffTS[fmTS])$y), "D", font=2)
 mtext("density", side=1, line=1.25)
 dev.off()
+
+
+
+
+
+
+# ===============================
+# = Dscat of Xi vs. log10(InfE) =
+# ===============================
+dev.new(height=3.5, width=3.5)
+dscat(log(data.2[,"InfE"], base=10), data.2[,"sh_0"], mar=c(2.5,2.5,0,0), cex=1, ps=9, family="Times", mgp=c(3, 0.5, 0), tcl=-0.35)
+abline(lm(sh_0~log10(InfE), data=data.2[,]), lty="dashed", lwd=2)
+mtext(bquote(xi), side=2, line=1.35, cex=1)
+mtext(bquote(log[10](sigma[infinity]/sigma[E])), side=1, line=1.5)
+
+# ==========================
+# = Dscat of Xi vs. Lambda =
+# ==========================
+dev.new(height=3.5, width=3.5)
+dscat(sqrt(data.2[,"Lambda"]), data.2[,"sh_0"], mar=c(2.5,2.5,0,0), cex=1, ps=9, family="Times", mgp=c(3, 0.5, 0), tcl=-0.35)
+abline(lm(sh_0~sqrt(Lambda), data=data.2[,]), lty="dashed", lwd=2)
+mtext(bquote(xi), side=2, line=1.35, cex=1)
+mtext(bquote(sqrt(.(lNota2))), side=1, line=1.5)
+
+# ===================================
+# = Dscat of Xi vs. Xi of residuals =
+# ===================================
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/dscat_xiTS_xiRES.png", res=150, units="in", height=3.5, width=3.5)
+# dev.new(height=3.5, width=3.5)
+dscat(data.2[,"residual_sh_0"], data.2[,"sh_0"], mar=c(2.5,2.5,0,0), cex=1, ps=9, family="Times", mgp=c(3, 0.5, 0), tcl=-0.35)
+abline(lm(sh_0~residual_sh_0, data=data.2[,]), lty="dashed", lwd=2)
+mtext(bquote(xi[Time~Series]), side=2, line=1.35, cex=1)
+mtext(bquote(xi[ARMA~Residuals]), side=1, line=1.5)
+dev.off()
+
+# =======================
+# = Dscat of Xi vs SigE =
+# =======================
+dev.new(height=3.5, width=3.5)
+dscat(sqrt(data.2[,"sigE"]), data.2[,"sh_0"], mar=c(2.5,2.5,0,0), cex=1, ps=9, family="Times", mgp=c(3, 0.5, 0), tcl=-0.35)
+abline(lm(sh_0~sqrt(sigE), data=data.2[,]), lty="dashed", lwd=2)
+mtext(bquote(xi[Time~Series]), side=2, line=1.35, cex=1)
+mtext(bquote(sqrt(sigma[E])), side=1, line=1.5)
+
+
 
 
 

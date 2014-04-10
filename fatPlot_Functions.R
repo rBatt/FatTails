@@ -459,3 +459,116 @@ getgroupsfromarguments2 <- function (args = match.call(sys.function(sys.parent()
     }
     groups
 }
+
+
+# =====================================================
+# = Density scatter plot w/ color-coded point density =
+# =====================================================
+
+dscat <- function(x, y, ...){
+	figDim <- par()$mfg[3:4]
+	
+	base <- t(matrix(c(
+			c(rep(1,4), 3),
+			rep(c(rep(4,4), 2), 4)
+		), nrow=5, ncol=5))
+	sp <- par()
+	
+	mDens <- function(z, orientation=1){
+		ed <- density(z, na.rm=TRUE)
+		dpl <- function(x, y, ...){plot(x, y, type="l", yaxt="n", xaxt="n", bty="n",xlab="", ylab="", ...)}
+		par(ps=sp$ps, cex=sp$cex)
+		old <- par()
+		switch(orientation,
+			par(mar=c(old$mar[1:2], 0,old$mar[4])),
+			par(mar=c(old$mar[1:2],0,0)),
+			par(mar=c(0,old$mar[2:3],0)),
+			par(mar=c(old$mar[1],0,0,old$mar[4]))
+			)
+		switch(orientation,
+			# dpl(x=ed$x, y=ed$y, ylim=rev(range(ed$y))),
+			dpl(x=ed$x, y=ed$y, ylim=rev(range(ed$y)), xlim=range(z, na.rm=TRUE)),
+			# dpl(x=ed$y, y=ed$x, xlim=rev(ed$y)),
+			dpl(x=ed$y, y=ed$x, xlim=rev(ed$y), ylim=range(z, na.rm=TRUE)),
+			{ #orientation = 3
+				# dpl(x=ed$x, y=ed$y);
+				dpl(x=ed$x, y=ed$y, xlim=range(z, na.rm=TRUE));  
+				axis(side=1, tcl=-0.5, labels=FALSE, lwd=0, lwd.ticks=1); 
+				axis(side=4, line=0, mgp=c(3, 0.5, 0), tcl=-0.15, labels=FALSE)
+			},
+			{ #orientation = 4
+				# dpl(x=ed$y, y=ed$x);
+				dpl(x=ed$y, y=ed$x, ylim=range(z));  
+				axis(side=2, tcl=-0.5, labels=FALSE, lwd=0, lwd.ticks=1); 
+				axis(side=3, line=0, mgp=c(3, 0.5, 0), tcl=-0.15, labels=FALSE)
+			}
+		)
+		par(mar=old$mar, ps=old$ps, cex=old$cex)
+	}
+	
+	dcs <- densCols(x,y, colramp=colorRampPalette(c("black","white")))
+	dfDens <- col2rgb(dcs)[1,] + 1L
+	zols <- colorRampPalette(c("#000099", "#00FEFF", "#45FE4F", "#FCFF00", "#FF9400", "#FF3100"))(256)
+	dfCol <- zols[dfDens]
+	
+	
+	#If figure is a 1x1, layout can just arrange a 5x5 matrix
+	if(all(figDim==1)){
+		par(cex=1, ...)
+		layout(base)
+		mDens(x, 3)
+		mDens(y, 4)
+		old2 <- par()$mar
+		par(mar=c(old2[1:2],0,0))
+		
+		plot(1,1, ylab="", xlab="", yaxt="n", xaxt="n", bty="n", pch=NA)
+		text(-0.2,-0.2, "Density", srt=45, xpd=TRUE, cex=1)
+		par(cex=sp$cex)
+		plot(x, y, bty="o", xlab="", ylab="", pch=19, col=dfCol)	
+	}else{
+		figLay0 <- matrix(1:prod(figDim), ncol=figDim[2], nrow=figDim[1], byrow=TRUE)
+		newForm0 <- matrix(0, nrow=figDim[1]*5, ncol=figDim[2]*5)
+		newForm <- newForm0
+		
+		findNew <- function(n){
+			spot <- figLay0==(figLay0[par()$mfg[1], par()$mfg[2]] + n)
+			ns <- which(spot, arr.ind=TRUE)
+			
+			newRows <- ((ns[1]-1)*5+1):((ns[1])*5)
+			newCols <- ((ns[2]-1)*5+1):((ns[2])*5)
+			rLogic <- is.element(row(newForm0),newRows)
+			cLogic <- is.element(col(newForm0),newCols)
+			
+			retLogic <- rLogic&cLogic
+			return(retLogic)
+		}	
+		
+		last <- ((par()$mfg[1] -1)*par()$mfg[4] + par()$mfg[2] + 1)
+		remain <- prod(figDim) - last
+		
+		newForm[findNew(1)] <- base
+		for(r in 1:remain){
+			newForm[findNew(r+1)] <- 4+r
+		}
+				
+		for(i in 1:4){
+			ti <- which(newForm==i, arr.ind=TRUE)
+			tForm <- newForm0
+			tForm[ti] <- 1
+			par(new=TRUE, cex=sp$cex, mar=sp$mar, ps=sp$ps)
+			layout(tForm)
+			switch(i,
+				mDens(x, 3),
+				mDens(y, 4),
+				{
+					plot(1,1, ylab="", xlab="", yaxt="n", xaxt="n", bty="n", pch=NA)
+					text(0.5,0.5, "Density", srt=45, xpd=TRUE, cex=1.2)
+				},
+				{
+					par(cex=sp$cex, ps=sp$ps, mgp=sp$mgp, mar=sp$mar, tcl=sp$tcl)
+					plot(x, y, bty="o", xlab="", ylab="", pch=19, col=dfCol)
+				}
+				)
+		}
+	}
+}

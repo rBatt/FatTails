@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>fatARMA.R</string>
+	<string>fatTails_Manuscript.R</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -16,13 +16,13 @@
 			<key>filename</key>
 			<string>ARMAFunctions.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-09T13:07:08Z</date>
+			<date>2014-04-09T23:20:03Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>FatTails_Functions.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-08T19:49:06Z</date>
+			<date>2014-04-09T21:46:56Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -32,21 +32,11 @@
 		</dict>
 		<dict>
 			<key>filename</key>
-			<string>fatARMA_Figures.R</string>
-			<key>lastUsed</key>
-			<date>2014-04-08T19:22:34Z</date>
-		</dict>
-		<dict>
-			<key>filename</key>
 			<string>fatTails_Manuscript.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-08T19:26:28Z</date>
-		</dict>
-		<dict>
-			<key>filename</key>
-			<string>fatARMA_Summary.R</string>
-			<key>lastUsed</key>
-			<date>2014-04-08T19:27:15Z</date>
+			<date>2014-04-09T23:44:58Z</date>
+			<key>selected</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -58,9 +48,7 @@
 			<key>filename</key>
 			<string>fatARMA.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-09T13:07:08Z</date>
-			<key>selected</key>
-			<true/>
+			<date>2014-04-09T23:20:15Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -72,13 +60,13 @@
 			<key>filename</key>
 			<string>fatPlots.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-08T19:26:41Z</date>
+			<date>2014-04-09T23:44:58Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>TurnExtreme_Fat_Data.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-08T19:27:53Z</date>
+			<date>2014-04-09T23:16:13Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -90,13 +78,13 @@
 			<key>filename</key>
 			<string>fatARMA_Sim.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-08T20:06:00Z</date>
+			<date>2014-04-09T23:27:14Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>fatPlot_Functions.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-08T18:57:31Z</date>
+			<date>2014-04-09T23:20:14Z</date>
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
@@ -108,30 +96,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>6</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>171</integer>
+				<integer>166</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>226</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>171</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>10</integer>
-				<key>line</key>
-				<integer>171</integer>
-			</dict>
+			<integer>301</integer>
 		</dict>
 		<key>Data_Functions.R</key>
 		<dict>
@@ -173,7 +145,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>281</integer>
 		</dict>
 		<key>ReadFatData.R</key>
 		<dict>
@@ -194,144 +166,100 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>108</integer>
+				<integer>31</integer>
 				<key>line</key>
-				<integer>196</integer>
+				<integer>56</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>175</integer>
+			<integer>53</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>27</integer>
+				<key>line</key>
+				<integer>56</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>36</integer>
+				<key>line</key>
+				<integer>56</integer>
+			</dict>
 		</dict>
 		<key>fatARMA.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>20</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>32</integer>
+				<integer>124</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>28</integer>
-		</dict>
-		<key>fatARMA_Figures.R</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>26</integer>
-				<key>line</key>
-				<integer>405</integer>
-			</dict>
-			<key>columnSelection</key>
-			<false/>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>15</integer>
-				<key>line</key>
-				<integer>405</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>26</integer>
-				<key>line</key>
-				<integer>405</integer>
-			</dict>
+			<integer>100</integer>
 		</dict>
 		<key>fatARMA_Sim.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>68</integer>
+				<integer>69</integer>
 				<key>line</key>
-				<integer>32</integer>
+				<integer>64</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>8</integer>
-		</dict>
-		<key>fatARMA_Summary.R</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>41</integer>
-				<key>line</key>
-				<integer>25</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>51</integer>
+			<integer>58</integer>
 		</dict>
 		<key>fatPlot_Functions.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>8</integer>
+				<integer>55</integer>
 				<key>line</key>
-				<integer>416</integer>
+				<integer>463</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>188</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>416</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>417</integer>
-			</dict>
+			<integer>548</integer>
 		</dict>
 		<key>fatPlots.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>9</integer>
+				<integer>99</integer>
 				<key>line</key>
-				<integer>210</integer>
+				<integer>48</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>196</integer>
+			<integer>41</integer>
 		</dict>
 		<key>fatTails_Manuscript.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>35</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>43</integer>
+				<integer>40</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
-			<integer>0</integer>
+			<integer>139</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>29</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
@@ -346,8 +274,6 @@
 		<string>FatTails_Functions.R</string>
 		<string>ARMAFunctions.R</string>
 		<string>fatPlot_Functions.R</string>
-		<string>fatARMA_Summary.R</string>
-		<string>fatARMA_Figures.R</string>
 		<string>FatTails_Figures.R</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
