@@ -102,7 +102,7 @@ data.fat.full <- data.fat.full[!is.na(data.fat.full[,"se.sh_0"]),]
 data.fat <- sub.gen(data.fat.full)
 
 #Split into Bio
-bio.gev <- data.gev[data.gev[,"Type"]=="Biological",]
+bio.gev <- data.fat.full[data.fat.full[,"Type"]=="Biological",]
 
 # =============================
 # = Fix up Zoop for hierarchy =
