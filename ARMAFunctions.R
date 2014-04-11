@@ -760,6 +760,13 @@ arima.sim2 <- function (model, n, rand.gen = rnorm, innov = rand.gen(n, ...),
     as.ts(x)
 }
 
+# =============================
+# = Random Numbers via Hurdle =
+# =============================
+r.jump.diff <- function(n, mu=0, sdev=1, lmu=0, lsdev=1, qFunc="rbinom", qArgs=list(n=n, size=1, prob=0.2)){
+	rnorm(n=n, mean=mu, sd=sdev) + do.call(qFunc, qArgs)*rlnorm(n=n, meanlog=lmu, sdlog=lsdev)
+}
+
 
 # ======================================================================================
 # = Simulate a variety of ARMA time series and fit GEV to maxima (1 maximum per nYear) =
@@ -794,7 +801,8 @@ myFatSim <- function(x, nYear=35){
 		normal=rnorm(N*nYear, 0, 1),
 		t=rt(N*nYear, 5),
 		cauchy=rcauchy(n=N*nYear),
-		lnorm=rlnorm(N*nYear, sdlog=0.65)
+		lnorm=rlnorm(N*nYear, sdlog=0.65),
+		r.jump.diff=r.jump.diff(n=N*nYear)
 	)
 	maxResid <- rep(NA, nYear)
 	
@@ -809,7 +817,8 @@ myFatSim <- function(x, nYear=35){
 		maxTS[i] <- simIndex[which.max(tsimTS)]
 	}
 	
-	gevRes <- gev.fit2(fullTS[maxTS])$mle[c("sh_0", "mu_0", "sig_0")]
+	gevRes0 <- gev.fit2(fullTS[maxTS])
+	gevRes <- c(gevRes0$mle[c("sh_0", "mu_0", "sig_0")], "se"=gevRes0$se["sh_0"])
 	Xi_resid <- gev.fit2(maxResid)$mle["sh_0"]
 	Order <- x[,"P"] + x[,"Q"]
 	
@@ -818,7 +827,7 @@ myFatSim <- function(x, nYear=35){
 	maC2 <- c("MA1"=NA,"MA2"=NA,"MA3"=NA)
 	maC2[0:x[,"Q"]] <- maC
 	
-	adf <- data.frame(x, "Order"=Order, "Lambda"=Lambda, "minRoot"=minRoot, t(arC2), t(maC2), "Xi"=gevRes["sh_0"], "mu"=gevRes["mu_0"], "sig"=gevRes["sig_0"], "residXi"=Xi_resid)
+	adf <- data.frame(x, "Order"=Order, "Lambda"=Lambda, "minRoot"=minRoot, t(arC2), t(maC2), "Xi"=gevRes["sh_0"], "mu"=gevRes["mu_0"], "sig"=gevRes["sig_0"], "residXi"=Xi_resid, "xi.se"=gevRes["se.sh_0"])
 	list("summary"=adf, "fullTS"=fullTS, "maxTS"=maxTS)
 }
 

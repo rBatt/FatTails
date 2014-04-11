@@ -31,6 +31,7 @@ setwd("/Users/battrd/Documents/School&Work/WiscResearch/FatTails")
 # ================
 source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/ARMAFunctions.R") #also loads GenSA and DEoptim packages
 # source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
+source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Functions.R")
 
 # =============================
 # = Define Simulation Options =
@@ -38,7 +39,7 @@ source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/ARMAFunctions.
 nPerYear <- 10 # number of observations per "year"
 Ps <- 1 # vector of the orders of AR to simulate (e.g., 1:2 would simulate time series that were AR(1), and that were AR(2))
 Qs <- 0:1 # vector of MA orders
-chooseDists <- c("normal", "lnorm") # vector of distributions – can be "normal", "cauchy", "lnorm", and "t"
+chooseDists <- c("normal", "r.jump.diff") # vector of distributions – can be "normal", "cauchy", "lnorm", and "t"
 nReps <- 5 # number of reps to do for each combination of P, Q, and Distribution
 simPars <- expand.grid(P=Ps, Q=Qs, Distribution=chooseDists, Rep=1:nReps, N=c(nPerYear)) # set up combinations of simulation options
 
@@ -46,7 +47,7 @@ simPars <- expand.grid(P=Ps, Q=Qs, Distribution=chooseDists, Rep=1:nReps, N=c(nP
 # ===============================================
 # = Simulate ARMA time series and calculate GEV =
 # ===============================================
-set.seed(449) # Set seed for random number generator
+set.seed(439) # Set seed for random number generator
 simXi0 <- dlply(.data=simPars, .variables=c("P","Q","Distribution","Rep", "N"), .fun=myFatSim) # conduct simulations and GEV analysis
 reorgSum <- function(x)x$summary # convenience function to pull out the 'summary' output from simXi0
 reorgFull <- function(x)x$fullTS # convenience function to pull out the 'fullTS' output from simXi0
@@ -60,12 +61,20 @@ row.names(simXiMax) <- NULL
 
 statSim <- simXi[,"Lambda"]<1 # subset to stationary time series
 simXiS <- simXi[statSim,]
+simXiS[,"critXi"] <- fattestSig(simXiS[,"Xi"], simXiS[,"xi.se"])
 
 # ===================================================================
 # = Grab the thinnest and fattest time series (that are stationary) =
 # ===================================================================
-fattestI <- which.max(simXiS[,"Xi"])
-thinnestI <- which.min(simXiS[,"Xi"])
+fDl <- simXiS[,"Distribution"]==chooseDists[2]
+fattestI <- which(fDl & simXiS[,"Xi"]==max(simXiS[,"Xi"])) #which.max(simXiS[,"critXi"])
+
+tDl <- simXiS[,"Distribution"]==chooseDists[1]
+xiPse <- (abs(simXiS[,"Xi"])+simXiS[,"xi.se"])
+thinnestI <- which(tDl & (xiPse==min(xiPse[tDl]))) # which.min(abs(simXiS[,"Xi"])+simXiS[,"xi.se"])
+
+print(simXiS[c(fattestI,thinnestI),])
+flush.console()
 
 ffTS <- simXiFull[,fattestI] # Fattest full time series
 fmTS <- simXiMax[,fattestI] # Fattest max time series
