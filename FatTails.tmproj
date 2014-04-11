@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>currentDocument</key>
-	<string>TurnExtreme_Fat_Data.R</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -64,15 +62,15 @@
 			<key>filename</key>
 			<string>fatPlots.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-10T19:20:17Z</date>
+			<date>2014-04-11T13:17:19Z</date>
+			<key>selected</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>TurnExtreme_Fat_Data.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-10T19:26:05Z</date>
-			<key>selected</key>
-			<true/>
+			<date>2014-04-10T19:56:45Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -172,14 +170,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>39</integer>
+				<integer>57</integer>
 				<key>line</key>
-				<integer>110</integer>
+				<integer>184</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>96</integer>
+			<integer>173</integer>
 		</dict>
 		<key>fatARMA.R</key>
 		<dict>
@@ -237,20 +235,6 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>fatPlots.R</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>312</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
 		<key>fatTails_Manuscript.R</key>
 		<dict>
 			<key>caret</key>
@@ -266,21 +250,6 @@
 			<integer>29</integer>
 		</dict>
 	</dict>
-	<key>openDocuments</key>
-	<array>
-		<string>ReadFatData.R</string>
-		<string>TurnExtreme_Fat_Data.R</string>
-		<string>fatARMA.R</string>
-		<string>fatARMA_Sim.R</string>
-		<string>fatPlots.R</string>
-		<string>fatTails_Manuscript.R</string>
-		<string>fatForest.R</string>
-		<string>Data_Functions.R</string>
-		<string>FatTails_Functions.R</string>
-		<string>ARMAFunctions.R</string>
-		<string>fatPlot_Functions.R</string>
-		<string>FatTails_Figures.R</string>
-	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
