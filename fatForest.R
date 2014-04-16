@@ -12,7 +12,7 @@ library(randomForest)
 # = Prepare a fish data frame for the forest =
 # ============================================
 # Grab fish GEV results and taxonomic info
-not4tree <- c("Type","taxLvl","Community","Species","a1","a2","a3","b1","b2","b3","nll","AICc","Period","taxID", "mu_0","sig_0", "Level2_time","Level2_normTime","logsd","Level2_logNormTime","Duration","logSd","level", "shape.sig")
+not4tree <- c("Type","taxLvl","Community","Species","a1","a2","a3","b1","b2","b3","nll","AICc","Period","taxID", "mu_0","sig_0", "Level2_time","Level2_normTime","logsd","Level2_logNormTime","Duration","logSd","level", "shape.sig", "Genus", "mean", "sd", "logMean")
 bigFish0 <- merge(fish.gev, data.2, all.x=TRUE)
 bigFish0 <- bigFish0[,!names(bigFish0)%in%not4tree]
 bigFish0 <- bigFish0[complete.cases(bigFish0),]
@@ -36,8 +36,12 @@ bigFish <- bigFish[,!colsNA]
 # ===============
 # = Fish Forest =
 # ===============
-fish.prox0 <- randomForest(sh_0~., bigFish0, importance=TRUE, ntree=1E3)
+fish.prox0 <- randomForest(sh_0~., bigFish0, importance=TRUE)
 varImpPlot(fish.prox0)
+f.blah <- importance(fish.prox0, type=1)
+f.blah[order(f.blah[,1]),]
+
+fish.party <- cforest(sh_0~., bigFish0)
 
 fish.prox <- randomForest(sh_0~., bigFish, importance=TRUE, ntree=1E3)
 varImpPlot(fish.prox)
@@ -62,6 +66,7 @@ bigZoop00[,"Family"] <- factor(bigZoop00[,"Family"])
 bigZoop00[,"Genus"] <- factor(bigZoop00[,"Genus"])
 bigZoop00[,"P"] <- factor(bigZoop00[,"P"])
 bigZoop00[,"Q"] <- factor(bigZoop00[,"Q"])
+bigZoop00[,"Q"] <- factor(bigZoop00[,"variable"])
 
 expZoopGen <- model.matrix(~Genus, data=bigZoop00)[,-1]
 bigZoop001 <- bigZoop00[,names(bigZoop00)[!names(bigZoop00)%in%"Genus"]]
@@ -79,8 +84,10 @@ bigZoop <- bigZoop[,!colsNA]
 # ===============
 # = Zoop Forest =
 # ===============
-zoop.prox0 <- randomForest(sh_0~., bigZoop0, importance=TRUE, ntree=1E3)
+zoop.prox0 <- randomForest(sh_0~., bigZoop00, importance=TRUE, ntree=1E3)
 varImpPlot(zoop.prox0)
+z.blah <- importance(zoop.prox0, type=1)
+z.blah[order(z.blah[,1]),]
 
 zoop.prox <- randomForest(sh_0~., bigZoop, importance=TRUE, ntree=1E3)
 varImpPlot(zoop.prox)
