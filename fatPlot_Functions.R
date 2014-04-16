@@ -151,10 +151,10 @@ colorDens <- function(vals=NULL, cols=NULL, revxy=FALSE, mu=NULL, sig=NULL, limX
 			polygon(c(0,dY[[i]],0), c(xA[1],dX[[i]],xA[2]), col=cFill[i], border=cLine[i], lwd=2)
 		}
 	}else{
-		plot(c(xA[1],dX,xA[2]), c(0,dY[[1]],0), type="l", col=cLine[1], xlab="", ylab="", xlim=limX, ylim=limY, lwd=2, ...)
-		polygon(c(xA[1],dX,xA[2]), c(0,dY[[1]],0), col=cFill[1], border=NA)
+		plot(c(xA[1],dX[[1]],xA[2]), c(0,dY[[1]],0), type="l", col=cLine[1], xlab="", ylab="", xlim=limX, ylim=limY, lwd=2, ...)
+		polygon(c(xA[1],dX[[1]],xA[2]), c(0,dY[[1]],0), col=cFill[1], border=NA)
 		for(i in 2:N){
-			polygon(c(xA[1],dX,xA[2]), c(0,dY[[i]],0), col=cFill[i], border=cLine[i], lwd=2)
+			polygon(c(xA[1],dX[[1]],xA[2]), c(0,dY[[i]],0), col=cFill[i], border=cLine[i], lwd=2)
 		}
 	}
 }

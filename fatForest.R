@@ -12,7 +12,7 @@ library(randomForest)
 # = Prepare a fish data frame for the forest =
 # ============================================
 # Grab fish GEV results and taxonomic info
-not4tree <- c("Type","taxLvl","Community","Species","a1","a2","a3","b1","b2","b3","nll","AICc","Period", "variable","taxID", "mu_0","sig_0", "Level2_time","Level2_normTime","logsd","Level2_logNormTime","Duration","logSd","level", "shape.sig")
+not4tree <- c("Type","taxLvl","Community","Species","a1","a2","a3","b1","b2","b3","nll","AICc","Period","taxID", "mu_0","sig_0", "Level2_time","Level2_normTime","logsd","Level2_logNormTime","Duration","logSd","level", "shape.sig")
 bigFish0 <- merge(fish.gev, data.2, all.x=TRUE)
 bigFish0 <- bigFish0[,!names(bigFish0)%in%not4tree]
 bigFish0 <- bigFish0[complete.cases(bigFish0),]
@@ -22,6 +22,7 @@ bigFish0[,"Family"] <- factor(bigFish0[,"Family"])
 bigFish0[,"Genus"] <- factor(bigFish0[,"Genus"])
 bigFish0[,"P"] <- factor(bigFish0[,"P"])
 bigFish0[,"Q"] <- factor(bigFish0[,"Q"])
+bigFish0[,"variable"] <- factor(bigFish0[,"variable"])
 
 # Prepare a fish data frame w/ other types of variables (really big)
 # Grab the GEV results from all of the other variable types, organize into a per-lake wide format
@@ -98,18 +99,30 @@ fz <- cbind(fz0, zfTax)
 
 fz.prox <- randomForest(sh_0~.,fz, importance=TRUE)
 varImpPlot(fz.prox)
+partialPlot(fz.prox, pred.data=fz, x.var="N")
+partialPlot(fz.prox, pred.data=fz, x.var="se.sh_0")
+partialPlot(fz.prox, pred.data=fz, x.var="se.sh_0")
 
+fz.party <- cforest(sh_0~., data=fz00, controls=cforest_unbiased(ntree=1E3))
+sort(varimp(fz.party))
 
 # ====================
 # = Try all fat data =
 # ====================
-not4tree2 <- c("taxLvl","Species","a1","a2","a3","b1","b2","b3","nll","AICc","Period", "taxID", "mu_0","sig_0", "Level2_time","Level2_normTime","logsd","Level2_logNormTime","Duration","logSd","level", "shape.sig","mean", "logMean","sd", "sigEps")
+not4tree2 <- c("taxLvl","Species","a1","a2","a3","b1","b2","b3","nll","AICc","Period", "taxID", "mu_0","sig_0", "Level2_time","Level2_normTime","logsd","Level2_logNormTime","Duration","logSd","level", "shape.sig","mean", "logMean","sd", "sigEps", "se.sh_0", "residual_mu_0", "variable", "location")
 data.tree00 <- data.2[,names(data.2)[!names(data.2)%in%c(not4tree2)]]
 data.tree00 <- data.tree00[complete.cases(data.tree00),]
-dtVar <- model.matrix(~variable, data=data.tree00)
-data.tree0 <- cbind(data.tree00[,names(data.tree00)[!names(data.tree00)%in%c("variable")]], dtVar[,-1])
+# dtVar <- model.matrix(~variable, data=data.tree00)
+# data.tree0 <- cbind(data.tree00[,names(data.tree00)[!names(data.tree00)%in%c("variable")]], dtVar[,-1])
 
-dt.prox <- randomForest(sh_0~., data.tree0, importance=TRUE)
+dt.prox <- randomForest(sh_0~., data.tree00, importance=TRUE)
 varImpPlot(dt.prox)
+partialPlot(dt.prox, pred.data=data.tree00, x.var=c("sigE"))
+
+partia
+dt.party <- cforest(sh_0~., data=data.tree00)
+varimp(dt.party)
+
+
 
 

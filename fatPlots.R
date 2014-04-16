@@ -151,7 +151,7 @@ axis(side=2)
 axis(side=1, at=1:4, labels=c("Bio","Chem","Phys","Met"))
 mtext(bquote(xi~~from~~GEV), side=2, line=1.5)
 
-beanplot(log10(Level2_time)~Type, data=data.fat[is.finite(data.fat[,"Level2_time"]),], log="", ylab="", xaxt="n", yaxt="n", border=bLine, col=beanCol, ll=0.01)
+beanplot(log10(Level2_time)~Type, data=data.fat[is.finite(data.fat[,"Level2_time"]),], log="", ylab="", xaxt="n", yaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5)
 wtBase <- axTicks(2)
 wtLab <- parse(text=paste(10,wtBase,sep="^"))
 axis(side=2, at=wtBase, labels=wtLab)
@@ -212,8 +212,8 @@ fLabXi <- parse(text=paste("xi", fXi, sep=" = "))
 	# = Plot Example w/ reversed xy =
 	# ===============================
 # Set up figure space
-dev.new(width=3.5, height=5) # open graphical device
-# png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/fat_conceptFig.png", res=150, units="in", height=5, width=3.5)
+# dev.new(width=3.5, height=5) # open graphical device
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/fat_conceptFig.png", res=150, units="in", height=5, width=3.5)
 cols1 <- rep(rep(1:3, each=3), 4) # first set of columns for layout matrix
 cols2 <- rep(rep(c(4,5,3), each=3), 3) # second set of column for layout matrix
 lmat <- matrix(c(cols1, cols2), ncol=7) # create layout matrix
@@ -263,7 +263,7 @@ cm2 <- min(ffTS)
 colorDens(vals=list(ffTS, ffTS[fmTS]), cols=c("gray","red"), revxy=TRUE, yaxt="n", bty="n", limX=ylim2)
 text(y=cm2+sign(cm2)*cm2*0.15, x=0.25*max(density(ffTS)$y, density(ffTS[fmTS])$y), "D", font=2)
 mtext("density", side=1, line=1.25)
-# dev.off()
+dev.off()
 
 
 
@@ -328,6 +328,44 @@ prop.fat.zoop0 <- sapply(sXi.zoop, function(x)c("bounded"=sum(x<0), "thin"=sum(x
 prop.fat.zoop <- cbind("taxLvl"=names(prop.fat.zoop0),t(prop.fat.zoop0))
 barplot(prop.fat.zoop, beside=TRUE, legend=TRUE, args.legend=list(x="topleft",title="Zoops"))
 dev.off()
+
+
+
+# ==================================
+# = Plot precipitation time series =
+# ==================================
+mad.precip <- data.max[data.max[,"variable"]=="precip_mm"&data.max[,"location"]=="Madison",]
+plot(mad.precip[,"year4"], mad.precip[,"Data"], type="l")
+
+
+
+fatQQ <- function(vari="cpue1_Sum", loca="ME", taxid="Lepomis", norm=FALSE){
+	oQ <- data.max[data.max[,"variable"]==vari&data.max[,"location"]==loca&data.max[,"taxID"]==taxid,"Data"]
+	oQ <- oQ[!is.na(oQ)]
+	oFat <- data.fat[data.fat[,"variable"]==vari&data.fat[,"location"]==loca&data.fat[,"taxID"]==taxid,]
+	exi <- oFat[,"sh_0"]
+	escale <- oFat[,"sig_0"]
+	eloc <- oFat[,"mu_0"]
+	oN <- oFat[,"N"]
+	tPs <- (1:oN)/(oN+1)
+	tQ <- qgev(tPs, xi=exi, mu=eloc, sigma=escale)
+	plot(1:oN, oQ, type="l", col="gray", lwd=2, xaxt="n", yaxt="n", xlab="", ylab="")
+	par(new=TRUE)
+	if(!norm){
+		plot(tQ, sort(oQ))	
+	}else{
+		qqnorm(scale(oQ))
+	}
+	
+	abline(a=0, b=1, lty="dotted")
+}
+
+fatQQ("cpue1_Sum", "ME", "Pimephales", norm=FALSE)
+
+
+
+
+
 
 
 
