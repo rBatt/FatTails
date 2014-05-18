@@ -73,9 +73,12 @@ pDens <- function(x, go=TRUE, ...){
 	tD <- rbind(matrix(c(min(tD[,1]-0.01), 0, 0, 0),ncol=4), tD, matrix(c(max(tD[,1])+0.01, 0, 0, 0), ncol=4))
 	plot(tD[,"time"], tD[,"gev"], pch=NA, ylim=c(-0.035,1), xlim=range(tD[,"time"]), ylab="", lwd=myLwd,  ...)
 	if(go){
-		polygon(tD[,"time"], tD[,"gev"], col=cFill[1], border=cLine[1], lwd=myLwd)
-		polygon(tD[,"time"], tD[,"norm"], col=cFill[2], border=cLine[2], lwd=myLwd)
-		polygon(tD[,"time"], tD[,"log"], col=cFill[3], border=cLine[3], lwd=myLwd)
+		polygon(tD[,"time"], tD[,"gev"], col=cFill[1], border=NA)
+		lines(tD[,"time"], tD[,"gev"], col=cLine[1], lwd=myLwd)
+		polygon(tD[,"time"], tD[,"norm"], col=cFill[2], border=NA)
+		lines(tD[,"time"], tD[,"norm"], col=cLine[2], lwd=myLwd)
+		polygon(tD[,"time"], tD[,"log"], col=cFill[3], border=NA)
+		lines(tD[,"time"], tD[,"log"], col=cLine[3], lwd=myLwd)
 
 		centrals <- tD[apply(tD[,-1], 2, which.max),1]
 		centrals <- tD[apply(tD[,-1], 2, which.max),1]
@@ -145,18 +148,20 @@ colorDens <- function(vals=NULL, cols=NULL, revxy=FALSE, mu=NULL, sig=NULL, limX
 	xA <- limX + c(-1,1)*xF # "add" this "adjustment" to the start and end of the dX
 
 	if(revxy){
-		plot(c(0,dY[[1]],0), c(xA[1],dX[[1]],xA[2]), type="l", col=cLine[1], xlab="", ylab="", ylim=limX, xlim=limY, lwd=2, ...)
+		plot(c(0,dY[[1]],0), c(xA[1],dX[[1]],xA[2]), type="n", col=cLine[1], xlab="", ylab="", ylim=limX, xlim=limY, ...)
 		polygon(c(0,dY[[1]],0), c(xA[1],dX[[1]],xA[2]), col=cFill[1], border=NA)
+		lines(c(0,dY[[1]],0), c(xA[1],dX[[1]],xA[2]), col=cLine[1], lwd=1.5)
 		for(i in 2:N){
 			polygon(c(0,dY[[i]],0), c(xA[1],dX[[i]],xA[2]), col=cFill[i], lty=0)
-			lines(c(0,dY[[i]],0), c(xA[1],dX[[i]],xA[2]), col=cFill[i], lwd=2)
+			lines(c(0,dY[[i]],0), c(xA[1],dX[[i]],xA[2]), col=cLine[i], lwd=1.5)
 		}
 	}else{
-		plot(c(xA[1],dX[[1]],xA[2]), c(0,dY[[1]],0), type="l", col=cLine[1], xlab="", ylab="", xlim=limX, ylim=limY, lwd=2, ...)
+		plot(c(xA[1],dX[[1]],xA[2]), c(0,dY[[1]],0), type="n", col=cLine[1], xlab="", ylab="", xlim=limX, ylim=limY, ...)
 		polygon(c(xA[1],dX[[1]],xA[2]), c(0,dY[[1]],0), col=cFill[1], border=NA, lty=0)
+		lines(c(xA[1],dX[[1]],xA[2]), c(0,dY[[1]],0), col=cLine[1], lwd=1.5)
 		for(i in 2:N){
 			polygon(c(xA[1],dX[[1]],xA[2]), c(0,dY[[i]],0), col=cFill[i], lty=0)
-			lines(c(xA[1],dX[[1]],xA[2]), c(0,dY[[i]],0), col=cFill[i], lwd=2)
+			lines(c(xA[1],dX[[1]],xA[2]), c(0,dY[[i]],0), col=cLine[i], lwd=1.5)
 		}
 	}
 }
@@ -190,18 +195,20 @@ colorPoly <- function(quants, dents, cols=NULL, revxy=FALSE, ...){
 	xA <- limX + c(-1,1)*xF # "add" this "adjustment" to the start and end of the dX
 
 	if(revxy){
-		plot(c(0,dY[[1]],0), c(xA[1],dX,xA[2]), type="l", col=cLine[1], xlab="", ylab="", ylim=limX, xlim=limY, lwd=2, ...)
+		plot(c(0,dY[[1]],0), c(xA[1],dX,xA[2]), type="n", col=cLine[1], xlab="", ylab="", ylim=limX, xlim=limY, ...)
 		polygon(c(0,dY[[1]],0), c(xA[1],dX,xA[2]), col=cFill[1], border=NA)
+		lines(c(0,dY[[1]],0), c(xA[1],dX,xA[2]), col=cLine[1], lwd=1.5)
 		for(i in 2:N){
 			polygon(c(0,dY[[i]],0), c(xA[1],dX,xA[2]), col=cFill[i], lty=0)
-			lines(c(0,dY[[i]],0), c(xA[1],dX,xA[2]), col=cFill[i], lwd=2)
+			lines(c(0,dY[[i]],0), c(xA[1],dX,xA[2]), col=cLine[i], lwd=1.5)
 		}
 	}else{
-		plot(c(xA[1],dX,xA[2]), c(0,dY[[1]],0), type="l", col=cLine[1], xlab="", ylab="", xlim=limX, ylim=limY, lwd=2, ...)
+		plot(c(xA[1],dX,xA[2]), c(0,dY[[1]],0), type="n", col=cLine[1], xlab="", ylab="", xlim=limX, ylim=limY, ...)
 		polygon(c(xA[1],dX,xA[2]), c(0,dY[[1]],0), col=cFill[1], border=NA, lty=0)
+		lines(c(xA[1],dX,xA[2]), c(0,dY[[1]],0), col=cLine[1], lwd=1.5)
 		for(i in 2:N){
 			polygon(c(xA[1],dX,xA[2]), c(0,dY[[i]],0), col=cFill[i], lty=0)
-			lines(c(xA[1],dX,xA[2]), c(0,dY[[i]],0), col=cFill[i], lwd=2)
+			lines(c(xA[1],dX,xA[2]), c(0,dY[[i]],0), col=cLine[i], lwd=1.5)
 		}
 	}
 }
