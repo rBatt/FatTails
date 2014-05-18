@@ -148,13 +148,15 @@ colorDens <- function(vals=NULL, cols=NULL, revxy=FALSE, mu=NULL, sig=NULL, limX
 		plot(c(0,dY[[1]],0), c(xA[1],dX[[1]],xA[2]), type="l", col=cLine[1], xlab="", ylab="", ylim=limX, xlim=limY, lwd=2, ...)
 		polygon(c(0,dY[[1]],0), c(xA[1],dX[[1]],xA[2]), col=cFill[1], border=NA)
 		for(i in 2:N){
-			polygon(c(0,dY[[i]],0), c(xA[1],dX[[i]],xA[2]), col=cFill[i], border=cLine[i], lwd=2)
+			polygon(c(0,dY[[i]],0), c(xA[1],dX[[i]],xA[2]), col=cFill[i], lty=0)
+			lines(c(0,dY[[i]],0), c(xA[1],dX[[i]],xA[2]), col=cFill[i], lwd=2)
 		}
 	}else{
 		plot(c(xA[1],dX[[1]],xA[2]), c(0,dY[[1]],0), type="l", col=cLine[1], xlab="", ylab="", xlim=limX, ylim=limY, lwd=2, ...)
-		polygon(c(xA[1],dX[[1]],xA[2]), c(0,dY[[1]],0), col=cFill[1], border=NA)
+		polygon(c(xA[1],dX[[1]],xA[2]), c(0,dY[[1]],0), col=cFill[1], border=NA, lty=0)
 		for(i in 2:N){
-			polygon(c(xA[1],dX[[1]],xA[2]), c(0,dY[[i]],0), col=cFill[i], border=cLine[i], lwd=2)
+			polygon(c(xA[1],dX[[1]],xA[2]), c(0,dY[[i]],0), col=cFill[i], lty=0)
+			lines(c(xA[1],dX[[1]],xA[2]), c(0,dY[[i]],0), col=cFill[i], lwd=2)
 		}
 	}
 }
@@ -191,13 +193,15 @@ colorPoly <- function(quants, dents, cols=NULL, revxy=FALSE, ...){
 		plot(c(0,dY[[1]],0), c(xA[1],dX,xA[2]), type="l", col=cLine[1], xlab="", ylab="", ylim=limX, xlim=limY, lwd=2, ...)
 		polygon(c(0,dY[[1]],0), c(xA[1],dX,xA[2]), col=cFill[1], border=NA)
 		for(i in 2:N){
-			polygon(c(0,dY[[i]],0), c(xA[1],dX,xA[2]), col=cFill[i], border=cLine[i], lwd=2)
+			polygon(c(0,dY[[i]],0), c(xA[1],dX,xA[2]), col=cFill[i], lty=0)
+			lines(c(0,dY[[i]],0), c(xA[1],dX,xA[2]), col=cFill[i], lwd=2)
 		}
 	}else{
 		plot(c(xA[1],dX,xA[2]), c(0,dY[[1]],0), type="l", col=cLine[1], xlab="", ylab="", xlim=limX, ylim=limY, lwd=2, ...)
-		polygon(c(xA[1],dX,xA[2]), c(0,dY[[1]],0), col=cFill[1], border=NA)
+		polygon(c(xA[1],dX,xA[2]), c(0,dY[[1]],0), col=cFill[1], border=NA, lty=0)
 		for(i in 2:N){
-			polygon(c(xA[1],dX,xA[2]), c(0,dY[[i]],0), col=cFill[i], border=cLine[i], lwd=2)
+			polygon(c(xA[1],dX,xA[2]), c(0,dY[[i]],0), col=cFill[i], lty=0)
+			lines(c(xA[1],dX,xA[2]), c(0,dY[[i]],0), col=cFill[i], lwd=2)
 		}
 	}
 }
