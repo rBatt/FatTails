@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>fatForest.R</string>
+	<string>fatPlots.R</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -22,7 +22,7 @@
 			<key>filename</key>
 			<string>FatTails_Functions.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-16T13:50:55Z</date>
+			<date>2014-05-18T05:04:48Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -34,9 +34,7 @@
 			<key>filename</key>
 			<string>fatForest.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-17T23:45:21Z</date>
-			<key>selected</key>
-			<true/>
+			<date>2014-05-18T01:22:39Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -52,9 +50,15 @@
 		</dict>
 		<dict>
 			<key>filename</key>
+			<string>fatPlots_JASM.R</string>
+			<key>lastUsed</key>
+			<date>2014-05-18T05:09:25Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
 			<string>fatARMA.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-16T13:56:26Z</date>
+			<date>2014-05-18T01:26:42Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -66,13 +70,15 @@
 			<key>filename</key>
 			<string>fatMax.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-11T15:39:17Z</date>
+			<date>2014-05-18T01:25:26Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>fatPlots.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-17T23:45:21Z</date>
+			<date>2014-05-18T05:09:31Z</date>
+			<key>selected</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -96,7 +102,7 @@
 			<key>filename</key>
 			<string>fatPlot_Functions.R</string>
 			<key>lastUsed</key>
-			<date>2014-04-16T19:54:35Z</date>
+			<date>2014-05-18T05:09:31Z</date>
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
@@ -192,14 +198,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>32</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>6</integer>
+				<integer>35</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>25</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>15</integer>
+				<key>line</key>
+				<integer>35</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>35</integer>
+			</dict>
 		</dict>
 		<key>fatARMA_Sim.R</key>
 		<dict>
@@ -220,9 +242,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>17</integer>
+				<integer>40</integer>
 				<key>line</key>
-				<integer>34</integer>
+				<integer>28</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -248,28 +270,42 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>75</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>94</integer>
+				<integer>65</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>51</integer>
 		</dict>
 		<key>fatPlots.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>136</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>395</integer>
+				<integer>268</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>385</integer>
+			<integer>258</integer>
+		</dict>
+		<key>fatPlots_JASM.R</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>56</integer>
+				<key>line</key>
+				<integer>60</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>53</integer>
 		</dict>
 		<key>fatTails_Manuscript.R</key>
 		<dict>
@@ -297,12 +333,13 @@
 		<string>FatTails_Figures.R</string>
 		<string>fatForest.R</string>
 		<string>fatARMA.R</string>
+		<string>fatPlots_JASM.R</string>
 		<string>fatTails_Manuscript.R</string>
 		<string>ReadFatData.R</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{-1919, 608}, {1716, 616}}</string>
+	<string>{{1, 360}, {1247, 518}}</string>
 </dict>
 </plist>

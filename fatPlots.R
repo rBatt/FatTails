@@ -213,8 +213,8 @@ fLabXi <- parse(text=paste("xi", fXi, sep=" = "))
 	# = Plot Example w/ reversed xy =
 	# ===============================
 # Set up figure space
-# dev.new(width=3.5, height=5) # open graphical device
-png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/fat_conceptFig.png", res=150, units="in", height=5, width=3.5)
+dev.new(width=3.5, height=5) # open graphical device
+# png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/fat_conceptFig.png", res=150, units="in", height=5, width=3.5)
 cols1 <- rep(rep(1:3, each=3), 4) # first set of columns for layout matrix
 cols2 <- rep(rep(c(4,5,3), each=3), 3) # second set of column for layout matrix
 lmat <- matrix(c(cols1, cols2), ncol=7) # create layout matrix
@@ -264,7 +264,7 @@ cm2 <- min(ffTS)
 colorDens(vals=list(ffTS, ffTS[fmTS]), cols=c("gray","red"), revxy=TRUE, yaxt="n", bty="n", limX=ylim2)
 text(y=cm2+sign(cm2)*cm2*0.15, x=0.25*max(density(ffTS)$y, density(ffTS[fmTS])$y), "D", font=2)
 mtext("density", side=1, line=1.25)
-dev.off()
+# dev.off()
 
 
 

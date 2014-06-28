@@ -767,6 +767,52 @@ r.jump.diff <- function(n, mu=0, sdev=1, lmu=0, lsdev=1, qFunc="rbinom", qArgs=l
 	rnorm(n=n, mean=mu, sd=sdev) + do.call(qFunc, qArgs)*rlnorm(n=n, meanlog=lmu, sdlog=lsdev)
 }
 
+# =================
+# = Coin Toss RNG =
+# =================
+rcoin <- function(N=1, nCoins=5, acc=FALSE){
+	Funcall <- function(f, ...){
+		f(...)	
+	} 
+	Iterate <- function(f, n = 1){
+	    function(x){
+			Reduce(Funcall, rep.int(list(f), n), x, right=TRUE, accumulate=acc)
+		} 
+	}
+	if(acc){
+		matrix(c(unlist(
+			Iterate(f=function(x){coin <- rbinom(n=N, size=1, prob=0.5); shock <- (rnorm(N, sd=1)); coin*shock*x}, n=nCoins)(0)
+			), rep(0, N)), ncol=N, byrow=T)
+	}else{
+		Iterate(f=function(x){coin <- rbinom(n=N, size=1, prob=0.5); shock <- (rnorm(N, sd=1)); x + coin*shock*x}, n=nCoins)(1)	
+	}
+}
+
+coin2 <- function(N, nCoins, nInter=nCoins){
+	nShocks <- matrix(NA, nrow=N, ncol=min(nCoins, nInter))
+	
+	for(nsim in 1:N){
+		coins <- rbinom(n=nCoins, size=1, prob=0.5)
+		shocks <- rnorm(n=nCoins)
+		for(i in 1:min(nCoins, nInter)){
+			 nShocks[nsim, i] <- sum(combn(1:min(nCoins, nInter), i, function(x)sum(coins[x]*shocks[x])))
+		}
+	}
+	rowSums(nShocks)
+}
+
+coin3 <- function(N, nCoins, nInter=nCoins){
+	nShocks <- matrix(NA, nrow=N, ncol=min(nCoins, nInter))
+	
+	for(nsim in 1:N){
+		coins <- rbinom(n=nCoins, size=1, prob=0.5)
+		for(i in 1:min(nCoins, nInter)){
+			 nShocks[nsim, i] <- sum(combn(1:min(nCoins, nInter), i, function(x)prod(coins[x])*(rnorm(1))))
+		}
+	}
+	rowSums(nShocks)
+}
+
 
 # ======================================================================================
 # = Simulate a variety of ARMA time series and fit GEV to maxima (1 maximum per nYear) =
@@ -775,7 +821,8 @@ myFatSim <- function(x, nYear=35){
 	N <- x[,"N"]
 	# AR Coefficients
 	if(x[,"P"]>=1){
-		arC <- runif(-1, 1, n=(x[,"P"]))
+		# arC <- runif(-1, 1, n=(x[,"P"]))
+		arC <- seq(1/(x[,"P"]+1), x[,"P"]/(x[,"P"]+1), length.out=x[,"P"])
 		Lambda <- max(abs(Eig(arC)))
 		minRoot <- min(Mod(polyroot(c(1, -arC))))
 	}else{
@@ -802,7 +849,9 @@ myFatSim <- function(x, nYear=35){
 		t=rt(N*nYear, 5),
 		cauchy=rcauchy(n=N*nYear),
 		lnorm=rlnorm(N*nYear, sdlog=0.65),
-		r.jump.diff=r.jump.diff(n=N*nYear)
+		r.jump.diff=r.jump.diff(n=N*nYear),
+		rcoin=rcoin(N=N*nYear, nCoin=3),
+		coin3=coin3(N=N*nYear, nCoin=4)
 	)
 	maxResid <- rep(NA, nYear)
 	
@@ -811,7 +860,7 @@ myFatSim <- function(x, nYear=35){
 		tsimResid <- simResid[simIndex]
 		maxResid[i] <- max(tsimResid)
 
-		tsimTS <- c(arima.sim2(model=list(order=simOrder, ar=arC, ma=maC), n=N, innov=tsimResid, start.innov=rep(0,1E4)))
+		tsimTS <- c(arima.sim2(model=list(order=simOrder, ar=arC, ma=maC), n=N, innov=tsimResid))
 		
 		fullTS[simIndex] <- tsimTS
 		maxTS[i] <- simIndex[which.max(tsimTS)]

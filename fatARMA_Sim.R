@@ -38,9 +38,9 @@ source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Funct
 # =============================
 nPerYear <- 10 # number of observations per "year"
 Ps <- 1 # vector of the orders of AR to simulate (e.g., 1:2 would simulate time series that were AR(1), and that were AR(2))
-Qs <- 0:1 # vector of MA orders
-chooseDists <- c("normal", "r.jump.diff") # vector of distributions – can be "normal", "cauchy", "lnorm", and "t"
-nReps <- 5 # number of reps to do for each combination of P, Q, and Distribution
+Qs <- 0 # vector of MA orders
+chooseDists <- c("normal", "rcoin") # vector of distributions – can be "normal", "cauchy", "lnorm", and "t"
+nReps <- 50 # number of reps to do for each combination of P, Q, and Distributionrt;
 simPars <- expand.grid(P=Ps, Q=Qs, Distribution=chooseDists, Rep=1:nReps, N=c(nPerYear)) # set up combinations of simulation options
 
 
@@ -66,6 +66,7 @@ simXiS[,"critXi"] <- fattestSig(simXiS[,"Xi"], simXiS[,"xi.se"])
 # ===================================================================
 # = Grab the thinnest and fattest time series (that are stationary) =
 # ===================================================================
+
 fDl <- simXiS[,"Distribution"]==chooseDists[2]
 fattestI <- which(fDl & simXiS[,"Xi"]==max(simXiS[,"Xi"])) #which.max(simXiS[,"critXi"])
 
@@ -84,8 +85,8 @@ tmTS <- simXiMax[,thinnestI] # Thinnest max time series
 
 
 
-
-
+ddply(simXiS, "Distribution", function(x)x[which.max(x[,"Xi"]),])
+boxplot(Xi~Distribution, data=simXiS)
 
 
 
