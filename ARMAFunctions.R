@@ -770,7 +770,12 @@ r.jump.diff <- function(n, mu=0, sdev=1, lmu=0, lsdev=1, qFunc="rbinom", qArgs=l
 # =================
 # = Coin Toss RNG =
 # =================
-rcoin <- function(N=1, nCoins=5, acc=FALSE){
+# set.seed(1); rTest <- rnorm(4)
+
+rcoin <- function(N, nCoins=4, acc=FALSE){
+	# N is the number of random numbers to generate
+	# nCoins is the number of coin flips ... it behaves somewhat like a variance parameter. The higher it is, the bigger the shocks (in either direction)
+	# If acc is set to TRUE, the print-out will be a matrix where the first row of each column contains output that would be equivalent to acc=FALSE. The last row is the shock (startShock) that initializes the process, and the values above the bottom row show how the shocks accmulate after each coin flip. If N=100 and nCoins=4, you'll get a 4x100 matrix. Note that if you look from the last to first row in a column, successive rows that have the same value indicate that the coin flip was a 0.
 	Funcall <- function(f, ...){
 		f(...)	
 	} 
@@ -779,12 +784,13 @@ rcoin <- function(N=1, nCoins=5, acc=FALSE){
 			Reduce(Funcall, rep.int(list(f), n), x, right=TRUE, accumulate=acc)
 		} 
 	}
+	startShock <- rnorm(N)
 	if(acc){
 		matrix(c(unlist(
-			Iterate(f=function(x){coin <- rbinom(n=N, size=1, prob=0.5); shock <- (rnorm(N, sd=1)); coin*shock*x}, n=nCoins)(0)
-			), rep(0, N)), ncol=N, byrow=T)
+			Iterate(f=function(x){coin <- rbinom(n=N, size=1, prob=0.5); shock <- (rnorm(N, sd=1)); x + coin*shock*x}, n=nCoins)(startShock)
+			)), ncol=N, byrow=T)
 	}else{
-		Iterate(f=function(x){coin <- rbinom(n=N, size=1, prob=0.5); shock <- (rnorm(N, sd=1)); x + coin*shock*x}, n=nCoins)(1)	
+		Iterate(f=function(x){coin <- rbinom(n=N, size=1, prob=0.5); shock <- (rnorm(N, sd=1)); x + coin*shock*x}, n=nCoins)(startShock)	
 	}
 }
 
@@ -820,9 +826,9 @@ coin3 <- function(N, nCoins, nInter=nCoins){
 myFatSim <- function(x, nYear=35){
 	N <- x[,"N"]
 	# AR Coefficients
-	if(x[,"P"]>=1){
+	if(x[,"P"]>=0){
 		# arC <- runif(-1, 1, n=(x[,"P"]))
-		arC <- seq(1/(x[,"P"]+1), x[,"P"]/(x[,"P"]+1), length.out=x[,"P"])
+		arC <- x[,"P"] #seq(1/(x[,"P"]+1), x[,"P"]/(x[,"P"]+1), length.out=x[,"P"])
 		Lambda <- max(abs(Eig(arC)))
 		minRoot <- min(Mod(polyroot(c(1, -arC))))
 	}else{
@@ -838,7 +844,7 @@ myFatSim <- function(x, nYear=35){
 		maC <- NULL
 	}
 	
-	simOrder <- c(x[,"P"], 0, x[,"Q"])
+	simOrder <- c(1,0,x[,"Q"]) #c(x[,"P"], 0, x[,"Q"])
 	
 	
 	fullTS <- rep(NA, N*nYear)
@@ -869,7 +875,7 @@ myFatSim <- function(x, nYear=35){
 	gevRes0 <- gev.fit2(fullTS[maxTS])
 	gevRes <- c(gevRes0$mle[c("sh_0", "mu_0", "sig_0")], "se"=gevRes0$se["sh_0"])
 	Xi_resid <- gev.fit2(maxResid)$mle["sh_0"]
-	Order <- x[,"P"] + x[,"Q"]
+	Order <- 1 + x[,"Q"] #x[,"P"] + x[,"Q"]
 	
 	arC2 <- c("AR1"=NA,"AR2"=NA,"AR3"=NA)
 	arC2[0:x[,"P"]] <- arC

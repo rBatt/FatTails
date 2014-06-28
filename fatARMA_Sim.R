@@ -36,11 +36,12 @@ source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Funct
 # =============================
 # = Define Simulation Options =
 # =============================
+nP <- 1
 nPerYear <- 10 # number of observations per "year"
-Ps <- 1 # vector of the orders of AR to simulate (e.g., 1:2 would simulate time series that were AR(1), and that were AR(2))
+Ps <- seq(1/(nP+1), nP/(nP+1), length.out=nP) #1 # vector of the orders of AR to simulate (e.g., 1:2 would simulate time series that were AR(1), and that were AR(2))
 Qs <- 0 # vector of MA orders
 chooseDists <- c("normal", "rcoin") # vector of distributions – can be "normal", "cauchy", "lnorm", and "t"
-nReps <- 50 # number of reps to do for each combination of P, Q, and Distributionrt;
+nReps <- 200 # number of reps to do for each combination of P, Q, and Distributionrt;
 simPars <- expand.grid(P=Ps, Q=Qs, Distribution=chooseDists, Rep=1:nReps, N=c(nPerYear)) # set up combinations of simulation options
 
 
@@ -86,7 +87,18 @@ tmTS <- simXiMax[,thinnestI] # Thinnest max time series
 
 
 ddply(simXiS, "Distribution", function(x)x[which.max(x[,"Xi"]),])
-boxplot(Xi~Distribution, data=simXiS)
+n.bx.at <- attr(id(simXiS[,c("P","Distribution")]), "n") # use id() from package plyr
+n.dis <- length(chooseDists)
+bx.bump <- cumsum(as.integer((0:(length(Ps)*n.dis-1))%%(length(Ps))==0)) - 1
+bx.at <- 1:n.bx.at + bx.bump # just increase the index by 1 every length(Ps)+1 value
+bx.at.labs <- c(length(Ps)/2, length(Ps)/2 + cumsum(rep(length(Ps), n.dis-1)) + cumsum(rep(1, n.dis-1))) + 0.5
+dev.new(width=10, height=4)
+par(mar=c(4, 2.5, 0.5, 0.5), ps=10, mgp=c(1.5, 0.5, 0), tcl=-0.5, ps=10)
+boxplot(Xi~round(P, 3)+Distribution, data=simXiS, names=rep(Ps,n.dis), at=bx.at)
+mtext(chooseDists, side=1, at=bx.at.labs, line=2.5)
+# mtext(c("AR(1) coefficients for model with\nnormal error", "AR(1) coefficients for model with\nrcoin() error", "AR(1) coefficients for model with\nnormal error + 50% chance at lognormal error"), side=1, at=bx.at.labs, line=2.5)
+mtext(bquote(time~~series~~xi), side=2, line=1.5)
+
 
 
 
