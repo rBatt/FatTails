@@ -585,3 +585,31 @@ dscat <- function(x, y, ...){
 		}
 	}
 }
+
+
+# =================
+# = Tailedness QQ =
+# =================
+# load("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data.RData")
+# fatQQ <- function(vari="cpue1_Sum", loca="ME", taxid="Lepomis", norm=FALSE){
+# 	oQ <- data.max[data.max[,"variable"]==vari&data.max[,"location"]==loca&data.max[,"taxID"]==taxid,"Data"]
+# 	oQ <- oQ[!is.na(oQ)]
+# 	oFat <- data.fat[data.fat[,"variable"]==vari&data.fat[,"location"]==loca&data.fat[,"taxID"]==taxid,]
+# 	exi <- oFat[,"sh_0"]
+# 	escale <- oFat[,"sig_0"]
+# 	eloc <- oFat[,"mu_0"]
+# 	oN <- oFat[,"N"]
+# 	tPs <- (1:oN)/(oN+1)
+# 	tQ <- qgev(tPs, xi=exi, mu=eloc, sigma=escale)
+# 	plot(1:oN, oQ, type="l", col="gray", lwd=2, xaxt="n", yaxt="n", xlab="", ylab="")
+# 	par(new=TRUE)
+# 	if(!norm){
+# 		plot(tQ, sort(oQ))	
+# 	}else{
+# 		qqnorm(scale(oQ))
+# 	}
+# 	
+# 	abline(a=0, b=1, lty="dotted")
+# }
+# 
+# fatQQ("cpue1_Sum", "ME", "Pimephales", norm=FALSE)
