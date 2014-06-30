@@ -32,16 +32,17 @@ setwd("/Users/battrd/Documents/School&Work/WiscResearch/FatTails")
 source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/ARMAFunctions.R") #also loads GenSA and DEoptim packages
 # source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
 source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Functions.R")
+source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/jdd.sim.R")
 
 # =============================
 # = Define Simulation Options =
 # =============================
 nP <- 1
-nPerYear <- 10 # number of observations per "year"
+nPerYear <- 25 # number of observations per "year"
 Ps <- seq(1/(nP+1), nP/(nP+1), length.out=nP) #1 # vector of the orders of AR to simulate (e.g., 1:2 would simulate time series that were AR(1), and that were AR(2))
 Qs <- 0 # vector of MA orders
-chooseDists <- c("normal", "rcoin") # vector of distributions – can be "normal", "cauchy", "lnorm", and "t"
-nReps <- 200 # number of reps to do for each combination of P, Q, and Distributionrt;
+chooseDists <- c("normal", "JDD") # vector of distributions – can be "normal", "cauchy", "lnorm", and "t"
+nReps <- 40 # number of reps to do for each combination of P, Q, and Distributionrt;
 simPars <- expand.grid(P=Ps, Q=Qs, Distribution=chooseDists, Rep=1:nReps, N=c(nPerYear)) # set up combinations of simulation options
 
 
@@ -63,16 +64,21 @@ row.names(simXiMax) <- NULL
 statSim <- simXi[,"Lambda"]<1 # subset to stationary time series
 simXiS <- simXi[statSim,]
 simXiS[,"critXi"] <- fattestSig(simXiS[,"Xi"], simXiS[,"xi.se"])
+simXiS <- simXiS[!is.na(simXiS[,"xi.se"]),]
 
 # ===================================================================
 # = Grab the thinnest and fattest time series (that are stationary) =
 # ===================================================================
 
+xiPse <- (abs(simXiS[,"Xi"])+simXiS[,"xi.se"])
+
+
 fDl <- simXiS[,"Distribution"]==chooseDists[2]
-fattestI <- which(fDl & simXiS[,"Xi"]==max(simXiS[,"Xi"])) #which.max(simXiS[,"critXi"])
+med.fat <- (abs(median(simXiS[fDl,"Xi"])-simXiS[,"Xi"])+simXiS[,"xi.se"]) == min(abs(median(simXiS[fDl,"Xi"])-simXiS[fDl,"Xi"])+simXiS[fDl,"xi.se"])
+# med.fat <- (abs(0.5-simXiS[,"Xi"])+simXiS[,"xi.se"]) == min(abs(0.5-simXiS[fDl,"Xi"])+simXiS[fDl,"xi.se"])
+fattestI <- which(med.fat) #which(fDl & simXiS[,"Xi"]==max(simXiS[fDl,"Xi"])) #which.max(simXiS[,"critXi"])
 
 tDl <- simXiS[,"Distribution"]==chooseDists[1]
-xiPse <- (abs(simXiS[,"Xi"])+simXiS[,"xi.se"])
 thinnestI <- which(tDl & (xiPse==min(xiPse[tDl]))) # which.min(abs(simXiS[,"Xi"])+simXiS[,"xi.se"])
 
 print(simXiS[c(fattestI,thinnestI),])
@@ -87,6 +93,9 @@ tmTS <- simXiMax[,thinnestI] # Thinnest max time series
 
 
 ddply(simXiS, "Distribution", function(x)x[which.max(x[,"Xi"]),])
+
+
+
 n.bx.at <- attr(id(simXiS[,c("P","Distribution")]), "n") # use id() from package plyr
 n.dis <- length(chooseDists)
 bx.bump <- cumsum(as.integer((0:(length(Ps)*n.dis-1))%%(length(Ps))==0)) - 1

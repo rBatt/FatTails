@@ -772,7 +772,7 @@ r.jump.diff <- function(n, mu=0, sdev=1, lmu=0, lsdev=1, qFunc="rbinom", qArgs=l
 # =================
 # set.seed(1); rTest <- rnorm(4)
 
-rcoin <- function(N, nCoins=4, acc=FALSE){
+rcoin <- function(N, nCoins=4, phi=0.5, acc=FALSE){
 	# N is the number of random numbers to generate
 	# nCoins is the number of coin flips ... it behaves somewhat like a variance parameter. The higher it is, the bigger the shocks (in either direction)
 	# If acc is set to TRUE, the print-out will be a matrix where the first row of each column contains output that would be equivalent to acc=FALSE. The last row is the shock (startShock) that initializes the process, and the values above the bottom row show how the shocks accmulate after each coin flip. If N=100 and nCoins=4, you'll get a 4x100 matrix. Note that if you look from the last to first row in a column, successive rows that have the same value indicate that the coin flip was a 0.
@@ -787,10 +787,10 @@ rcoin <- function(N, nCoins=4, acc=FALSE){
 	startShock <- rnorm(N)
 	if(acc){
 		matrix(c(unlist(
-			Iterate(f=function(x){coin <- rbinom(n=N, size=1, prob=0.5); shock <- (rnorm(N, sd=1)); x + coin*shock*x}, n=nCoins)(startShock)
+			Iterate(f=function(x){coin <- rbinom(n=N, size=1, prob=0.5); shock <- rnorm(N, sd=1); Z <- rnorm(N, sd=0.01); x * (phi + Z + coin*shock)}, n=nCoins)(startShock)
 			)), ncol=N, byrow=T)
 	}else{
-		Iterate(f=function(x){coin <- rbinom(n=N, size=1, prob=0.5); shock <- (rnorm(N, sd=1)); x + coin*shock*x}, n=nCoins)(startShock)	
+		Iterate(f=function(x){coin <- rbinom(n=N, size=1, prob=0.5); shock <- rnorm(N, sd=1); Z <- rnorm(N, sd=0.01); x * (phi + Z + coin*shock)}, n=nCoins)(startShock)	
 	}
 }
 
@@ -850,31 +850,57 @@ myFatSim <- function(x, nYear=35){
 	fullTS <- rep(NA, N*nYear)
 	maxTS <- rep(NA, nYear)
 	
-	simResid <- switch(as.character(x[,"Distribution"]),
-		normal=rnorm(N*nYear, 0, 1),
-		t=rt(N*nYear, 5),
-		cauchy=rcauchy(n=N*nYear),
-		lnorm=rlnorm(N*nYear, sdlog=0.65),
-		r.jump.diff=r.jump.diff(n=N*nYear),
-		rcoin=rcoin(N=N*nYear, nCoin=3),
-		coin3=coin3(N=N*nYear, nCoin=4)
-	)
-	maxResid <- rep(NA, nYear)
-	
-	for(i in 1:nYear){
-		simIndex <- (i*N-(N-1)):(i*N)
-		tsimResid <- simResid[simIndex]
-		maxResid[i] <- max(tsimResid)
+	if(x[,"Distribution"]!="JDD"){
+		simResid <- switch(as.character(x[,"Distribution"]),
+			normal=rnorm(N*nYear, 0, 1),
+			t=rt(N*nYear, 5),
+			cauchy=rcauchy(n=N*nYear),
+			lnorm=rlnorm(N*nYear, sdlog=0.65),
+			r.jump.diff=r.jump.diff(n=N*nYear),
+			rcoin=rcoin(N=N*nYear, nCoin=3),
+			coin3=coin3(N=N*nYear, nCoin=4)
+		)
+		maxResid <- rep(NA, nYear)
 
-		tsimTS <- c(arima.sim2(model=list(order=simOrder, ar=arC, ma=maC), n=N, innov=tsimResid))
-		
-		fullTS[simIndex] <- tsimTS
-		maxTS[i] <- simIndex[which.max(tsimTS)]
+		for(i in 1:nYear){
+			simIndex <- (i*N-(N-1)):(i*N)
+			tsimResid <- simResid[simIndex]
+			maxResid[i] <- max(tsimResid)
+
+			tsimTS <- c(arima.sim2(model=list(order=simOrder, ar=arC, ma=maC), n=N, innov=tsimResid))+0
+
+			fullTS[simIndex] <- tsimTS
+			maxTS[i] <- simIndex[which.max(tsimTS)]
+		}
+
+		gevRes0 <- gev.fit2(fullTS[maxTS])
+		gevRes <- c(gevRes0$mle[c("sh_0", "mu_0", "sig_0")], "se"=gevRes0$se["sh_0"])
+		Xi_resid <- gev.fit2(maxResid)$mle["sh_0"]
+	
+	}else{
+	
+		simResid <- NA
+		maxResid <- rep(NA, nYear)
+
+		# fullTS <- Stationary(log(jdd.sim(N=N*nYear)))[,2]
+		# fullTS <- log(jdd.sim(N=N*nYear))
+		# fullTS <- jdd.sim(N=N*nYear)
+		for(i in 1:nYear){
+			simIndex <- (i*N-(N-1)):(i*N)
+			tsimResid <- NA
+			maxResid[i] <- NA
+
+			tsimTS <- jdd.sim(N=N, S0=0.85, lambda=0.01)
+			# tsimTS <- fullTS[simIndex]
+			fullTS[simIndex] <- tsimTS
+			maxTS[i] <- simIndex[which.max(tsimTS)]
+		}
+
+		gevRes0 <- gev.fit2(fullTS[maxTS])
+		gevRes <- c(gevRes0$mle[c("sh_0", "mu_0", "sig_0")], "se"=gevRes0$se["sh_0"])
+		Xi_resid <- NA #gev.fit2(maxResid)$mle["sh_0"]
 	}
 	
-	gevRes0 <- gev.fit2(fullTS[maxTS])
-	gevRes <- c(gevRes0$mle[c("sh_0", "mu_0", "sig_0")], "se"=gevRes0$se["sh_0"])
-	Xi_resid <- gev.fit2(maxResid)$mle["sh_0"]
 	Order <- 1 + x[,"Q"] #x[,"P"] + x[,"Q"]
 	
 	arC2 <- c("AR1"=NA,"AR2"=NA,"AR3"=NA)
