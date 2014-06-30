@@ -32,17 +32,17 @@ setwd("/Users/battrd/Documents/School&Work/WiscResearch/FatTails")
 source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/ARMAFunctions.R") #also loads GenSA and DEoptim packages
 # source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
 source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Functions.R")
-source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/jdd.sim.R")
+source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/JDD.R")
 
 # =============================
 # = Define Simulation Options =
 # =============================
 nP <- 1
-nPerYear <- 25 # number of observations per "year"
+nPerYear <- 100 # number of observations per "year"
 Ps <- seq(1/(nP+1), nP/(nP+1), length.out=nP) #1 # vector of the orders of AR to simulate (e.g., 1:2 would simulate time series that were AR(1), and that were AR(2))
 Qs <- 0 # vector of MA orders
 chooseDists <- c("normal", "JDD") # vector of distributions – can be "normal", "cauchy", "lnorm", and "t"
-nReps <- 40 # number of reps to do for each combination of P, Q, and Distributionrt;
+nReps <- 30 # number of reps to do for each combination of P, Q, and Distributionrt;
 simPars <- expand.grid(P=Ps, Q=Qs, Distribution=chooseDists, Rep=1:nReps, N=c(nPerYear)) # set up combinations of simulation options
 
 
@@ -75,7 +75,7 @@ xiPse <- (abs(simXiS[,"Xi"])+simXiS[,"xi.se"])
 
 fDl <- simXiS[,"Distribution"]==chooseDists[2]
 med.fat <- (abs(median(simXiS[fDl,"Xi"])-simXiS[,"Xi"])+simXiS[,"xi.se"]) == min(abs(median(simXiS[fDl,"Xi"])-simXiS[fDl,"Xi"])+simXiS[fDl,"xi.se"])
-# med.fat <- (abs(0.5-simXiS[,"Xi"])+simXiS[,"xi.se"]) == min(abs(0.5-simXiS[fDl,"Xi"])+simXiS[fDl,"xi.se"])
+# med.fat <- (abs(0.8-simXiS[,"Xi"])+simXiS[,"xi.se"]) == min(abs(0.8-simXiS[fDl,"Xi"])+simXiS[fDl,"xi.se"])
 fattestI <- which(med.fat) #which(fDl & simXiS[,"Xi"]==max(simXiS[fDl,"Xi"])) #which.max(simXiS[,"critXi"])
 
 tDl <- simXiS[,"Distribution"]==chooseDists[1]

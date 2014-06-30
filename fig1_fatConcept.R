@@ -36,7 +36,7 @@ par(mar=c(2.5,0.0,0.5,0.1), oma=c(0, 2, 0, 0.25), ps=10, cex=1, mgp=c(1, 0.3, 0)
 
 # Plot thin-tailed time series
 ylim1 <- range(tfTS)*c(1, 1.15)
-plot(tfTS, type="l", col="gray", xlab="", xaxt="n", ylab="", ylim=ylim1, bty="l")
+plot(tfTS, type="l", col="gray", xlab="", xaxt="n", ylab="", ylim=ylim1, bty="l", lwd=0.5)
 text(0.025*length(tfTS), y=max(tfTS)*1.05, "A", font=2)
 ats1 <- axTicks(1)
 labs1 <- ats1/nPerYear
@@ -47,7 +47,7 @@ mtext("time", side=1, line=1.25)
 
 # Plot fat-tailed time series
 ylim2 <- range(ffTS)*c(1, 1.15)
-plot(ffTS, type="l", col="gray", xlab="", ylab="", xaxt="n", ylim=ylim2, bty="l")
+plot(ffTS, type="l", col="gray", xlab="", ylab="", xaxt="n", ylim=ylim2, bty="l", lwd=0.5)
 text(0.025*length(ffTS), y=max(ffTS)*1.05, "B", font=2)
 ats2 <- axTicks(1)
 labs2 <- ats2/nPerYear
@@ -69,12 +69,14 @@ text(x=cma0*0.5, y=max(c(thinGEV,fatGEV))*0.58, bquote(xi~"="~.(fXi)), pos=4, co
 # Plot empirical densities for thin-tailed
 colorDens(vals=list(tfTS, tfTS[tmTS]), cols=c("gray","blue"), revxy=TRUE, yaxt="n", bty="n", limX=ylim1)
 cm1 <- min(tfTS)
-text(y=cm1+sign(cm1)*cm1*0.15, x=0.25*max(density(tfTS)$y, density(tfTS[tmTS])$y), "C", font=2)
+# text(y=cm1+sign(cm1)*cm1*0.5, x=0.25*max(density(tfTS)$y, density(tfTS[tmTS])$y), "C", font=2)
+text(y=0.25*sum(range(density(tfTS)$x)), x=0.75*sum(range(density(tfTS[tmTS])$y)), "C", font=2)
 mtext("density", side=1, line=1.25)
 
 # Plot empirical densities for fat-tailed
 cm2 <- min(ffTS)
 colorDens(vals=list(ffTS, ffTS[fmTS]), cols=c("gray","red"), revxy=TRUE, yaxt="n", bty="n", limX=ylim2)
-text(y=cm2+sign(cm2)*cm2*0.15, x=0.25*max(density(ffTS)$y, density(ffTS[fmTS])$y), "D", font=2)
+# text(y=cm2+sign(cm2)*cm2*0.5, x=0.25*max(density(ffTS)$y, density(ffTS[fmTS])$y), "D", font=2)
+text(y=0.25*sum(range(density(ffTS)$x)), x=0.75*sum(range(density(ffTS)$y)), "D", font=2)
 mtext("density", side=1, line=1.25)
 # dev.off()
