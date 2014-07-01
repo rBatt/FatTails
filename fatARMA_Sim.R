@@ -101,12 +101,11 @@ n.dis <- length(chooseDists)
 bx.bump <- cumsum(as.integer((0:(length(Ps)*n.dis-1))%%(length(Ps))==0)) - 1
 bx.at <- 1:n.bx.at + bx.bump # just increase the index by 1 every length(Ps)+1 value
 bx.at.labs <- c(length(Ps)/2, length(Ps)/2 + cumsum(rep(length(Ps), n.dis-1)) + cumsum(rep(1, n.dis-1))) + 0.5
-dev.new(width=10, height=4)
-par(mar=c(4, 2.5, 0.5, 0.5), ps=10, mgp=c(1.5, 0.5, 0), tcl=-0.5, ps=10)
-boxplot(Xi~round(P, 3)+Distribution, data=simXiS, names=rep(Ps,n.dis), at=bx.at)
-mtext(chooseDists, side=1, at=bx.at.labs, line=2.5)
-# mtext(c("AR(1) coefficients for model with\nnormal error", "AR(1) coefficients for model with\nrcoin() error", "AR(1) coefficients for model with\nnormal error + 50% chance at lognormal error"), side=1, at=bx.at.labs, line=2.5)
-mtext(bquote(time~~series~~xi), side=2, line=1.5)
+# dev.new(width=10, height=4)
+# par(mar=c(4, 2.5, 0.5, 0.5), ps=10, mgp=c(1.5, 0.5, 0), tcl=-0.5, ps=10)
+# boxplot(Xi~round(P, 3)+Distribution, data=simXiS, names=rep(Ps,n.dis), at=bx.at)
+# mtext(chooseDists, side=1, at=bx.at.labs, line=2.5)
+# mtext(bquote(time~~series~~xi), side=2, line=1.5)
 
 
 

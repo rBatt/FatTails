@@ -890,7 +890,7 @@ myFatSim <- function(x, nYear=35){
 			tsimResid <- NA
 			maxResid[i] <- NA
 
-			tsimTS <- jdd.sim(N=N, S0=2, lambda=0.01)
+			tsimTS <- jdd.brigo(N=N, S0=2, lambda=0.01)
 			# tsimTS <- fullTS[simIndex]
 			fullTS[simIndex] <- tsimTS
 			maxTS[i] <- simIndex[which.max(tsimTS)]

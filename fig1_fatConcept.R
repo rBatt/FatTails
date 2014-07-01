@@ -4,6 +4,7 @@
 # =========================
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatARMA_Sim.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/JDD.R")
 	# ========================
 	# = Prepare for plotting =
 	# ========================
