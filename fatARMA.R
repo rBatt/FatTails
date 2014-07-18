@@ -47,7 +47,7 @@ finalFrame0[(!phRows)&big0,"Data"] <- log(finalFrame0[(!phRows)&big0,"Data"])
 finalFrame <- finalFrame0 # used to be the step where I took the log and made it stationary – already done.
 # testFrame <- finalFrame[finalFrame[,"variable"]%in%c("chlor","doc"),]
 # test <- ddply(.data=testFrame, .variables=c("Type","taxLvl","taxID","variable", "location"), .fun=ARMAfit, dName="Data", .parallel=TRUE, Method="Evolve", .paropts=list(.export=fnNames, .packages=pkgNames))
-
+save(finalFrame, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/finalFrame.RData")
 
 # ===================
 # = Fit ARMA Models =
