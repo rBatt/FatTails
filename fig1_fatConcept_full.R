@@ -186,7 +186,7 @@ plot(1, type="n", xaxt="n", yaxt="n", xlab="", ylab="", bty="n") # plot blank re
 # part 5.3
 par(mar=pm.3)
 colorDens(vals=list(samples2[,"X"], samples2.max[,"X"]), cols=c("gray","black"), revxy=TRUE, yaxt="n", bty="n", limX=range(samples2[,"X"]))
-cm1 <- min(samples2[,"rS"])
+cm1 <- min(samples2[,"X"])
 # text(y=cm1+sign(cm1)*cm1*0.5, x=0.25*max(density(tfTS)$y, density(tfTS[tmTS])$y), "C", font=2)
 X.dens <- density(samples2[,"X"])$x
 X.max.dens <- density(samples2.max[,"X"])$y

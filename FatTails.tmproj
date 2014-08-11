@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>fatBirth_Sim.R</string>
+	<string>fig1_fatConcept.R</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -100,9 +100,7 @@
 					<key>filename</key>
 					<string>fatBirth_Sim.R</string>
 					<key>lastUsed</key>
-					<date>2014-08-10T22:38:50Z</date>
-					<key>selected</key>
-					<true/>
+					<date>2014-08-11T18:59:52Z</date>
 				</dict>
 			</array>
 			<key>expanded</key>
@@ -120,13 +118,15 @@
 							<key>filename</key>
 							<string>fig1_fatConcept.R</string>
 							<key>lastUsed</key>
-							<date>2014-08-10T22:38:50Z</date>
+							<date>2014-08-11T19:19:23Z</date>
+							<key>selected</key>
+							<true/>
 						</dict>
 						<dict>
 							<key>filename</key>
 							<string>fig2_xi_waiting.R</string>
 							<key>lastUsed</key>
-							<date>2014-08-10T22:21:32Z</date>
+							<date>2014-08-11T18:46:22Z</date>
 						</dict>
 						<dict>
 							<key>filename</key>
@@ -176,6 +176,18 @@
 				<dict>
 					<key>children</key>
 					<array>
+						<dict>
+							<key>filename</key>
+							<string>fig1_fatConcept_full.R</string>
+							<key>lastUsed</key>
+							<date>2014-08-11T19:19:23Z</date>
+						</dict>
+						<dict>
+							<key>filename</key>
+							<string>fig1_fatConcept_old.R</string>
+							<key>lastUsed</key>
+							<date>2014-08-11T18:46:08Z</date>
+						</dict>
 						<dict>
 							<key>filename</key>
 							<string>fatPlots_JASM.R</string>
@@ -495,14 +507,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>76</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>335</integer>
+				<integer>119</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>311</integer>
+			<integer>113</integer>
 		</dict>
 		<key>fatForest.R</key>
 		<dict>
@@ -611,27 +623,55 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>20</integer>
+				<integer>33</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>29</integer>
+		</dict>
+		<key>fig1_fatConcept_full.R</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>122</integer>
+				<key>line</key>
+				<integer>13</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>fig1_fatConcept_old.R</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>39</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>11</integer>
+			<integer>30</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>49</integer>
+				<integer>31</integer>
 				<key>line</key>
-				<integer>23</integer>
+				<integer>39</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>20</integer>
+				<integer>39</integer>
 			</dict>
 		</dict>
 		<key>fig2_xi_waiting.R</key>
@@ -829,6 +869,8 @@
 		<string>fatPlots_JASM.R</string>
 		<string>FatTails_Figures.R</string>
 		<string>fig2_xi_waiting.R</string>
+		<string>fig1_fatConcept_full.R</string>
+		<string>fig1_fatConcept.R</string>
 		<string>ARMAFunctions.R</string>
 		<string>FatTails_Functions.R</string>
 		<string>JDD.R</string>
@@ -841,11 +883,11 @@
 		<string>fatForest.R</string>
 		<string>fatPlot_Functions.R</string>
 		<string>jdd.disc.R</string>
-		<string>fig1_fatConcept.R</string>
+		<string>fig1_fatConcept_old.R</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{3, 554}, {1904, 864}}</string>
+	<string>{{1, 363}, {1249, 515}}</string>
 </dict>
 </plist>

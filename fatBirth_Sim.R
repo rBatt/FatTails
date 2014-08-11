@@ -7,7 +7,7 @@ source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/ARMAFunctions.
 # source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
 source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Functions.R")
 
-set.seed(35)
+set.seed(1)
 
 # =================
 # = Tony Function =
@@ -167,77 +167,77 @@ for(time in 1:tmax){
 # # ############ Iterate to check    #############
 # # ##############################################
 # 
-nreps <- 100
 
-n.per.sample <- 25 # number of time steps per sample
-samples.per.year <- 20 # number of samples per year
-years <- 30 # number of years
+simXis <- function(nreps=100){
+	n.per.sample <- 25 # number of time steps per sample
+	samples.per.year <- 20 # number of samples per year
+	years <- 30 # number of years
 
-tmax <- n.per.sample * samples.per.year * years
-Tmax <- samples.per.year * years
-# 
-# b <- 0.2
-# s <- 2
-# a <- 0.1
-# 
-# sd1 <- 0.25
-# sd2 <- 0.25
+	tmax <- n.per.sample * samples.per.year * years
+	Tmax <- samples.per.year * years
 
-xis <- array(0,c(nreps,3))
-for(i in 1:nreps){
-	variables <- array(0,c(tmax,4))
-	samples <- array(0,c(Tmax,3))
-	
-	X <- 25
-	cR <- 1
-	T <- 1
-	for(t in 1:tmax){
-		
-		phi1 <- rnorm(n=1,m=0,sd=sd1)
-		phi2 <- rnorm(n=1,m=0,sd=sd2)
-		
-		#rB <- B(b,phi1 + phi2)
-		#rS <- S(s,phi1 - phi2)
-		rB <- B(b,phi1)
-		rS <- S(s,phi2)
-		
-		variables[t,] <- c(phi1, phi2, rB, rS)
-		
-		cR <- cR*rB*rS
-		
-		if(t %% n.per.sample == 0){
-			X <- X * cR * FF(a,X)
-			samples[T,] <- c(phi1, phi2, X)
-			
-			cR <- 1
-			T <- T + 1
+	b <- 0.2
+	s <- 2
+	a <- 0.1
+
+	sd1 <- 0.25
+	sd2 <- 0.25
+
+	xis <- array(0,c(nreps,3))
+	for(i in 1:nreps){
+		variables <- array(0,c(tmax,4))
+		samples <- array(0,c(Tmax,3))
+
+		X <- 25
+		cR <- 1
+		t.T <- 1
+		for(t in 1:tmax){
+
+			phi1 <- rnorm(n=1,m=0,sd=sd1)
+			phi2 <- rnorm(n=1,m=0,sd=sd2)
+
+			rB <- B(b,phi1)
+			rS <- S(s,phi2)
+
+			variables[t,] <- c(phi1, phi2, rB, rS)
+
+			cR <- cR*rB*rS
+
+			if(t %% n.per.sample == 0){
+				X <- X * cR * FF(a,X)
+				samples[t.T,] <- c(phi1, phi2, X)
+
+				cR <- 1
+				t.T <- t.T + 1
+			}
 		}
+
+		Y <- yearly.Max(samples[,1],n.per.year=samples.per.year)
+		gev.envir1 <- gev.fit2(xdat=Y, show = FALSE, method = "Nelder-Mead", maxit = 10000)$mle[3]
+
+		Y <- yearly.Max(samples[,2],n.per.year=samples.per.year)
+		gev.envir2 <- gev.fit2(xdat=Y, show = FALSE, method = "Nelder-Mead", maxit = 10000)$mle[3]
+
+		Y <- yearly.Max(samples[,3],n.per.year=samples.per.year)
+		gev.pop <- gev.fit2(xdat=Y, show = FALSE, method = "Nelder-Mead", maxit = 10000)$mle[3]
+
+		xis[i,] <- c(gev.envir1, gev.envir2, gev.pop)
 	}
-	
-	Y <- yearly.Max(samples[,1],n.per.year=samples.per.year)
-	gev.envir1 <- gev.fit2(xdat=Y, show = FALSE, method = "Nelder-Mead", maxit = 10000)$mle[3]
-	
-	Y <- yearly.Max(samples[,2],n.per.year=samples.per.year)
-	gev.envir2 <- gev.fit2(xdat=Y, show = FALSE, method = "Nelder-Mead", maxit = 10000)$mle[3]
-	
-	Y <- yearly.Max(samples[,3],n.per.year=samples.per.year)
-	gev.pop <- gev.fit2(xdat=Y, show = FALSE, method = "Nelder-Mead", maxit = 10000)$mle[3]
-	
-	xis[i,] <- c(gev.envir1, gev.envir2, gev.pop)
-	
-	# show(xis[i,])
+	return(xis)
 }
 
-dev.new()
-par(mfrow=c(4,1))
-hist(xis[,1],main='Envir 1', xlim=c(-0.8,0.8), breaks=seq(-0.8,0.8,0.1))
-hist(xis[,2],main='Envir 1', xlim=c(-0.8,0.8), breaks=seq(-0.8,0.8,0.1))
-hist(xis[,3],main='Pop', xlim=c(-0.8,0.8), breaks=seq(-0.8,0.8,0.1))
-hist(xis[,3] - (xis[,1]+xis[,2]), main='Pop-Envir', xlim=c(-1,1), breaks=seq(-1,1,0.1))
-
-colMeans(xis)
-mean(xis[,2] - xis[,1])
-cor(xis)
-
+xis <- simXis(100)
+# 
+# dev.new()
+# par(mfrow=c(4,1))
+# hist(xis[,1],main='Envir 1', xlim=c(-0.8,0.8), breaks=seq(-0.8,0.8,0.1))
+# hist(xis[,2],main='Envir 1', xlim=c(-0.8,0.8), breaks=seq(-0.8,0.8,0.1))
+# hist(xis[,3],main='Pop', xlim=c(-0.8,0.8), breaks=seq(-0.8,0.8,0.1))
+# hist(xis[,3] - (xis[,1]+xis[,2]), main='Pop-Envir', xlim=c(-1,1), breaks=seq(-1,1,0.1))
+# 
+# colMeans(xis)
+# mean(xis[,2] - xis[,1])
+# cor(xis)
+# 
 
 
