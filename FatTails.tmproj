@@ -94,13 +94,13 @@
 					<key>filename</key>
 					<string>fatARMA_Sim.R</string>
 					<key>lastUsed</key>
-					<date>2014-07-18T20:27:59Z</date>
+					<date>2014-08-11T20:39:31Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>fatBirth_Sim.R</string>
 					<key>lastUsed</key>
-					<date>2014-08-11T18:59:52Z</date>
+					<date>2014-08-11T20:50:33Z</date>
 				</dict>
 			</array>
 			<key>expanded</key>
@@ -118,7 +118,7 @@
 							<key>filename</key>
 							<string>fig1_fatConcept.R</string>
 							<key>lastUsed</key>
-							<date>2014-08-11T19:19:23Z</date>
+							<date>2014-08-11T20:58:11Z</date>
 							<key>selected</key>
 							<true/>
 						</dict>
@@ -186,7 +186,7 @@
 							<key>filename</key>
 							<string>fig1_fatConcept_old.R</string>
 							<key>lastUsed</key>
-							<date>2014-08-11T18:46:08Z</date>
+							<date>2014-08-11T20:58:11Z</date>
 						</dict>
 						<dict>
 							<key>filename</key>
@@ -477,30 +477,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>27</integer>
 				<key>line</key>
-				<integer>28</integer>
+				<integer>55</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>4</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>88</integer>
-				<key>line</key>
-				<integer>33</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>28</integer>
-			</dict>
+			<integer>76</integer>
 		</dict>
 		<key>fatBirth_Sim.R</key>
 		<dict>
@@ -509,12 +493,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>119</integer>
+				<integer>6</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>113</integer>
+			<integer>160</integer>
 		</dict>
 		<key>fatForest.R</key>
 		<dict>
@@ -621,14 +605,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>13</integer>
 				<key>line</key>
-				<integer>33</integer>
+				<integer>84</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>29</integer>
+			<integer>73</integer>
 		</dict>
 		<key>fig1_fatConcept_full.R</key>
 		<dict>
@@ -651,27 +635,27 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>39</integer>
+				<integer>30</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>30</integer>
+			<integer>22</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>31</integer>
+				<integer>140</integer>
 				<key>line</key>
-				<integer>39</integer>
+				<integer>30</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>39</integer>
+				<integer>30</integer>
 			</dict>
 		</dict>
 		<key>fig2_xi_waiting.R</key>

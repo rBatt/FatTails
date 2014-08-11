@@ -1,19 +1,16 @@
 
-# ===============
-# = Ryan Figure =
-# ===============
-library("evir")
+
+
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
+load("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/fatBirth_Sim.RData")
 
 # set Par Margins (pm)
 pm.1 <- c(0.75, 0.75, 0.5, 0)
 pm.2 <- c(1.5, 0.75, 0.5, 0)
 pm.3 <- c(1, 0.75, 0.5, 0)
 
-dev.new(width=3.5, height=5)
-# cols1 <- rep(rep(c(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 7, 7, 7, 7), each=4), 4) # first set of columns for layout matrix
-# cols2 <- rep(rep(c(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 7, 7, 7, 7), each=4), 1) # first set of columns for layout matrix
-# cols3 <- rep(rep(c(4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7), each=4), 3) # second set of column for layout matrix
+# dev.new(width=3.5, height=5)
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Fig1_fat_conceptFig.png", res=150, units="in", height=5, width=3.5)
 cols1 <- rep(rep(c(1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 7, 7, 7, 7), each=4), 4) # first set of columns for layout matrix
 cols2 <- rep(rep(c(1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 7, 7, 7, 7), each=4), 1) # first set of columns for layout matrix
 cols3 <- rep(rep(c(4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7), each=4), 3) # second set of column for layout matrix
@@ -37,14 +34,14 @@ par(mar=pm.1)
 plot(samples2[,"phi1"], type="l", col="gray", xlab="", ylab="", bty="l", xpd=TRUE, ylim=ylim1.1) # plot full samples of variable phi1
 points(samples2.max[,"phi1.i"], samples2.max[,"phi1"], col="blue", xpd=TRUE) # add circles for annual maxima of phi1
 mtext(bquote(phi1[1]), side=2, line=0.75)
-text(x=25, y=0.75, "A", font=2)
+text(x=25, y=0.85, "A", font=2)
 
 par(mar=pm.1)
 ylim1.2 <- range(samples2[,"phi2"])*c(1, 1.15)
 plot(samples2[,"phi2"], type="l", col="gray", xlab="", ylab="", bty="l", xpd=TRUE, ylim=ylim1.2) # plot full samples of variable phi2
 points(samples2.max[,"phi2.i"], samples2.max[,"phi2"], col="red", xpd=TRUE) # add circles for annual maxima of phi2
 mtext(bquote(phi1[2]), side=2, line=0.75)
-text(x=25, y=0.75, "B", font=2)
+text(x=25, y=0.85, "B", font=2)
 
 	# ==========
 	# = part 2 =
@@ -55,43 +52,45 @@ plot(samples2[,"X"], type="l", col="gray", xlab="", ylab="", bty="l", xpd=TRUE) 
 points(samples2.max[,"X.i"], samples2.max[,"X"], col="black", xpd=TRUE) # add circles for annual maxima of phi1
 mtext(bquote(X), side=2, line=0.75)
 mtext(bquote(Time), side=1, line=0.75)
-text(x=25, y=150, "C", font=2)
+text(x=25, y=115, "C", font=2)
 
 
 
 	# ==========
-	# = part 5 =
+	# = part 3 =
 	# ==========
-# part 5: Parent and Maxima distributions for parts 1-3
-# part 5.1
+# part 3: Parent and Maxima distributions for parts 1-3
+# part 3.1
 par(mar=pm.1)
 colorDens(vals=list(samples2[,"phi1"], samples2.max[,"phi1"]), cols=c("gray","blue"), revxy=TRUE, yaxt="n", bty="n", limX=ylim1.1)
 cm1 <- min(samples2[,"phi1"])
-text(y=0.25*sum(range(density(samples2[,"phi1"])$x)), x=0.75*sum(range(density(samples2.max[,"phi1"])$y)), "D", font=2)
+text(y=-0.65, x=0.85*sum(range(density(samples2.max[,"phi1"])$y)), "D", font=2)
 
 par(mar=pm.1)
 colorDens(vals=list(samples2[,"phi2"], samples2.max[,"phi2"]), cols=c("gray","red"), revxy=TRUE, yaxt="n", bty="n", limX=ylim1.2)
 cm1 <- min(samples2[,"phi2"])
-text(y=0.25*sum(range(density(samples2[,"phi2"])$x)), x=0.75*sum(range(density(samples2.max[,"phi2"])$y)), "E", font=2)
+text(y=-0.65, x=0.85*sum(range(density(samples2.max[,"phi2"])$y)), "E", font=2)
 
-# part 5.2
+# part 3.2
 par(mar=pm.2)
 colorDens(vals=list(samples2[,"X"], samples2.max[,"X"]), cols=c("gray","black"), revxy=TRUE, yaxt="n", bty="n", limX=range(samples2[,"X"]))
 cm1 <- min(samples2[,"X"])
 X.dens <- density(samples2[,"X"])$x
 X.max.dens <- density(samples2.max[,"X"])$y
-text(y=0.225*sum(range(X.dens)), x=0.85*sum(range(X.max.dens)), "F", font=2)
+text(y=25, x=0.85*sum(range(X.max.dens)), "F", font=2)
 mtext(bquote(Density), side=1, line=0.75)
 
-
-# part 6: difference in xi's between population and the environment
+	# ==========
+	# = Part 4 =
+	# ==========
+# part 4: difference in xi's between population and the environment
 par(mar=pm.3)
 colorDens(vals=list(xis[,1], xis[,2], xis[,3], (xis[,3]-(xis[,1]+xis[,2]))), cols=c("blue","red","black","green"), revxy=FALSE, yaxt="s", bty="l")
 mtext(bquote(xi), side=1, line=0.75)
 mtext(bquote(Density), side=2, line=0.75)
-text(y=2.5, x=-0.65, "G", font=2)
+text(y=2.5, x=-0.75, "G", font=2)
 
-
+dev.off()
 
 
 
