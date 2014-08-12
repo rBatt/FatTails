@@ -33,14 +33,14 @@ ylim1.1 <- range(samples2[,"phi1"])*c(1, 1.15)
 par(mar=pm.1)
 plot(samples2[,"phi1"], type="l", col="gray", xlab="", ylab="", bty="l", xpd=TRUE, ylim=ylim1.1) # plot full samples of variable phi1
 points(samples2.max[,"phi1.i"], samples2.max[,"phi1"], col="blue", xpd=TRUE) # add circles for annual maxima of phi1
-mtext(bquote(phi1[1]), side=2, line=0.75)
+mtext(bquote(phi), side=2, line=0.75)
 text(x=25, y=0.85, "A", font=2)
 
 par(mar=pm.1)
 ylim1.2 <- range(samples2[,"phi2"])*c(1, 1.15)
 plot(samples2[,"phi2"], type="l", col="gray", xlab="", ylab="", bty="l", xpd=TRUE, ylim=ylim1.2) # plot full samples of variable phi2
 points(samples2.max[,"phi2.i"], samples2.max[,"phi2"], col="red", xpd=TRUE) # add circles for annual maxima of phi2
-mtext(bquote(phi1[2]), side=2, line=0.75)
+mtext(bquote(gamma), side=2, line=0.75)
 text(x=25, y=0.85, "B", font=2)
 
 	# ==========
