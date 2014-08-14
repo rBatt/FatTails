@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>fig1_fatConcept.R</string>
+	<string>fatTails_Manuscript.R</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -40,7 +40,7 @@
 					<key>filename</key>
 					<string>fatForest.R</string>
 					<key>lastUsed</key>
-					<date>2014-07-03T11:46:26Z</date>
+					<date>2014-08-13T16:27:35Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
@@ -58,7 +58,9 @@
 					<key>filename</key>
 					<string>fatTails_Manuscript.R</string>
 					<key>lastUsed</key>
-					<date>2014-07-03T11:49:06Z</date>
+					<date>2014-08-13T16:27:35Z</date>
+					<key>selected</key>
+					<true/>
 				</dict>
 				<dict>
 					<key>children</key>
@@ -118,9 +120,7 @@
 							<key>filename</key>
 							<string>fig1_fatConcept.R</string>
 							<key>lastUsed</key>
-							<date>2014-08-11T20:58:11Z</date>
-							<key>selected</key>
-							<true/>
+							<date>2014-08-13T16:27:17Z</date>
 						</dict>
 						<dict>
 							<key>filename</key>
@@ -505,14 +505,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>40</integer>
+				<integer>271</integer>
 				<key>line</key>
-				<integer>28</integer>
+				<integer>12</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>13</integer>
+			<integer>0</integer>
 		</dict>
 		<key>fatLog.R</key>
 		<dict>
@@ -561,29 +561,29 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>23</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>10</integer>
+				<integer>16</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>33</integer>
+			<integer>10</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>19</integer>
+				<integer>40</integer>
 				<key>line</key>
-				<integer>10</integer>
+				<integer>16</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
-				<integer>28</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>10</integer>
+				<integer>16</integer>
 			</dict>
 		</dict>
 		<key>fat_forest_plot.R</key>
@@ -605,14 +605,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>13</integer>
+				<integer>41</integer>
 				<key>line</key>
-				<integer>84</integer>
+				<integer>89</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>73</integer>
+			<integer>67</integer>
 		</dict>
 		<key>fig1_fatConcept_full.R</key>
 		<dict>
