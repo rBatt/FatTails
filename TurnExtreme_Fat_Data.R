@@ -98,7 +98,7 @@ data.fat03 <- merge(data.fat01, data.fat02, all=TRUE)
 data.fat.full <- data.fat03[!is.na(data.fat03[,"sh_0"]),]
 row.names(data.fat.full) <- NULL
 data.fat.full[,"shape.sig"] = fattestSig(mu=data.fat.full[,"sh_0"], se=data.fat.full[,"se.sh_0"])
-data.fat.full <- data.fat.full[!is.na(data.fat.full[,"se.sh_0"]),]
+data.fat.full <- data.fat.full[!is.na(data.fat.full[,"se.sh_0"]),] # this is where the number of time series drops from 597 to 595
 data.fat <- sub.gen(data.fat.full)
 
 #Split into Bio
