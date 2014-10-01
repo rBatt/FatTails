@@ -912,3 +912,64 @@ myFatSim <- function(x, nYear=35){
 	list("summary"=adf, "fullTS"=fullTS, "maxTS"=maxTS)
 }
 
+
+# ================================
+# = Fit ARMA to full time series =
+# ================================
+
+fitARMA2 <- function(DF){
+	x <- DF[,"Data"]
+	year <- DF[,"year4"]
+	
+	Y.gev000 <- fillMiss(DF)
+	Y.gev00 <- tony.yearly.Max(Y.gev000[,"Data"], Y.gev000[,"year4"])
+	Y.gev0 <- lm(Y.gev00[,1] ~ I(1:length(unique(Y.gev00[,2]))))$residuals
+	Y.gev <- Y.gev0/sd(Y.gev0, na.rm=TRUE)
+	
+	u <- 1:length(x) # year-min(year)
+	y <- lm(x ~ u)$residuals
+	y <- y/sd(y)
+
+	X <- y
+	Y <- tony.yearly.Max(X,year[!is.na(x)])[,1]
+	xi <- as.numeric(gev.fit2(xdat=Y, show = FALSE, method = "Nelder-Mead", maxit = 10000)$mle[3])
+	
+	gev0 <- gev.fit2(xdat=Y.gev, show = FALSE, method = "Nelder-Mead", maxit = 10000)
+	xi2 <- as.numeric(gev0$mle[3])
+	xi2.se <- as.numeric(gev0$se[3])
+
+	a <- list()
+	if(length(y)>30){
+		a[[1]] <- tryCatch(arima(y,order=c(1,0,0), method="CSS-ML", optim.control=list(maxit=10^3)), error=function(cond){NA})
+		a[[2]] <- tryCatch(arima(y,order=c(2,0,0), method="CSS-ML", optim.control=list(maxit=10^3)), error=function(cond){list(aic=NA)})
+		a[[3]] <- tryCatch(arima(y,order=c(3,0,0), method="CSS-ML", optim.control=list(maxit=10^3)), error=function(cond){list(aic=NA)})
+		a[[4]] <- tryCatch(arima(y,order=c(2,0,1), method="CSS-ML", optim.control=list(maxit=10^3)), error=function(cond){list(aic=NA)})
+		a[[5]] <- tryCatch(arima(y,order=c(3,0,1), method="CSS-ML", optim.control=list(maxit=10^3)), error=function(cond){list(aic=NA)})
+		a[[6]] <- tryCatch(arima(y,order=c(3,0,2), method="CSS-ML", optim.control=list(maxit=10^3)), error=function(cond){list(aic=NA)})
+		pick <- order(c(a[[1]]$aic, a[[2]]$aic,a[[3]]$aic,a[[4]]$aic,a[[5]]$aic,a[[6]]$aic))[1]
+	}
+	if(length(y)<=30){
+		a[[1]] <- tryCatch(arima(y,order=c(1,0,0), method="CSS-ML", optim.control=list(maxit=10^3)), error=function(cond){NA})
+		a[[2]] <- tryCatch(arima(y,order=c(2,0,0), method="CSS-ML", optim.control=list(maxit=10^3)), error=function(cond){list(aic=NA)})
+		a[[3]] <- tryCatch(arima(y,order=c(2,0,1), method="CSS-ML", optim.control=list(maxit=10^3)), error=function(cond){list(aic=NA)})
+		pick <- order(c(a[[1]]$aic, a[[2]]$aic,a[[3]]$aic))[1]
+	}
+	
+	X <- a[[pick]]$residuals
+	Y <- tony.yearly.Max(X,year[!is.na(x)])[,1]
+	
+	gev.resid0 <- gev.fit2(xdat=Y, show = FALSE, method = "Nelder-Mead", maxit = 10000)
+	
+	xi.resid <- as.numeric(gev.resid0$mle[3])
+	xi.resid.se <- as.numeric(gev.resid0$se[3])
+	
+	
+	
+	best.pq <- a[[pick]]$ar[1:2]
+	best.eig <- max(abs(Eig(a[[pick]]$coef[1:best.pq[1]])))
+	
+	data.frame("length"=length(x), "p"=best.pq[1], "q"=best.pq[2], "lambda"=best.eig, "loglik"=a[[pick]]$loglik, "aic"=a[[pick]]$aic, "xi"=xi, "xi2"=xi2, "xi.resid"=xi.resid, "xi2.se"=xi2.se, "xi.resid.se"=xi.resid.se)
+}
+
+
+

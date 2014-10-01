@@ -312,5 +312,122 @@ tony.yearly.Max <- function(X=NULL, t=NULL){
 }
 
 
+# ============================================================================
+# = Add NA's to full time series for LTER data (not just fill annual maxima) =
+# ============================================================================
+fill.Full <- function(x){
+	require(zoo)
+	require(plyr)
+	
+	x <- x[order(x[,"year4"], x[,"daynum"]),]
+	
+	xyr <- x[,"year4"]
+	tyr <- table(xyr)
+	max.obs <- max(tyr, na.rm=TRUE)
+	max.yrs <- names(tyr)[tyr==max.obs]
+	
+	# =======================
+	# = Handle simple cases =
+	# =======================
+	if(all(tyr==max.obs)){ # if all are the same, don't bother with complexities
+		x2 <- x
+		x2[,"rank"] <- 1:max.obs
+		
+		possYears <- do.call(":", as.list(range(xyr, na.rm=TRUE)))
+		possRanks <- 1:max.obs
+		refFrame0 <- expand.grid(possRanks, possYears)
+		refFrame <- data.frame("Type"=unique(x2[,"Type"]), "taxID"=unique(x2[,"taxID"]), "location"=unique(x2[,"location"]), "variable"=unique(x2[,"variable"]), "year4"=refFrame0[,2], "rank"=refFrame0[,1])
+	
+		fillFrame0 <- merge(x2, refFrame, all=TRUE)
+		fillFrame <- fillFrame0[,c("Type", "taxID","location","variable", "year4", "daynum", "rank", "n.yr", "Data")]
+	
+		return(fillFrame)
+	}
+	
+	if(max.obs>60){ # if there's more than 1 a week, just fill in to daily resolution
+		x2 <- x
+		x2[,"rank"] <- x2[,"daynum"]
+		
+		possYears <- do.call(":", as.list(range(xyr, na.rm=TRUE)))
+		possRanks <- 1:365
+		refFrame0 <- expand.grid(possRanks, possYears)
+		refFrame <- data.frame("Type"=unique(x2[,"Type"]), "taxID"=unique(x2[,"taxID"]), "location"=unique(x2[,"location"]), "variable"=unique(x2[,"variable"]), "year4"=refFrame0[,2], "rank"=refFrame0[,1])
+	
+		fillFrame0 <- merge(x2, refFrame, all=TRUE)
+		fillFrame <- fillFrame0[,c("Type", "taxID","location","variable", "year4", "daynum", "rank", "n.yr", "Data")]
+	
+		return(fillFrame)
+		
+	}
+	
+	if(max.obs==1){ # if there's only 1 observation per year, just fill in years
+		x2 <- x
+		x2[,"rank"] <- 1
+		
+		possYears <- do.call(":", as.list(range(xyr, na.rm=TRUE)))
+		possRanks <- 1
+		refFrame0 <- expand.grid(possRanks, possYears)
+		refFrame <- data.frame("Type"=unique(x2[,"Type"]), "taxID"=unique(x2[,"taxID"]), "location"=unique(x2[,"location"]), "variable"=unique(x2[,"variable"]), "year4"=refFrame0[,2], "rank"=refFrame0[,1])
+	
+		fillFrame0 <- merge(x2, refFrame, all=TRUE)
+		fillFrame <- fillFrame0[,c("Type", "taxID","location","variable", "year4", "daynum", "rank", "n.yr", "Data")]
+	
+		return(fillFrame)
+	}
+	
+	# ================================
+	# = Handle more complicated case =
+	# ================================
+	max.dat <- x[x[,"year4"]%in%max.yrs,]	
+	mu.day <- rollapply(sort(max.dat[,"daynum"]), mean, width=length(max.yrs), by=length(max.yrs))
+	
+	x.ranked00 <- cbind(x,rank00=findInterval(x[,"daynum"], c(mu.day), all.inside=TRUE))
+	
+	# plot(blah[,"rank"], blah[,"daynum"])
+	# abline(h=rollapply(sort(max.dat[,"daynum"]), mean, width=3, by=3))
+	
+	x.ranked0 <- ddply(x.ranked00, "year4", function(x){x[,"rank0"] <- x[,"rank00"]+cumsum(duplicated(x[,"rank00"])); x})
+	
+	
+	demote <- function(x){
+		xr2 <- x[,"rank0"]
+		excess <- max(xr2) - max.obs
+
+
+		if(excess>0){
+			rankBump <- integer(length(xr2))
+			# rankDemote.index <- c()
+			# rankDemote <- integer(length(xr2))
+			for(i in 1:excess){
+				rankDiffs <- c(NA, diff(xr2))
+				dayDiffs <- c(NA, diff(x[,"daynum"]))
+				rank.per.day <- dayDiffs/rankDiffs
+				
+				# updating xr2 iteratively just in case a certain index represented a >2 jump in rank, and even after being demoted once, deserves a 2nd demotion because its rank.per.day was still the smallest after 1st (etc) demote
+				rankDemote.index <- which.min(rank.per.day) #which(rank.per.day <= sort(rank.per.day)[i])[i]
+				rankDemote <- cumsum(seq_along(xr2) == rankDemote.index)
+				xr2 <- xr2 - rankDemote
+			}
+		}
+		
+		x[,"rank"] <- xr2
+		x
+	}
+	
+	x2 <- ddply(x.ranked0, "year4", demote)
+	
+	
+	possYears <- do.call(":", as.list(range(xyr, na.rm=TRUE)))
+	possRanks <- 1:max.obs
+	refFrame0 <- expand.grid(possRanks, possYears)
+	refFrame <- data.frame("Type"=unique(x2[,"Type"]), "taxID"=unique(x2[,"taxID"]), "location"=unique(x2[,"location"]), "variable"=unique(x2[,"variable"]), "year4"=refFrame0[,2], "rank"=refFrame0[,1])
+	
+	fillFrame0 <- merge(x2, refFrame, all=TRUE)
+	fillFrame <- fillFrame0[,c("Type", "taxID","location","variable", "year4", "daynum", "rank", "n.yr", "Data")]
+	
+	return(fillFrame)
+	
+}
+
 
 
