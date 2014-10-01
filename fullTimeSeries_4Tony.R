@@ -44,7 +44,7 @@ full <- full[n.yr>=15,]
 # ==========================
 # = Trim to useful columns =
 # ==========================
-full <- full[,list(Type, taxID, location, variable, year4, n.yr, Data)]
+full <- full[,list(Type, taxID, location, variable, year4, daynum, n.yr, Data)]
 
 
 

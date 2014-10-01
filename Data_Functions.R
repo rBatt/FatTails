@@ -286,6 +286,30 @@ sub.gen <- function(x){
 
 
 
+# ======================================================================================
+# Series of yearly maxima
+# ======================================================================================
+tony.yearly.Max <- function(X=NULL, t=NULL){
+    years <- unique(t)
+	n.year <- length(years)
+  
+    Y <- array(0,c(n.year,1))
+    index <- Y
+    i <- 0
+    counter <- 0
+    for(y in years){
+	    i <- i+1
+    	# Y[i] <- ifelse(all(!is.finite(X[t==t])), NA, max(X[t==y], na.rm=TRUE))
+		if(all(!is.finite(X[t==y]))){
+			Y[i] <- NA
+		}else{
+			Y[i] <- max(X[t==y], na.rm=TRUE) 	
+		}
+    	index[i] <- counter + order(X[t==y],decreasing = T)[1]
+    	counter <- counter + length(X[t==y])
+    }
+  	return(cbind(Y,index))
+}
 
 
 
