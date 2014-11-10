@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>fatForest.R</string>
+	<string>fatARMA.R</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -25,13 +25,13 @@
 					<key>filename</key>
 					<string>fullTimeSeries_4Tony.R</string>
 					<key>lastUsed</key>
-					<date>2014-09-23T15:47:28Z</date>
+					<date>2014-09-30T20:28:22Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>TurnExtreme_Fat_Data.R</string>
 					<key>lastUsed</key>
-					<date>2014-09-27T15:05:12Z</date>
+					<date>2014-10-01T12:40:04Z</date>
 				</dict>
 			</array>
 			<key>expanded</key>
@@ -46,27 +46,33 @@
 					<key>filename</key>
 					<string>fatForest.R</string>
 					<key>lastUsed</key>
-					<date>2014-09-27T15:09:48Z</date>
-					<key>selected</key>
-					<true/>
+					<date>2014-10-14T16:18:28Z</date>
+				</dict>
+				<dict>
+					<key>filename</key>
+					<string>FatARMA2.R</string>
+					<key>lastUsed</key>
+					<date>2014-10-14T16:10:17Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>fatARMA.R</string>
 					<key>lastUsed</key>
-					<date>2014-09-23T15:47:21Z</date>
+					<date>2014-11-09T18:41:06Z</date>
+					<key>selected</key>
+					<true/>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>fatLog.R</string>
 					<key>lastUsed</key>
-					<date>2014-09-23T15:47:18Z</date>
+					<date>2014-10-01T15:39:42Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>fatTails_Manuscript.R</string>
 					<key>lastUsed</key>
-					<date>2014-09-23T15:46:13Z</date>
+					<date>2014-10-14T13:11:11Z</date>
 				</dict>
 				<dict>
 					<key>children</key>
@@ -75,7 +81,7 @@
 							<key>filename</key>
 							<string>fatMax.R</string>
 							<key>lastUsed</key>
-							<date>2014-06-27T21:22:09Z</date>
+							<date>2014-09-30T21:25:39Z</date>
 						</dict>
 						<dict>
 							<key>filename</key>
@@ -102,13 +108,13 @@
 					<key>filename</key>
 					<string>fatARMA_Sim.R</string>
 					<key>lastUsed</key>
-					<date>2014-09-11T16:16:02Z</date>
+					<date>2014-10-14T13:11:13Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>fatBirth_Sim.R</string>
 					<key>lastUsed</key>
-					<date>2014-09-23T15:38:27Z</date>
+					<date>2014-10-14T13:19:23Z</date>
 				</dict>
 			</array>
 			<key>expanded</key>
@@ -126,19 +132,19 @@
 							<key>filename</key>
 							<string>fig1_fatConcept.R</string>
 							<key>lastUsed</key>
-							<date>2014-08-13T16:27:17Z</date>
+							<date>2014-10-11T01:00:01Z</date>
 						</dict>
 						<dict>
 							<key>filename</key>
 							<string>fig2_xi_waiting.R</string>
 							<key>lastUsed</key>
-							<date>2014-09-23T15:46:53Z</date>
+							<date>2014-11-09T18:41:06Z</date>
 						</dict>
 						<dict>
 							<key>filename</key>
 							<string>fig3_compareWaiting_dists.R</string>
 							<key>lastUsed</key>
-							<date>2014-09-23T15:47:09Z</date>
+							<date>2014-10-01T15:39:17Z</date>
 						</dict>
 					</array>
 					<key>expanded</key>
@@ -153,25 +159,37 @@
 							<key>filename</key>
 							<string>JDD.sim.plot.R</string>
 							<key>lastUsed</key>
-							<date>2014-07-03T12:19:09Z</date>
+							<date>2014-10-02T13:21:07Z</date>
 						</dict>
 						<dict>
 							<key>filename</key>
 							<string>xi_arma_resids_plot.R</string>
 							<key>lastUsed</key>
-							<date>2014-09-12T16:38:40Z</date>
+							<date>2014-10-14T17:50:58Z</date>
 						</dict>
 						<dict>
 							<key>filename</key>
 							<string>dscat_xiTS_xiRES_plot.R</string>
 							<key>lastUsed</key>
-							<date>2014-09-12T16:38:36Z</date>
+							<date>2014-11-01T22:11:04Z</date>
 						</dict>
 						<dict>
 							<key>filename</key>
 							<string>fat_forest_plot.R</string>
 							<key>lastUsed</key>
-							<date>2014-09-12T16:38:35Z</date>
+							<date>2014-10-14T17:49:27Z</date>
+						</dict>
+						<dict>
+							<key>filename</key>
+							<string>Diaptomus_eg_arma_xi.R</string>
+							<key>lastUsed</key>
+							<date>2014-09-30T12:43:56Z</date>
+						</dict>
+						<dict>
+							<key>filename</key>
+							<string>dscat_xiTS_lambda_plot.R</string>
+							<key>lastUsed</key>
+							<date>2014-10-14T15:44:50Z</date>
 						</dict>
 					</array>
 					<key>expanded</key>
@@ -198,13 +216,13 @@
 							<key>filename</key>
 							<string>fatPlots_JASM.R</string>
 							<key>lastUsed</key>
-							<date>2014-08-07T19:13:06Z</date>
+							<date>2014-10-14T16:26:44Z</date>
 						</dict>
 						<dict>
 							<key>filename</key>
 							<string>FatTails_Figures.R</string>
 							<key>lastUsed</key>
-							<date>2014-06-30T21:36:57Z</date>
+							<date>2014-10-14T16:26:54Z</date>
 						</dict>
 						<dict>
 							<key>filename</key>
@@ -261,25 +279,25 @@
 					<key>filename</key>
 					<string>ARMAFunctions.R</string>
 					<key>lastUsed</key>
-					<date>2014-09-27T15:09:48Z</date>
+					<date>2014-10-01T12:56:14Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>FatTails_Functions.R</string>
 					<key>lastUsed</key>
-					<date>2014-09-23T15:28:28Z</date>
+					<date>2014-10-01T12:55:35Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>Data_Functions.R</string>
 					<key>lastUsed</key>
-					<date>2014-09-23T15:27:40Z</date>
+					<date>2014-10-14T16:27:06Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>fatPlot_Functions.R</string>
 					<key>lastUsed</key>
-					<date>2014-09-11T16:15:41Z</date>
+					<date>2014-10-14T16:26:43Z</date>
 				</dict>
 			</array>
 			<key>expanded</key>
@@ -289,7 +307,7 @@
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
-	<integer>445</integer>
+	<integer>317</integer>
 	<key>metaData</key>
 	<dict>
 		<key>ARMAFunctions.R</key>
@@ -297,14 +315,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>43</integer>
+				<integer>1</integer>
 				<key>line</key>
-				<integer>468</integer>
+				<integer>969</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>632</integer>
+			<integer>938</integer>
 		</dict>
 		<key>CalcZoopBiomass.R</key>
 		<dict>
@@ -325,14 +343,42 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>68</integer>
+				<integer>53</integer>
 				<key>line</key>
-				<integer>281</integer>
+				<integer>317</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>260</integer>
+			<integer>309</integer>
+		</dict>
+		<key>Diaptomus_eg_arma_xi.R</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>9</integer>
+				<key>line</key>
+				<integer>13</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>FatARMA2.R</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>234</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>216</integer>
 		</dict>
 		<key>FatTails_Figures.R</key>
 		<dict>
@@ -346,7 +392,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>1</integer>
+			<integer>77</integer>
 		</dict>
 		<key>FatTails_Functions.R</key>
 		<dict>
@@ -411,14 +457,14 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>86</integer>
+				<integer>63</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>170</integer>
+			<integer>178</integer>
 		</dict>
-		<key>dscat_xiTS_xiRES_plot.R</key>
+		<key>dscat_xiTS_lambda_plot.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
@@ -427,10 +473,40 @@
 				<key>line</key>
 				<integer>2</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>87</integer>
+				<key>line</key>
+				<integer>2</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>2</integer>
+			</dict>
+		</dict>
+		<key>dscat_xiTS_xiRES_plot.R</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>29</integer>
+				<key>line</key>
+				<integer>24</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>5</integer>
 		</dict>
 		<key>dscat_xi_ARMA_index_plot.R</key>
 		<dict>
@@ -453,27 +529,27 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>7</integer>
+				<integer>55</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>93</integer>
+			<integer>44</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>97</integer>
+				<integer>2</integer>
 				<key>line</key>
-				<integer>7</integer>
+				<integer>60</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>7</integer>
+				<integer>55</integer>
 			</dict>
 		</dict>
 		<key>fatARMA_Sim.R</key>
@@ -502,21 +578,21 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>11</integer>
+			<integer>60</integer>
 		</dict>
 		<key>fatForest.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>14</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>8</integer>
+				<integer>147</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>136</integer>
 		</dict>
 		<key>fatLog.R</key>
 		<dict>
@@ -532,6 +608,20 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
+		<key>fatMax.R</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>26</integer>
+				<key>line</key>
+				<integer>9</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
 		<key>fatPlot_Functions.R</key>
 		<dict>
 			<key>caret</key>
@@ -539,28 +629,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>521</integer>
+				<integer>412</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>520</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>22</integer>
-				<key>line</key>
-				<integer>524</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>521</integer>
-			</dict>
+			<integer>0</integer>
 		</dict>
 		<key>fatPlots_JASM.R</key>
 		<dict>
@@ -583,7 +657,35 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>16</integer>
+				<integer>86</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>72</integer>
+		</dict>
+		<key>fat_forest_plot.R</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>136</integer>
+				<key>line</key>
+				<integer>74</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>57</integer>
+		</dict>
+		<key>fig1_fatConcept.R</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>89</integer>
+				<key>line</key>
+				<integer>4</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
@@ -594,45 +696,17 @@
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>40</integer>
+				<integer>87</integer>
 				<key>line</key>
-				<integer>16</integer>
+				<integer>4</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>16</integer>
-			</dict>
-		</dict>
-		<key>fat_forest_plot.R</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>82</integer>
-				<key>line</key>
-				<integer>36</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>fig1_fatConcept.R</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>41</integer>
-				<key>line</key>
 				<integer>89</integer>
+				<key>line</key>
+				<integer>4</integer>
 			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>67</integer>
 		</dict>
 		<key>fig1_fatConcept_full.R</key>
 		<dict>
@@ -683,30 +757,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>2</integer>
+				<integer>25</integer>
 				<key>line</key>
-				<integer>17</integer>
+				<integer>28</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>30</integer>
-				<key>line</key>
-				<integer>17</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>2</integer>
-				<key>line</key>
-				<integer>17</integer>
-			</dict>
+			<integer>9</integer>
 		</dict>
 		<key>fig3_compareWaiting_dists.R</key>
 		<dict>
@@ -720,21 +778,21 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>47</integer>
+			<integer>0</integer>
 		</dict>
 		<key>fullTimeSeries_4Tony.R</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>31</integer>
 				<key>line</key>
-				<integer>54</integer>
+				<integer>14</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>38</integer>
+			<integer>5</integer>
 		</dict>
 		<key>jdd.disc.R</key>
 		<dict>
@@ -815,30 +873,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>39</integer>
 				<key>line</key>
-				<integer>3</integer>
+				<integer>30</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>87</integer>
-				<key>line</key>
-				<integer>3</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>3</integer>
-			</dict>
+			<integer>14</integer>
 		</dict>
 		<key>xi_taxClass_plot.R</key>
 		<dict>
@@ -880,6 +922,7 @@
 		<string>tailedness_taxLevel_plot.R</string>
 		<string>fat_forest_plot.R</string>
 		<string>dscat_xiTS_xiRES_plot.R</string>
+		<string>dscat_xiTS_lambda_plot.R</string>
 		<string>signifXi_beanplot.R</string>
 		<string>xi_taxClass_plot.R</string>
 		<string>xi_arma_resids_plot.R</string>
@@ -894,6 +937,9 @@
 		<string>FatTails_Functions.R</string>
 		<string>JDD.R</string>
 		<string>fatTails_Manuscript.R</string>
+		<string>Diaptomus_eg_arma_xi.R</string>
+		<string>FatARMA2.R</string>
+		<string>fatMax.R</string>
 		<string>fatLog.R</string>
 		<string>CalcZoopBiomass.R</string>
 		<string>ReadFatData.R</string>
@@ -908,6 +954,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{596, 629}, {1573, 761}}</string>
+	<string>{{418, 799}, {1269, 568}}</string>
 </dict>
 </plist>
