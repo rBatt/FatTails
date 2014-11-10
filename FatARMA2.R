@@ -2,6 +2,7 @@
 # Uses the arima() function in R, not Tony's
 # Also, fits to full time series, not annual maxima like previous ARMA analysis
 
+library(plyr)
 
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data_Functions.R") # for tony.yearly.max, fill.Full
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Functions.R") # for fillMiss
@@ -39,7 +40,10 @@ z <- z[z[,"xi.resid"]<3,]
 
 z[,"Type"] <- factor(z[,"Type"], levels=c("Biological", "Chemical", "Physical", "Meteorological"))
 
+
+save(z0, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/fatARMA2.z0.RData")
 save(z, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/fatARMA2.z.RData")
+save(z.full, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/fatARMA2.z.full.RData")
 
 
 
@@ -211,5 +215,30 @@ save(X, Y, ii, XX, YY, iii, file="/Users/Battrd/Documents/School&Work/WiscResear
 # load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data2.RData")
 # plot(test[,c("xi2","sh_0")])
 # plot(test[,c("xi2.se","se.sh_0")])
+
+
+
+# =========================
+# = To go into manuscript =
+# =========================
+summary(lm(xi2~Type+I(p+q)+lambda, data=z, weights=1/xi2.se^2))
+dev.new(); par(mfrow=c(2,2), mar=c(2,2,2,0.5), ps=10, cex=1, mgp=c(0.75,0.15,0), tcl=-0.15, family="Times")
+plot(lm(xi2~Type+I(p+q)+lambda, data=z, weights=1/xi2.se)) # these are surprisingly amazing diagnostics
+
+# summary(lm(xi2~Type+I(p+q)+lambda+xi.resid, data=z, weights=1/xi2.se)) # shows that order isn't significant
+summary(lm(xi2~Type+I(p+q)+lambda+xi.resid, data=z, weights=1/xi2.se^2))
+dev.new(); par(mfrow=c(2,2), mar=c(2,2,2,0.5), ps=10, cex=1, mgp=c(0.75,0.15,0), tcl=-0.15, family="Times")
+plot(lm(xi2~Type+lambda+xi.resid, data=z, weights=1/xi2.se^2)) # these are surprisingly amazing diagnostics
+
+
+summary(lm(xi2~Type+I(p+q)+lambda+xi.resid, data=z, weights=1/xi2.se^2))$coef
+
+
+# =====================================================
+# = Why I excluded 1 ts due to crazy high residual xi =
+# =====================================================
+summary(lm(xi2~Type+lambda+xi.resid, data=z, weights=1/xi2.se^2))
+dev.new(); par(mfrow=c(2,2), mar=c(2,2,2,0.5), ps=10, cex=1, mgp=c(0.75,0.15,0), tcl=-0.15, family="Times")
+plot(lm(xi2~Type+I(p+q)+lambda+xi.resid, data=z0, weights=1/xi2.se^2)) # above regression, but w/o the outlier removed
 
 

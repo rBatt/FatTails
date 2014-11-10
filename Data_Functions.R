@@ -315,6 +315,7 @@ tony.yearly.Max <- function(X=NULL, t=NULL){
 # ============================================================================
 # = Add NA's to full time series for LTER data (not just fill annual maxima) =
 # ============================================================================
+# note that this function was designed for FatARMA2.R
 fill.Full <- function(x){
 	require(zoo)
 	require(plyr)
