@@ -1,11 +1,12 @@
 
 rm(list=ls())
 graphics.off()
-setwd("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails")
-# library("wmtsa")
+
 library("reshape")
-source("FatTails_Functions.R")
-source("Data_Functions.R")
+
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/Data_Functions.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/FatTails_Functions.R")
+
 
 setThresh <- 1.1
 threshObs <- 15

@@ -6,7 +6,7 @@ load("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme
 # = Proportion bounded/thin/fat in at each taxonomic level =
 # ==========================================================
 
-png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/tailedness_taxLevel.png", res=150, units="in", height=4, width=8)
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Other/tailedness_taxLevel.png", res=150, units="in", height=4, width=8)
 par(mfrow=c(1,2), mar=c(2,2.5,0.5,0.5), mgp=c(1.5,0.5,0), tcl=-0.3, ps=10, family="Times")
 
 sXi.fish <- tapply(fish.gev.full[,"shape.sig"], fish.gev.full[,"taxLvl"], sign)

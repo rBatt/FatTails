@@ -1,7 +1,7 @@
 
 library(data.table)
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Functions.R")
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data_Functions.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/FatTails_Functions.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/Data_Functions.R")
 
 
 full0 <- fread("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/FatTailsDataFull.txt")

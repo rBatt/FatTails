@@ -2,7 +2,7 @@
 
 rm(list=ls())
 graphics.off()
-source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/ARMAFunctions.R")
+source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/ARMAFunctions.R")
 fnNames <- ls()
 pkgNames <- c("DEoptim","GenSA")
 load("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data.RData")

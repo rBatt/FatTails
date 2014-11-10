@@ -2,7 +2,7 @@
 
 library(plyr)
 library(beanplot)
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Functions.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/FatTails_Functions.R")
 load("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/finalFrame.RData")
 load("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data.RData")
 

@@ -16,7 +16,7 @@ beanCol <- list(c(bFill[1]),
 # = Signif Xi Beanplot =
 # ======================
 # dev.new(width=3.5, height=3.5)
-png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/signifXi_beanplot.png", res=150, units="in", height=3.5, width=3.5)
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Other/signifXi_beanplot.png", res=150, units="in", height=3.5, width=3.5)
 par(mfrow=c(1,1), mar=c(2,2.5,0.5,0.5), ps=10, cex=1, mgp=c(2, 0.4, 0), tcl=-0.3, family="Times")
 beanplot(shape.sig~Type, data=data.fat, ylab="", yaxt="n", xaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5, bw=0.05, what=c(1,1,1,1), maxstripline=0.05)
 axis(side=2)

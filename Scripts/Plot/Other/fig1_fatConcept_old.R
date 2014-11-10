@@ -2,9 +2,9 @@
 # =========================
 # = ARIMA Simulation Plot =
 # =========================
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatARMA_Sim.R")
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/JDD.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/fatPlot_Functions.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Simulate/fatARMA_Sim.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/JDD.R")
 	# ========================
 	# = Prepare for plotting =
 	# ========================
@@ -29,7 +29,7 @@ fLabXi <- parse(text=paste("xi", fXi, sep=" = "))
 # Set up figure space
 # dev.new(width=3.5, height=5) # open graphical device
 # png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Fig1_fat_conceptFig.png", res=150, units="in", height=5, width=3.5)
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Fig1_fat_conceptFig.pdf", height=5, width=3.5)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Other/Fig1_fat_conceptFig.pdf", height=5, width=3.5)
 cols1 <- rep(rep(1:3, each=3), 4) # first set of columns for layout matrix
 cols2 <- rep(rep(c(4,5,3), each=3), 3) # second set of column for layout matrix
 lmat <- matrix(c(cols1, cols2), ncol=7) # create layout matrix

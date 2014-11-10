@@ -1,6 +1,6 @@
 
 load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data.RData")
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatARMA_Sim.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Simulate/fatARMA_Sim.R")
 
 library(lme4)
 library(multcomp)

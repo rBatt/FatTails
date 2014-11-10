@@ -1,7 +1,7 @@
 
 library(beanplot)
 load("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data.RData")
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/fatPlot_Functions.R")
 
 
 # ==============================
@@ -16,7 +16,7 @@ beanCol <- list(c(bFill[1]),
 				)
 
 # dev.new(width=3.5, height=6)
-png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Fig2_fatBeanXiWaiting.png", res=150, units="in", height=6, width=3.5)
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/MainText/Fig2_fatBeanXiWaiting.png", res=150, units="in", height=6, width=3.5)
 par(mfrow=c(2,1), mar=c(2,2.5,0.5,0.5), ps=10, cex=1, mgp=c(2, 0.4, 0), tcl=-0.3, family="Times")
 beanplot(sh_0~Type, data=data.fat, ylab="", yaxt="n", xaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5)
 axis(side=2)
@@ -38,7 +38,7 @@ dev.off()
 # ===========================
 # = Xi Waiting Time Boxplot =
 # ===========================
-# png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/fatBoxXiWaiting.png", res=150, units="in", height=6, width=3.5)
+# png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/MainText/fatBoxXiWaiting.png", res=150, units="in", height=6, width=3.5)
 # par(mfrow=c(2,1), mar=c(2.5,2.5,0.5,0.5), ps=10, cex=1, mgp=c(2, 0.4, 0), tcl=-0.3, family="Times")
 # boxplot(sh_0~Type, data=data.fat, outline=FALSE, ylab="", yaxt="n", xaxt="n")
 # axis(side=2)

@@ -3,7 +3,7 @@
 # = Ryan Figure =
 # ===============
 library("evir")
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/fatPlot_Functions.R")
 
 pm.1 <- c(0.75, 0, 0.5, 0)
 pm.blank <- c(0, 0, 1, 0)

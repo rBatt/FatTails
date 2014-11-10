@@ -1,7 +1,7 @@
 
 
 
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/fatPlot_Functions.R")
 load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data2.RData")
 
 

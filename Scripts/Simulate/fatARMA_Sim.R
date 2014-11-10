@@ -24,15 +24,15 @@ library("plyr")
 # =========================
 # = Set working directory =
 # =========================
-setwd("/Users/battrd/Documents/School&Work/WiscResearch/FatTails")
+# setwd("/Users/battrd/Documents/School&Work/WiscResearch/FatTails")
 
 # ================
 # = Load scripts =
 # ================
-source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/ARMAFunctions.R") #also loads GenSA and DEoptim packages
+source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/ARMAFunctions.R") #also loads GenSA and DEoptim packages
 # source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
-source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Functions.R")
-source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/JDD.R")
+source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/FatTails_Functions.R")
+source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/JDD.R")
 
 # =============================
 # = Define Simulation Options =

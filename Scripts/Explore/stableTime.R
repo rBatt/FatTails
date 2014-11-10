@@ -4,8 +4,7 @@ library("doParallel")
 
 registerDoParallel()
 
-setwd("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/")
-load("finalFrame_noXform_Stat.RData")
+load("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/finalFrame_noXform_Stat.RData")
 
 stableTime2 <- function(x){
 	ts <- x[,"Data"]

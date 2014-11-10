@@ -1,8 +1,8 @@
 
 
 
-source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/JDD.R")
-source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Functions.R")
+source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/JDD.R")
+source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/FatTails_Functions.R")
 
 
 
@@ -43,7 +43,7 @@ ramp.cols <- col2rgb(colorRampPalette(c("blue", "cyan", "green", "yellow", "oran
 mycols <- rgb(red=ramp.cols["red",], green=ramp.cols["green",], blue=ramp.cols["blue",], alpha=50, maxColorValue=256) # add transparency
 
 # dev.new(width=3.9, height=6) # new graphical device
-png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/JDD_2mods.png", width=3.9, height=6, units="in", res=150) 
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Other/JDD_2mods.png", width=3.9, height=6, units="in", res=150) 
 # par(mfcol=c(4, 2), mar=c(2.25, 3, 0.5, 1.5), oma=c(0.1, 0.1, 8, 0.1), ps=10, mgp=c(0.9, 0.15, 0), tcl=-0.20, family="Times", cex=1) # graphical params
 par(mfcol=c(4, 2), mar=c(1.9, 1.75, 0.5, 1.6), oma=c(0.0, 0.01, 5.5, 0.01), ps=8, mgp=c(0.65, 0.1, 0), tcl=-0.20, family="Times", cex=1)
 # Plotting Johannes 2004 Eq 1

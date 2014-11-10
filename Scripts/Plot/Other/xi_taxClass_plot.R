@@ -1,12 +1,12 @@
 
 load("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data.RData")
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/fatPlot_Functions.R")
 
 # ==================================
 # = Plot Xi Across taxonomic level =
 # ==================================
 # dev.new(width=3.5, height=6)
-png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/xi_taxClass.png", res=150, units="in", height=6, width=3.5)
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Other/xi_taxClass.png", res=150, units="in", height=6, width=3.5)
 par(mfrow=c(2,1), mar=c(3,3,0.5,0.5), mgp=c(1.5, 0.4, 0), tcl=-0.25, family="Times", cex=1, ps=10)
 plotTax(D=zoop.gev.full, V="density", Stat="sh_0", taxCol="Phylum", ylim=c(-0.5, 1.5))
 ztLab <- c("Spec","Genus","Fam","Ord","Class","Phy","Comm")

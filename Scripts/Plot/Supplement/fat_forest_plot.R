@@ -43,7 +43,7 @@ text.corner <- function(words, corner=2, nchar.buffer.width=2, ...){
 # ====================================
 # = Fat Forest: Zoop Marginal Effect =
 # ====================================
-png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/zoop_Marginal.png", res=150, units="in", height=5, width=3.5)
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/zoop_Marginal.png", res=150, units="in", height=5, width=3.5)
 # dev.new(width=3.5, height=5)
 par(mfrow=c(2,1), mar=c(2.5,2.5,0.5,0.5), ps=10, family="Times", mgp=c(1.25,0.4,0), tcl=-0.35)
 plot(zoop.pp.sesh0, type="l", xlab=bquote(Standard~~error~~of~~xi),ylab=bquote(Zooplankton~~xi))
@@ -58,7 +58,7 @@ dev.off()
 # = Fat Forest: Fish Marginal Effect =
 # ====================================
 # dev.new(width=3.5, height=5)
-png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/fish_Marginal.png", res=150, units="in", height=5, width=3.5)
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/fish_Marginal.png", res=150, units="in", height=5, width=3.5)
 par(mfrow=c(2,1), mar=c(2.5,2.5,0.5,0.5), ps=10, family="Times", mgp=c(1.5,0.3,0), tcl=-0.25)
 plot(fish.pp.xires, type="l", xlab=bquote(xi[Residual]),ylab=bquote(Fish~~xi))
 plot(fish.pp.sesh0, type="l", xlab=bquote(Standard~~error~~of~~xi),ylab=bquote(Fish~~xi))
@@ -72,7 +72,7 @@ dev.off()
 # = Fat Forest: Full Data Marginal Effect =
 # =========================================
 # dev.new(width=3.5, height=5)
-png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/fullData_Marginal.png", res=150, units="in", height=5, width=3.5)
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/fullData_Marginal.png", res=150, units="in", height=5, width=3.5)
 par(mfrow=c(2,1), mar=c(2.5,2.5,0.5,0.5), ps=10, family="Times", mgp=c(1.25,0.4,0), tcl=-0.35, cex=1)
 plot(data.pp.xires, type="l", xlab=bquote(xi[Residual]),ylab=bquote(xi))
 plot(data.pp.sesh, type="l", xlab=bquote(Standard~~error~~of~~xi),ylab=bquote(xi))

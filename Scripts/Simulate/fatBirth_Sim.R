@@ -3,8 +3,8 @@
 # ================
 # = Load scripts =
 # ================
-source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/ARMAFunctions.R") #also loads GenSA and DEoptim packages
-source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Functions.R")
+source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/ARMAFunctions.R") #also loads GenSA and DEoptim packages
+source("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/FatTails_Functions.R")
 
 set.seed(5)
 

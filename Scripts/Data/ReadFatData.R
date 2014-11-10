@@ -14,9 +14,9 @@ graphics.off()
 setwd("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_rawData")
 library("plyr")
 # library("reshape")
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data_Functions.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/Data_Functions.R")
 # source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Fat_dGEV.R")
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/CalcZoopBiomass.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/CalcZoopBiomass.R")
 
 
 # deemedBad <- list()

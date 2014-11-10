@@ -3,10 +3,9 @@ graphics.off()
 
 library("plyr")
 
-setwd("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails")
-load("/Data/All_Params_TurnExtreme_Fat_Data.RData")
-load("/Data/FatTails_rawData/OrganizedFatData_Read_Fat_Data.RData")
-source("FatTails_Functions.R")
+load("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/All_Params_TurnExtreme_Fat_Data.RData")
+load("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/FatTails_rawData/OrganizedFatData_Read_Fat_Data.RData")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/FatTails_Functions.R")
 
 
 # ========================================

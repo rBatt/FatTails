@@ -4,9 +4,9 @@
 
 library(plyr)
 
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data_Functions.R") # for tony.yearly.max, fill.Full
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/FatTails_Functions.R") # for fillMiss
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/ARMAFunctions.R") # for gev.fit2, fitARMA2
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/Data_Functions.R") # for tony.yearly.max, fill.Full
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/FatTails_Functions.R") # for fillMiss
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/ARMAFunctions.R") # for gev.fit2, fitARMA2
 
 
 load("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/bad.no.se.names.RData")

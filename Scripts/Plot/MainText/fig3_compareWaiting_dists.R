@@ -1,7 +1,7 @@
 
 
 load("/Users/battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data.RData")
-source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/fatPlot_Functions.R")
+source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functions/fatPlot_Functions.R")
 
 
 
@@ -20,7 +20,7 @@ cLine <- rainbow(n=3, v=0.8, s=1)
 cFill <- rgb(t(col2rgb(cLine, alpha=TRUE)), alpha=40, maxColorValue=255)
 
 # dev.new(width=3.5, height=6)
-png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Fig3_compareTimes.png", width=3.5, height=6, units="in", res=300, bg="white")
+png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/MainText/Fig3_compareTimes.png", width=3.5, height=6, units="in", res=300, bg="white")
 par(mfrow=c(3,1), mar=c(0.5, 1.25, 0.25, 0.25), mgp=c(1, 0.3, 0), tcl=-0.3, cex=1, ps=10, family="Times", oma=c(1.5,1,0,0), xpd=T)
 pDens(bound, xaxt="n", xlab="")
 axis(1, labels=FALSE)
@@ -56,7 +56,7 @@ dev.off()
 # cFill <- rgb(t(col2rgb(cLine, alpha=TRUE)), alpha=40, maxColorValue=255)
 # 
 # # dev.new(width=3.5, height=6)
-# png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Fig3_compareTimes.png", width=3.5, height=6, units="in", res=300, bg="white")
+# png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/MainText/Fig3_compareTimes.png", width=3.5, height=6, units="in", res=300, bg="white")
 # par(mfrow=c(3,1), mar=c(0.5, 1.25, 0.25, 0.25), mgp=c(1, 0.3, 0), tcl=-0.3, cex=1, ps=10, family="Times", oma=c(1.5,1,0,0), xpd=T)
 # pDens(bound, xaxt="n", xlab="")
 # axis(1, labels=FALSE)
