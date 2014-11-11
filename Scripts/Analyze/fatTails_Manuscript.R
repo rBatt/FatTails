@@ -1,6 +1,7 @@
 
 load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data.RData")
 source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Simulate/fatARMA_Sim.R")
+load("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/fatForest.RData") # also contains data.2
 
 library(lme4)
 library(multcomp)
@@ -204,15 +205,41 @@ data.fat[fatLogic&bioLogic,][long.gev.bio,]
 data.fat[fatLogic&bioLogic,][long.lnorm.bio,]
 
 
+# =========================
+# = Random Forest Summary =
+# =========================
+# zoop.prox.imp[order(zoop.prox.imp, decreasing=TRUE),] # from randomForest package: 1st = xi.resid, 2nd = N; 3rd = location; 4th = Family
+# z.party.imp <- sort(varimp(zoop.party), decreasing=TRUE) # from party package: 1st = xi.resid, 2nd = N; 3rd = lambda; 4th = Class
+zoopForest.range
+#   predictor               min               max              range
+# 1    xi.res 0.151895949871895 0.507498714450341  0.355602764578446
+# 2         N 0.228710355863257 0.366487830681183  0.137777474817926
+# 3  location  0.23250457626325 0.301365184844827 0.0688606085815762
+# 4     class 0.251728021813366 0.268227782324993 0.0164997605116272
+
+
+# fish.prox.imp[order(fish.prox.imp, decreasing=TRUE),] # 1st=xi.resid; 2nd = location; 3rd = lambda; 4th = pq
+# fish.party.imp <- sort(varimp(fish.party), decreasing=TRUE) # 1st = xi.resid; 2nd = lambda; 3rd = location; 4th = pq
+fishForest.range
+#   predictor                min               max              range
+# 1    xi.res 0.0249185363770066  0.42393195107084  0.399013414693833
+# 2    lambda  0.133610090554674 0.206531350550918 0.0729212599962435
+# 3  location  0.132881126490146 0.278317336537784  0.145436210047638
+# 4        pq  0.166597142727039 0.184934098402071 0.0183369556750325
 
 
 
 
 
+# dt.imp[order(dt.imp, decreasing=TRUE),] # 1st = xi.resid; 2nd = Type; 3rd = Lambda; 4th = N
+# dt.party.imp <- sort(varimp(dt.party), decreasing=TRUE) # 1st = xi.resid; 2nd = Type; 3r = lambda; 4th = location
 
-
-
-
+dataForest.range
+#   predictor                  min               max              range
+# 1    xi.res     -0.2095763880635 0.382636569819512  0.592212957883012
+# 2      Type -0.00165278831938694 0.174674994419116  0.176327782738503
+# 3    lambda   0.0285705854951115 0.168874257450988  0.140303671955876
+# 4  location   0.0481159882655436 0.132970017204484 0.0848540289389406
 
 
 

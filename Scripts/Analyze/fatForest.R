@@ -10,10 +10,85 @@ data.3 <- merge(data.2, z[,c("Type","taxID","location", "variable", "pq", "lambd
 
 library(party)
 library(rpart)
-
 library(randomForest)
 
 not4tree0 <- c("a1", "a2", "a3", "AICc", "b1", "b2", "b3", "Community", "Duration", "level", "Level2_logNormTime", "Level2_normTime", "Level2_time", "logMean", "logSd", "mean", "mu_0", "nll", "Period", "sd", "shape.sig", "sig_0", "Species", "taxID", "taxLvl", "variable", "residual_mu_0", "residual_sig_0", "residual_sh_0", "sigEps", "sigE", "sigInf","InfE","Einf","Lambda", "P", "Q", "se.sh_0")
+
+
+# ============================================
+# = Prepare a zoop data frame for the forest =
+# ============================================
+# Grab zoop GEV results and taxonomic info
+bigZoop00 <- merge(zoop.gev[,c("taxID","location","variable","Phylum","Class","Order","Family")], data.3, all.x=TRUE)
+bigZoop00 <- bigZoop00[,!names(bigZoop00)%in%not4tree.fz]
+bigZoop00 <- bigZoop00[complete.cases(bigZoop00),]
+row.names(bigZoop00) <- NULL
+
+# ldply(bigZoop00, function(x)class(x))
+bigZoop00[,"Phylum"] <- factor(bigZoop00[,"Phylum"])
+bigZoop00[,"Class"] <- factor(bigZoop00[,"Class"])
+bigZoop00[,"Order"] <- factor(bigZoop00[,"Order"])
+bigZoop00[,"Family"] <- factor(bigZoop00[,"Family"])
+# bigZoop00[,"Genus"] <- factor(bigZoop00[,"Genus"]) # 33 levels, doesn't work with randomForest
+# bigZoop00[,"P"] <- factor(bigZoop00[,"P"])
+# bigZoop00[,"Q"] <- factor(bigZoop00[,"Q"])
+bigZoop00[,"pq"] <- factor(bigZoop00[,"pq"])
+# bigZoop00[,"variable"] <- factor(bigZoop00[,"variable"])
+
+
+# ===============
+# = Zoop Forest =
+# ===============
+
+# Construct Random Forests
+zoop.prox0 <- randomForest(sh_0~., bigZoop00, importance=TRUE, ntree=2E3)
+zoop.party <- cforest(sh_0~., bigZoop00, controls=cforest_unbiased(ntree=2E3, mtry=ceiling(sqrt(dim(bigZoop00)[2]-1))))
+
+# Get importances
+zoop.prox.imp <- importance(zoop.prox0, type=1)
+zoop.prox.imp[order(zoop.prox.imp, decreasing=TRUE),] # 1st = xi.resid, 2nd = N; 3rd = location; 4th = Family
+z.party.imp <- sort(varimp(zoop.party), decreasing=TRUE) # 1st = xi.resid, 2nd = N; 3rd = lambda; 4th = Class
+
+# Get partial plots
+zoop.pp.xires <- partialPlot(zoop.prox0, pred.data=bigZoop00, x.var="xi.resid", plot=FALSE)
+zoop.pp.N <- partialPlot(zoop.prox0, pred.data=bigZoop00, x.var="N", plot=FALSE)
+zoop.pp.lambda <- partialPlot(zoop.prox0, pred.data=bigZoop00, x.var="lambda", plot=FALSE)
+zoop.pp.class <- partialPlot(zoop.prox0, pred.data=bigZoop00, x.var="Class", plot=FALSE)
+
+# zoop.pp.loc0 <- partialPlot(zoop.prox0, pred.data=bigZoop00, x.var="location", plot=FALSE)
+# zoop.pp.loc.or <- order(zoop.pp.loc0$y)
+# zoop.pp.loc <- zoop.pp.loc0
+# zoop.pp.loc$y <- zoop.pp.loc0$y[zoop.pp.loc.or]
+# zoop.pp.loc$x <- factor(zoop.pp.loc0$x[zoop.pp.loc.or], levels=zoop.pp.loc0$x[zoop.pp.loc.or])
+
+
+
+
+# Summarize top 4 zoop forests
+zoopForest.range <- as.data.frame(cbind(
+	"predictor"=c("xi.res","N","location","class"), 
+	"min"=c(
+		min(zoop.pp.xires$y), 
+		min(zoop.pp.N$y), 
+		min(zoop.pp.lambda$y), 
+		min(zoop.pp.class$y)
+	),
+	"max"=c(
+		max(zoop.pp.xires$y), 
+		max(zoop.pp.N$y), 
+		max(zoop.pp.lambda$y), 
+		max(zoop.pp.class$y)
+	),
+	"range"=c(
+		diff(range(zoop.pp.xires$y)), 
+		diff(range(zoop.pp.N$y)), 
+		diff(range(zoop.pp.lambda$y)), 
+		diff(range(zoop.pp.class$y))
+	)
+))
+
+
+
 
 # ============================================
 # = Prepare a fish data frame for the forest =
@@ -41,7 +116,6 @@ bigFish0[,"location"] <- factor(bigFish0[,"location"])
 
 # Construct Random Forest
 fish.prox0 <- randomForest(sh_0~., bigFish0, importance=TRUE, ntree=2E3)
-
 fish.party <- cforest(sh_0~., bigFish0, controls=cforest_unbiased(ntree=2E3, mtry=ceiling(sqrt(dim(bigFish0)[2]-1))))
 
 
@@ -49,7 +123,6 @@ fish.party <- cforest(sh_0~., bigFish0, controls=cforest_unbiased(ntree=2E3, mtr
 # Get importances
 fish.prox.imp <- importance(fish.prox0, type=1)
 fish.prox.imp[order(fish.prox.imp, decreasing=TRUE),] # 1st=xi.resid; 2nd = location; 3rd = lambda; 4th = pq
-
 fish.party.imp <- sort(varimp(fish.party), decreasing=TRUE) # 1st = xi.resid; 2nd = lambda; 3rd = location; 4th = pq
 
 # Partial Plots
@@ -92,80 +165,6 @@ fishForest.range <- as.data.frame(cbind(
 
 
 
-
-
-# ============================================
-# = Prepare a zoop data frame for the forest =
-# ============================================
-# Grab zoop GEV results and taxonomic info
-bigZoop00 <- merge(zoop.gev[,c("taxID","location","variable","Phylum","Class","Order","Family")], data.3, all.x=TRUE)
-bigZoop00 <- bigZoop00[,!names(bigZoop00)%in%not4tree.fz]
-bigZoop00 <- bigZoop00[complete.cases(bigZoop00),]
-row.names(bigZoop00) <- NULL
-
-# ldply(bigZoop00, function(x)class(x))
-bigZoop00[,"Phylum"] <- factor(bigZoop00[,"Phylum"])
-bigZoop00[,"Class"] <- factor(bigZoop00[,"Class"])
-bigZoop00[,"Order"] <- factor(bigZoop00[,"Order"])
-bigZoop00[,"Family"] <- factor(bigZoop00[,"Family"])
-# bigZoop00[,"Genus"] <- factor(bigZoop00[,"Genus"]) # 33 levels, doesn't work with randomForest
-# bigZoop00[,"P"] <- factor(bigZoop00[,"P"])
-# bigZoop00[,"Q"] <- factor(bigZoop00[,"Q"])
-bigZoop00[,"pq"] <- factor(bigZoop00[,"pq"])
-# bigZoop00[,"variable"] <- factor(bigZoop00[,"variable"])
-
-
-# ===============
-# = Zoop Forest =
-# ===============
-
-# Construct Random Forests
-zoop.prox0 <- randomForest(sh_0~., bigZoop00, importance=TRUE, ntree=2E3)
-zoop.party <- cforest(sh_0~., bigZoop00, controls=cforest_unbiased(ntree=2E3, mtry=ceiling(sqrt(dim(bigZoop00)[2]-1))))
-
-# Get importances
-zoop.prox.imp <- importance(zoop.prox0, type=1)
-zoop.prox.imp[order(zoop.prox.imp, decreasing=TRUE),] # 1st = xi.resid, 2nd = N; 3rd = location; 4th = Family
-
-z.party.imp <- sort(varimp(zoop.party), decreasing=TRUE) # 1st = xi.resid, 2nd = N; 3rd = lambda; 4th = Class
-
-# Get partial plots
-zoop.pp.xires <- partialPlot(zoop.prox0, pred.data=bigZoop00, x.var="xi.resid", plot=FALSE)
-zoop.pp.N <- partialPlot(zoop.prox0, pred.data=bigZoop00, x.var="N", plot=FALSE)
-zoop.pp.lambda <- partialPlot(zoop.prox0, pred.data=bigZoop00, x.var="lambda", plot=FALSE)
-zoop.pp.class <- partialPlot(zoop.prox0, pred.data=bigZoop00, x.var="Class", plot=FALSE)
-
-# zoop.pp.loc0 <- partialPlot(zoop.prox0, pred.data=bigZoop00, x.var="location", plot=FALSE)
-# zoop.pp.loc.or <- order(zoop.pp.loc0$y)
-# zoop.pp.loc <- zoop.pp.loc0
-# zoop.pp.loc$y <- zoop.pp.loc0$y[zoop.pp.loc.or]
-# zoop.pp.loc$x <- factor(zoop.pp.loc0$x[zoop.pp.loc.or], levels=zoop.pp.loc0$x[zoop.pp.loc.or])
-
-
-
-
-# Summarize top 4 zoop forests
-zoopForest.range <- as.data.frame(cbind(
-	"predictor"=c("xi.res","N","location","class"), 
-	"min"=c(
-		min(zoop.pp.xires$y), 
-		min(zoop.pp.N$y), 
-		min(zoop.pp.lambda$y), 
-		min(zoop.pp.class$y)
-	),
-	"max"=c(
-		max(zoop.pp.xires$y), 
-		max(zoop.pp.N$y), 
-		max(zoop.pp.lambda$y), 
-		max(zoop.pp.class$y)
-	),
-	"range"=c(
-		diff(range(zoop.pp.xires$y)), 
-		diff(range(zoop.pp.N$y)), 
-		diff(range(zoop.pp.lambda$y)), 
-		diff(range(zoop.pp.class$y))
-	)
-))
 
 
 
