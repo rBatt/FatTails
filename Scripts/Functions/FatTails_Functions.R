@@ -2,6 +2,8 @@
 # =================================
 # = Core function for fitting GEV =
 # =================================	
+# Based on code by Katz et al. 2005. Statistics of extremes: Modeling ecological disturbances. Ecology 86:1124-1134.
+# Code can be found here: http://www.esapubs.org/archive/ecol/E086/060/suppl-1.htm#anchorFilelist
 gev.fit <- function (xdat, ydat = NULL, mul = NULL, sigl = NULL, shl = NULL, mulink = identity, siglink = identity, shlink = identity, show = FALSE, method = "Nelder-Mead", maxit = 10000, ...){
 
     z <- list() #these are going to be aspects of the output, more later
