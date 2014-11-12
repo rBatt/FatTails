@@ -76,7 +76,7 @@ png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplemen
 par(mfrow=c(2,1), mar=c(2.5,2.5,0.5,0.5), ps=10, family="Times", mgp=c(1.25,0.4,0), tcl=-0.35, cex=1)
 plot(data.pp.xires, type="l", xlab=bquote(xi[Residual]),ylab=bquote(xi))
 # plot(data.pp.sesh, type="l", xlab=bquote(Standard~~error~~of~~xi),ylab=bquote(xi))
-plot(data.pp.type$y, xlab=bquote(Variable~~type), xaxt="n", pch=19, ylab=bquote(xi))
+plot(data.pp.type$y, xlab=bquote(Variable~~category), xaxt="n", pch=19, ylab=bquote(xi))
 axis(side=1, at=1:length(data.pp.type$x), labels=FALSE)
 lakeShort <- c("Physical"="Phys","Biological"="Bio", "Meteorological"="Met", "Chemical"="Chem")
 text(1:length(data.pp.type$x), par("usr")[3]-0.0002, labels=lakeShort[as.character(data.pp.type$x)], pos=1, xpd=TRUE, srt=45)
