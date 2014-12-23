@@ -37,7 +37,7 @@ TukeyHSD(aov(mod1))
 	# ================================
 	# = Linear regression w/ weights =
 	# ================================
-xiWeights0 <- 1/(data.fat[,"se.sh_0"]^2)
+xiWeights0 <- 1/(data.fat[,"se.sh_0"]^2) # note that alkalinity in AL is weighted extremely heavily ...
 xiWeights <- xiWeights0/sum(xiWeights0)
 mod2 <- lm(sh_0~Type, data=data.fat, weights=xiWeights)
 summary(mod2)
@@ -63,9 +63,42 @@ TukeyHSD(aov(mod3))
 summary(aov(mod3))
 summary(aov(lm(sh_0~Type+location, data=data.fat, weights=xiWeights)))
 
-
 fGen <- fish.gev[fish.gev[,"taxLvl"]=="Genus",]
-summary(lmer(sh_0~ Family + (1|Orde/Genus), data=fGen))
+summary(lmer(sh_0~ Family + (1|Order/Genus), data=fGen))
+
+
+# ================================================
+# = Testing while controlling for N and location =
+# ================================================
+# added 22-Dec-2014, manuscript v4.3
+contr <- c("Chemical-Biological=0","Physical-Biological=0","Meteorological-Biological=0")
+
+# ============================================================
+# = Drop Meteorological, Compare Type|Location, with weights =
+# ============================================================
+data.fat2 <- data.fat[data.fat[,"Type"]!="Meteorological",]
+
+# Compare a few w/o weights
+fm4 <- ((lmer(sh_0~Type+N+(Type|location), data=data.fat2)))
+summary(glht(fm4, linfct=mcp(Type=c("Chemical-Biological=0","Physical-Biological=0"))))
+
+# Do it with weights
+xiWeights.2 <- 1/(data.fat2[,"se.sh_0"]^2)
+fm4.w <- ((lmer(sh_0~Type+N+(Type|location), weights=xiWeights.2, data=data.fat2)))
+summary(glht(fm4.w, linfct=mcp(Type=c("Chemical-Biological=0","Physical-Biological=0"))))
+
+
+# Now do one with meteorological variables, and just use N as a predictor
+fm.met.w <- lm(sh_0~Type+N, weights=xiWeights.2, data=data.fat2)
+summary(glht(fm.met.w, linfct=mcp(Type=contr)))
+AIC(fm.met.w)
+AIC(lm(sh_0~Type, weights=xiWeights.2, data=data.fat2))
+
+fm.met.nw <- lm(sh_0~Type+N, data=data.fat2)
+summary(glht(fm.met.nw, linfct=mcp(Type=contr)))
+
+
+
 
 
 # =========================
