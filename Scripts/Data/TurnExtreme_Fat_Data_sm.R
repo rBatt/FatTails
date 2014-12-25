@@ -113,7 +113,8 @@ data.fat.full[,"shape.sig"] = fattestSig(mu=data.fat.full[,"sh_0"], se=data.fat.
 	save(bad.no.se.names, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/bad.no.se.names.RData")
 	
 data.fat.full <- data.fat.full[!is.na(data.fat.full[,"se.sh_0"]),] # this is where the number of time series drops from 597 to 595
-data.fat <- sub.gen(data.fat.full)
+data.fat.shortMet <- sub.gen(data.fat.full)
 
 
+save(data.fat.shortMet, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.fat.shortMet.RData")
 save.image(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data_sm.RData")
