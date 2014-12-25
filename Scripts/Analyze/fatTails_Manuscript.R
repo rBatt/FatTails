@@ -89,13 +89,30 @@ summary(glht(fm4.w, linfct=mcp(Type=c("Chemical-Biological=0","Physical-Biologic
 
 
 # Now do one with meteorological variables, and just use N as a predictor
-fm.met.w <- lm(sh_0~Type+N, weights=xiWeights.2, data=data.fat2)
+fm.met.w <- lm(sh_0~Type+N, weights=xiWeights0, data=data.fat)
 summary(glht(fm.met.w, linfct=mcp(Type=contr)))
 AIC(fm.met.w)
-AIC(lm(sh_0~Type, weights=xiWeights.2, data=data.fat2))
+AIC(lm(sh_0~Type, weights=xiWeights, data=data.fat))
 
-fm.met.nw <- lm(sh_0~Type+N, data=data.fat2)
+fm.met.nw <- lm(sh_0~Type+N, data=data.fat)
 summary(glht(fm.met.nw, linfct=mcp(Type=contr)))
+
+
+# tried again after consulting with Tony
+re1 <- lmer(sh_0 ~ Type + N + (1|location), data=data.fat)
+summary(glht(re1, linfct=mcp(Type=contr)))
+
+re1.w <- lmer(sh_0 ~ Type + N + (1|location), data=data.fat, weights=1/(data.fat[,"se.sh_0"]^2))
+summary(glht(re1.w, linfct=mcp(Type=contr)))
+
+re2 <- lmer(sh_0 ~ Type + N + (N|location), data=data.fat)
+summary(glht(re2, linfct=mcp(Type=contr)))
+
+re2.w <- lmer(sh_0 ~ Type + N + (N|location), data=data.fat, weights=1/(data.fat[,"se.sh_0"]^2))
+summary(glht(re2.w, linfct=mcp(Type=contr)))
+
+
+
 
 
 
