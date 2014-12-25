@@ -205,4 +205,5 @@ for(i in 1:length(uztax2)){
 }
 fish.gev <- sub.gen(fish.gev.full)
 
+save(data.fat, file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.fat.RData")
 save.image(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/TurnExtreme_Fat_Data.RData")
