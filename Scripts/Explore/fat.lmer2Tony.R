@@ -4,6 +4,13 @@
 load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.fat.shortMet.RData")
 load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.fat.RData")
 
+# "location" column is lake or region
+# "sh_0" is xi (shape parameter from GEV)
+# "se.sh_0" is the estimated standard error of xi
+# "N" is the number of annual maxima
+# "Duration" is the duration of the time series – not the same as N if there was a missing year (1986, 1988 would be duration = 3, N=2)
+# "Type" is the variable category – Biological, Chemical, Physical, Meteorological
+
 
 library(lme4)
 library(multcomp)
