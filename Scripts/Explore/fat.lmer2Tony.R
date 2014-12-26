@@ -1,9 +1,7 @@
 
-
-
-load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.fat.shortMet.RData")
-load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.fat.RData")
-
+# ================
+# = Script Notes =
+# ================
 # "location" column is lake or region
 # "sh_0" is xi (shape parameter from GEV)
 # "se.sh_0" is the estimated standard error of xi
@@ -12,8 +10,20 @@ load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.f
 # "Type" is the variable category – Biological, Chemical, Physical, Meteorological
 
 
+# ===================
+# = Load Data Files =
+# ===================
+# NOTE: Tony, you can just double click the .RData files instead of running the ntext two lines
+load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.fat.shortMet.RData")
+load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.fat.RData")
+
+
+# ==================
+# = Load Libraries =
+# ==================
 library(lme4)
 library(multcomp)
+
 
 # ========================
 # = Definte some objects =
@@ -28,6 +38,7 @@ xiWeights.shortMet <- 1/(data.fat.shortMet[,"se.sh_0"]^2)
 contr <- c("Chemical-Biological=0","Physical-Biological=0","Meteorological-Biological=0")
 contr.noMet <- c("Chemical-Biological=0","Physical-Biological=0")
 
+
 # ============================================================
 # = Drop Meteorological, Compare Type|Location, with weights =
 # ============================================================
@@ -39,7 +50,6 @@ summary(glht(fm4, linfct=mcp(Type=contr.noMet)))
 # Do it with weights
 fm4.w <- (lmer(sh_0~Type+N+(Type|location), weights=xiWeights.noMet, data=data.fat.noMet))
 summary(glht(fm4.w, linfct=mcp(Type=contr.noMet)))
-
 
 
 # ===================================
