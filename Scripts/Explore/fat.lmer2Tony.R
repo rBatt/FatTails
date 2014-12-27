@@ -23,53 +23,45 @@ load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.f
 # ==================
 library(lme4)
 library(multcomp)
-
-
-# ========================
-# = Definte some objects =
-# ========================
-data.fat.noMet <- data.fat[data.fat[,"Type"]!="Meteorological",] # no meteorological time series
+library(car)
 
 # Weights
-xiWeights.noMet <- 1/(data.fat.noMet[,"se.sh_0"]^2) # weights for the data set with no met
-xiWeights.shortMet <- 1/(data.fat.shortMet[,"se.sh_0"]^2)
+xiWeights <- 1/(data.fat[,"se.sh_0"]^2)
+xiWeights.shortMet <- 1/(data.fat.shortMet[,"se.sh_0"]^2) 
 
-# contrasts for comparison
-contr <- c("Chemical-Biological=0","Physical-Biological=0","Meteorological-Biological=0")
-contr.noMet <- c("Chemical-Biological=0","Physical-Biological=0")
+hist(xiWeights^.5)
+summary(data.fat)
+cbind(data.fat[,c(1,4,5,9,10)],xiWeights)
 
+# xiWeights.trun takes the one weight > 2000 and truncates it as 2000
+xiWeights.trun <- xiWeights
+xiWeights.trun[xiWeights.trun>2*10^3] <- 2*10^3
+hist(xiWeights.trun^.5, breaks=40)
 
-# ============================================================
-# = Drop Meteorological, Compare Type|Location, with weights =
-# ============================================================
-# These results give the result that the non-met variables are less fat-tailed than biology
-# Compare w/o weights
-fm4 <- (lmer(sh_0~Type+N+(Type|location), data=data.fat.noMet))
-summary(glht(fm4, linfct=mcp(Type=contr.noMet)))
+# Best analysis
+summary(lmer(sh_0 ~ Type + N + (1 | location), data=data.fat))
 
-# Do it with weights
-fm4.w <- (lmer(sh_0~Type+N+(Type|location), weights=xiWeights.noMet, data=data.fat.noMet))
-summary(glht(fm4.w, linfct=mcp(Type=contr.noMet)))
+# simple analysis
+summary(lm(sh_0 ~ Type, data=data.fat))
 
+# There is no N : Type interaction
+Anova(lmer(sh_0 ~ Type * N + (1 | location), data=data.fat))
 
-# ===================================
-# = With Met, after Consulting Tony =
-# ===================================
-# tried again after consulting with Tony
-re1 <- lmer(sh_0 ~ Type + N + (1|location), data=data.fat.shortMet) # random effect model 1
-summary(glht(re1, linfct=mcp(Type=contr)))
+# Analyses with truncated weights
+summary(lmer(sh_0 ~ Type + N + (1 | location), data=data.fat, weights=xiWeights.trun))
+summary(lmer(sh_0 ~ Type * N + (1 | location), data=data.fat, weights=xiWeights.trun))
+Anova(lmer(sh_0 ~ Type * N + (1 | location), data=data.fat, weights=xiWeights.trun))
+summary(lmer(sh_0 ~ Type + N + (1 | location) + (0 + N | Type), data=data.fat, weights=xiWeights.trun))
 
-re1.w <- lmer(sh_0 ~ Type + N + (1|location), data=data.fat.shortMet, weights=xiWeights.shortMet) # random effect w/ weights
-summary(glht(re1.w, linfct=mcp(Type=contr)))
+# pairwise comparisons
+data.BC <- data.fat[is.element(data.fat$Type,c("Biological","Chemical")),]
+Anova(lmer(sh_0 ~ Type + N + (1 | location), data=data.BC))
+summary(lm(sh_0 ~ Type, data=data.BC))
 
-re2 <- lmer(sh_0 ~ Type + N + (N|location), data=data.fat.shortMet) # random effect model 2
-summary(glht(re2, linfct=mcp(Type=contr)))
+data.BP <- data.fat[is.element(data.fat$Type,c("Biological","Physical")),]
+Anova(lmer(sh_0 ~ Type + N + (1 | location), data=data.BP))
+summary(lm(sh_0 ~ Type, data=data.BP))
 
-re2.w <- lmer(sh_0 ~ Type + N + (N|location), data=data.fat.shortMet, weights=xiWeights.shortMet) # re2 with weights
-summary(glht(re2.w, linfct=mcp(Type=contr)))
-
-
-
-
-
-
+data.BM <- data.fat[is.element(data.fat$Type,c("Biological","Meteorological")),]
+Anova(lmer(sh_0 ~ Type + N + (1 | location), data=data.BM))
+summary(lm(sh_0 ~ Type, data=data.BM))
