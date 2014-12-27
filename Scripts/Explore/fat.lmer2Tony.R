@@ -14,7 +14,6 @@
 # = Load Data Files =
 # ===================
 # NOTE: Tony, you can just double click the .RData files instead of running the ntext two lines
-load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.fat.shortMet.RData")
 load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.fat.RData")
 
 
@@ -22,21 +21,8 @@ load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.f
 # = Load Libraries =
 # ==================
 library(lme4)
-library(multcomp)
 library(car)
 
-# Weights
-xiWeights <- 1/(data.fat[,"se.sh_0"]^2)
-xiWeights.shortMet <- 1/(data.fat.shortMet[,"se.sh_0"]^2) 
-
-hist(xiWeights^.5)
-summary(data.fat)
-cbind(data.fat[,c(1,4,5,9,10)],xiWeights)
-
-# xiWeights.trun takes the one weight > 2000 and truncates it as 2000
-xiWeights.trun <- xiWeights
-xiWeights.trun[xiWeights.trun>2*10^3] <- 2*10^3
-hist(xiWeights.trun^.5, breaks=40)
 
 # Best analysis (Table S2)
 summary(lmer(sh_0 ~ Type + N + (1 | location), data=data.fat))
@@ -46,12 +32,6 @@ summary(lm(sh_0 ~ Type, data=data.fat))
 
 # There is no N : Type interaction
 Anova(lmer(sh_0 ~ Type * N + (1 | location), data=data.fat))
-
-# Analyses with truncated weights
-summary(lmer(sh_0 ~ Type + N + (1 | location), data=data.fat, weights=xiWeights.trun))
-summary(lmer(sh_0 ~ Type * N + (1 | location), data=data.fat, weights=xiWeights.trun))
-Anova(lmer(sh_0 ~ Type * N + (1 | location), data=data.fat, weights=xiWeights.trun))
-summary(lmer(sh_0 ~ Type + N + (1 | location) + (0 + N | Type), data=data.fat, weights=xiWeights.trun))
 
 # pairwise comparisons (Comparisons in Main Text)
 data.BC <- data.fat[is.element(data.fat$Type,c("Biological","Chemical")),]
