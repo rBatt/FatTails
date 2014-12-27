@@ -38,10 +38,10 @@ xiWeights.trun <- xiWeights
 xiWeights.trun[xiWeights.trun>2*10^3] <- 2*10^3
 hist(xiWeights.trun^.5, breaks=40)
 
-# Best analysis
+# Best analysis (Table S2)
 summary(lmer(sh_0 ~ Type + N + (1 | location), data=data.fat))
 
-# simple analysis
+# simple analysis (Table S1)
 summary(lm(sh_0 ~ Type, data=data.fat))
 
 # There is no N : Type interaction
@@ -53,7 +53,7 @@ summary(lmer(sh_0 ~ Type * N + (1 | location), data=data.fat, weights=xiWeights.
 Anova(lmer(sh_0 ~ Type * N + (1 | location), data=data.fat, weights=xiWeights.trun))
 summary(lmer(sh_0 ~ Type + N + (1 | location) + (0 + N | Type), data=data.fat, weights=xiWeights.trun))
 
-# pairwise comparisons
+# pairwise comparisons (Comparisons in Main Text)
 data.BC <- data.fat[is.element(data.fat$Type,c("Biological","Chemical")),]
 Anova(lmer(sh_0 ~ Type + N + (1 | location), data=data.BC))
 summary(lm(sh_0 ~ Type, data=data.BC))
