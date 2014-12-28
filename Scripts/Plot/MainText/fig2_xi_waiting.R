@@ -22,6 +22,7 @@ beanplot(sh_0~Type, data=data.fat, ylab="", yaxt="n", xaxt="n", border=bLine, co
 axis(side=2)
 axis(side=1, at=1:4, labels=c("Bio","Chem","Phys","Met"))
 mtext(bquote(xi~~from~~GEV), side=2, line=1.5)
+text(0.5,1.5, "A", font=2)
 
 beanplot(log10(Level2_time)~Type, data=data.fat[is.finite(data.fat[,"Level2_time"]),], log="", ylab="", xaxt="n", yaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5)
 wtBase <- axTicks(2)
@@ -29,6 +30,7 @@ wtLab <- parse(text=paste(10,wtBase,sep="^"))
 axis(side=2, at=wtBase, labels=wtLab)
 axis(side=1, at=1:4,labels=c("Bio","Chem","Phys","Met"))
 mtext(bquote(Waiting~Time~(years)), side=2, line=1.5)
+text(0.5, 8.75, "B", font=2)
 dev.off()
 
 
