@@ -36,12 +36,20 @@ Anova(lmer(sh_0 ~ Type * N + (1 | location), data=data.fat))
 # pairwise comparisons (Comparisons in Main Text)
 data.BC <- data.fat[is.element(data.fat$Type,c("Biological","Chemical")),]
 Anova(lmer(sh_0 ~ Type + N + (1 | location), data=data.BC))
-summary(lm(sh_0 ~ Type, data=data.BC))
+summary(lm(sh_0 ~ Type, data=data.BC)) # Chem part of first sentence of main result
 
 data.BP <- data.fat[is.element(data.fat$Type,c("Biological","Physical")),]
 Anova(lmer(sh_0 ~ Type + N + (1 | location), data=data.BP))
-summary(lm(sh_0 ~ Type, data=data.BP))
+summary(lm(sh_0 ~ Type, data=data.BP)) # Phys part of first sentence of main result
 
 data.BM <- data.fat[is.element(data.fat$Type,c("Biological","Meteorological")),]
 Anova(lmer(sh_0 ~ Type + N + (1 | location), data=data.BM))
-summary(lm(sh_0 ~ Type, data=data.BM))
+summary(lm(sh_0 ~ Type, data=data.BM)) # Met part of first sentence of main result
+
+
+# Second part of main result statement in main text
+summary(lmer(sh_0 ~ Type + N + (1 | location), data=data.BC))
+summary(lmer(sh_0 ~ Type + N + (1 | location), data=data.BP))
+summary(lmer(sh_0 ~ Type + N + (1 | location), data=data.BM))
+
+
