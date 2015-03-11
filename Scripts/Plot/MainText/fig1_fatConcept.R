@@ -33,14 +33,14 @@ ylim1.1 <- range(samples2[,"phi1"])*c(1, 1.15)
 par(mar=pm.1)
 plot(samples2[,"phi1"], type="l", col="gray", xlab="", ylab="", bty="l", xpd=TRUE, ylim=ylim1.1) # plot full samples of variable phi1
 points(samples2.max[,"phi1.i"], samples2.max[,"phi1"], col="blue", xpd=TRUE) # add circles for annual maxima of phi1
-mtext(bquote(phi1), side=2, line=0.75)
+mtext(bquote(Driver~(phi1)), side=2, line=0.75)
 text(x=25, y=0.85, "A", font=2)
 
 par(mar=pm.1)
 ylim1.2 <- range(samples2[,"phi2"])*c(1, 1.15)
 plot(samples2[,"phi2"], type="l", col="gray", xlab="", ylab="", bty="l", xpd=TRUE, ylim=ylim1.2) # plot full samples of variable phi2
 points(samples2.max[,"phi2.i"], samples2.max[,"phi2"], col="red", xpd=TRUE) # add circles for annual maxima of phi2
-mtext(bquote(gamma), side=2, line=0.75)
+mtext(bquote(Driver~(gamma)), side=2, line=0.75)
 text(x=25, y=0.85, "B", font=2)
 
 	# ==========
@@ -50,7 +50,7 @@ text(x=25, y=0.85, "B", font=2)
 par(mar=pm.2)
 plot(samples2[,"X"], type="l", col="gray", xlab="", ylab="", bty="l", xpd=TRUE) # plot full samples of variable phi1
 points(samples2.max[,"X.i"], samples2.max[,"X"], col="black", xpd=TRUE) # add circles for annual maxima of phi1
-mtext(bquote(X), side=2, line=0.75)
+mtext(bquote(Population~(X)), side=2, line=0.75)
 mtext(bquote(Time), side=1, line=0.75)
 text(x=25, y=115, "C", font=2)
 
@@ -86,7 +86,7 @@ mtext(bquote(Density), side=1, line=0.75)
 # part 4: difference in xi's between population and the environment
 par(mar=pm.3)
 colorDens(vals=list(xis[,1], xis[,2], xis[,3], (xis[,3]-(xis[,1]+xis[,2]))), cols=c("blue","red","black","green"), revxy=FALSE, yaxt="s", bty="l")
-mtext(bquote(xi), side=1, line=0.75)
+mtext(bquote(Tailedness~(xi)), side=1, line=0.75)
 mtext(bquote(Density), side=2, line=0.75)
 text(y=2.5, x=-0.75, "G", font=2)
 

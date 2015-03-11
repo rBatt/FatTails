@@ -21,7 +21,7 @@ par(mfrow=c(2,1), mar=c(2,2.5,0.5,0.5), ps=10, cex=1, mgp=c(2, 0.4, 0), tcl=-0.3
 beanplot(sh_0~Type, data=data.fat, ylab="", yaxt="n", xaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5)
 axis(side=2)
 axis(side=1, at=1:4, labels=c("Bio","Chem","Phys","Met"))
-mtext(bquote(xi~~from~~GEV), side=2, line=1.5)
+mtext(bquote(Tailedness~(xi)), side=2, line=1.5)
 text(0.5,1.5, "A", font=2)
 
 beanplot(log10(Level2_time)~Type, data=data.fat[is.finite(data.fat[,"Level2_time"]),], log="", ylab="", xaxt="n", yaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5)
