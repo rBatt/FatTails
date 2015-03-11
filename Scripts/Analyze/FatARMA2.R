@@ -218,27 +218,6 @@ save(X, Y, ii, XX, YY, iii, file="/Users/Battrd/Documents/School&Work/WiscResear
 
 
 
-# =========================
-# = To go into manuscript =
-# =========================
-summary(lm(xi2~Type+I(p+q)+lambda, data=z, weights=1/xi2.se^2))
-dev.new(); par(mfrow=c(2,2), mar=c(2,2,2,0.5), ps=10, cex=1, mgp=c(0.75,0.15,0), tcl=-0.15, family="Times")
-plot(lm(xi2~Type+I(p+q)+lambda, data=z, weights=1/xi2.se)) # these are surprisingly amazing diagnostics
 
-# summary(lm(xi2~Type+I(p+q)+lambda+xi.resid, data=z, weights=1/xi2.se)) # shows that order isn't significant
-summary(lm(xi2~Type+I(p+q)+lambda+xi.resid, data=z, weights=1/xi2.se^2))
-dev.new(); par(mfrow=c(2,2), mar=c(2,2,2,0.5), ps=10, cex=1, mgp=c(0.75,0.15,0), tcl=-0.15, family="Times")
-plot(lm(xi2~Type+lambda+xi.resid, data=z, weights=1/xi2.se^2)) # these are surprisingly amazing diagnostics
-
-
-summary(lm(xi2~Type+I(p+q)+lambda+xi.resid, data=z, weights=1/xi2.se^2))$coef
-
-
-# =====================================================
-# = Why I excluded 1 ts due to crazy high residual xi =
-# =====================================================
-summary(lm(xi2~Type+lambda+xi.resid, data=z, weights=1/xi2.se^2))
-dev.new(); par(mfrow=c(2,2), mar=c(2,2,2,0.5), ps=10, cex=1, mgp=c(0.75,0.15,0), tcl=-0.15, family="Times")
-plot(lm(xi2~Type+I(p+q)+lambda+xi.resid, data=z0, weights=1/xi2.se^2)) # above regression, but w/o the outlier removed
 
 
