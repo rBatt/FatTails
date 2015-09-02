@@ -10,7 +10,9 @@ pm.2 <- c(1.5, 0.75, 0.5, 0)
 pm.3 <- c(1, 0.75, 0.5, 0)
 
 # dev.new(width=3.5, height=5)
-png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/MainText/Fig1_fat_conceptFig.png", res=150, units="in", height=4.885714, width=3.42)
+# png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/MainText/Fig1_fat_conceptFig.png", res=150, units="in", height=4.885714, width=3.42)
+# tiff("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/MainText/Fig1_fat_conceptFig.tif", height=4.885714, width=3.42, res=600, compression="lzw", units="in")
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/MainText/Fig1_fat_conceptFig.pdf", width=3.42, height=4.885714)
 cols1 <- rep(rep(c(1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 7, 7, 7, 7), each=4), 4) # first set of columns for layout matrix
 cols2 <- rep(rep(c(1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 7, 7, 7, 7), each=4), 1) # first set of columns for layout matrix
 cols3 <- rep(rep(c(4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7), each=4), 3) # second set of column for layout matrix
@@ -93,6 +95,4 @@ text(y=2.5, x=-0.75, "G", font=2)
 dev.off()
 
 
-
-
-
+embedFonts("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/MainText/Fig1_fat_conceptFig.pdf")
