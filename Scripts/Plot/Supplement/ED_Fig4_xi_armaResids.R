@@ -30,8 +30,9 @@ beanCol <- list(c(bFill[1]),
 # = Updated ARMA Residual Xi Beanplot =
 # =====================================
 # dev.new(width=3.5, height=3.5)
-png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/ED_Fig4_xi_armaResids.png", res=150, units="in", height=3.5, width=3.5)
-par(mfrow=c(1,1), mar=c(2,2.5,0.5,0.5), ps=10, cex=1, mgp=c(2, 0.4, 0), tcl=-0.3, family="Times")
+# png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS1_xi_armaResids.png", res=150, units="in", height=3.5, width=3.5)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS1_xi_armaResids.pdf", width=3.42, height=3.42)
+par(mfrow=c(1,1), mar=c(2,2.5,0.5,0.5), ps=8, cex=1, mgp=c(2, 0.4, 0), tcl=-0.3, family="Times")
 beanplot(xi.resid~Type, data=z, ylab="", yaxt="n", xaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5)
 axis(side=2)
 axis(side=1, at=1:4, labels=c("Bio","Chem","Phys","Met"))
