@@ -523,6 +523,7 @@ dscat <- function(x, y, ...){
 	dfDens <- col2rgb(dcs)[1,] + 1L
 	zols <- colorRampPalette(c("#000099", "#00FEFF", "#45FE4F", "#FCFF00", "#FF9400", "#FF3100"))(256)
 	dfCol <- zols[dfDens]
+	d.ord <- order(dfDens)
 	
 	
 	#If figure is a 1x1, layout can just arrange a 5x5 matrix
@@ -537,7 +538,8 @@ dscat <- function(x, y, ...){
 		plot(1,1, ylab="", xlab="", yaxt="n", xaxt="n", bty="n", pch=NA)
 		text(-0.2,-0.2, "Density", srt=45, xpd=TRUE, cex=1)
 		par(cex=sp$cex)
-		plot(x, y, bty="o", xlab="", ylab="", pch=19, col=dfCol)	
+		# plot(x, y, bty="o", xlab="", ylab="", pch=19, col=dfCol)	
+		plot(x[d.ord], y[d.ord], bty="o", xlab="", ylab="", pch=19, col=dfCol[d.ord])	
 	}else{
 		figLay0 <- matrix(1:prod(figDim), ncol=figDim[2], nrow=figDim[1], byrow=TRUE)
 		newForm0 <- matrix(0, nrow=figDim[1]*5, ncol=figDim[2]*5)
@@ -579,7 +581,8 @@ dscat <- function(x, y, ...){
 				},
 				{
 					par(cex=sp$cex, ps=sp$ps, mgp=sp$mgp, mar=sp$mar, tcl=sp$tcl)
-					plot(x, y, bty="o", xlab="", ylab="", pch=19, col=dfCol)
+					# plot(x, y, bty="o", xlab="", ylab="", pch=19, col=dfCol)
+					plot(x[d.ord], y[d.ord], bty="o", xlab="", ylab="", pch=19, col=dfCol[d.ord])
 				}
 				)
 		}
