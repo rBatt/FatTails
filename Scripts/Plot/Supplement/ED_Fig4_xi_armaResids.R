@@ -35,7 +35,10 @@ pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplemen
 par(mfrow=c(1,1), mar=c(2,2.5,0.5,0.5), ps=8, cex=1, mgp=c(2, 0.4, 0), tcl=-0.3, family="Times")
 beanplot(xi.resid~Type, data=z, ylab="", yaxt="n", xaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5)
 axis(side=2)
-axis(side=1, at=1:4, labels=c("Bio","Chem","Phys","Met"))
+# axis(side=1, at=1:4, labels=c("Bio","Chem","Phys","Met"))
+tbl_nms <- c("Biological","Chemical","Physical","Meteorological") # just to make sure oder is correct in label
+a1_labs <- paste0(c("Bio (","Chem (","Phys (","Met ("), table(data.fat[,"Type"])[tbl_nms], ")")
+axis(side=1, at=1:4, labels=a1_labs)
 mtext(bquote(xi~~of~~ARMA~Residuals), side=2, line=1.5)
 dev.off()
 

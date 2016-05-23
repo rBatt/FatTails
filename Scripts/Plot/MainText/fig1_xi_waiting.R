@@ -21,15 +21,20 @@ pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/MainText/
 par(mfrow=c(2,1), mar=c(2,2.5,0.5,0.5), ps=8, cex=1, mgp=c(2, 0.4, 0), tcl=-0.3, family="Times")
 beanplot(sh_0~Type, data=data.fat, ylab="", yaxt="n", xaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5)
 axis(side=2)
-axis(side=1, at=1:4, labels=c("Bio","Chem","Phys","Met"))
+tbl_nms <- c("Biological","Chemical","Physical","Meteorological") # just to make sure oder is correct in label
+a1_labs <- paste0(c("Bio (","Chem (","Phys (","Met ("), table(data.fat[,"Type"])[tbl_nms], ")")
+axis(side=1, at=1:4, labels=a1_labs)
 mtext(bquote(Tailedness~(xi)), side=2, line=1.5)
 text(0.5,1.5, "A", font=2)
 
-beanplot(log10(Level2_time)~Type, data=data.fat[is.finite(data.fat[,"Level2_time"]),], log="", ylab="", xaxt="n", yaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5)
+fin_l2Time <- is.finite(data.fat[,"Level2_time"])
+beanplot(log10(Level2_time)~Type, data=data.fat[fin_l2Time,], log="", ylab="", xaxt="n", yaxt="n", border=bLine, col=beanCol, ll=0.01, beanlinewd=1.5)
 wtBase <- axTicks(2)
 wtLab <- parse(text=paste(10,wtBase,sep="^"))
 axis(side=2, at=wtBase, labels=wtLab)
-axis(side=1, at=1:4,labels=c("Bio","Chem","Phys","Met"))
+tbl_nms <- c("Biological","Chemical","Physical","Meteorological") # just to make sure oder is correct in label
+a2_labs <- paste0(c("Bio (","Chem (","Phys (","Met ("), table(data.fat[fin_l2Time,"Type"])[tbl_nms], ")")
+axis(side=1, at=1:4, labels=a2_labs)
 mtext(bquote(Waiting~Time~(years)), side=2, line=1.5)
 text(0.5, 8.75, "B", font=2)
 dev.off()
