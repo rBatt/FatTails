@@ -1,4 +1,35 @@
+
+% !TEX TS-program = xelatex
+%
+% Created by Ryan Batt on 2016-05-23.
+% Copyright (c) 2016 .
+\documentclass{article}
+
+\usepackage{polyglossia}
+\usepackage{hyperref}
+
+\hypersetup
+{
+  pdftitle   = {FatEquations},
+  pdfsubject = {Extremes},
+  pdfauthor  = {Ryan Batt}
+}
+
+\title{Equations for Extreme Events in Ecosystem Time Series}
+\author{Ryan Batt}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    Abstract
+\end{abstract}
+
+\section{Equations}
+
 % GEV CDF
+GEV cummulative distribution function:  
 \[F\left( x;\mu ,\sigma ,\xi  \right)=\left\{ \begin{matrix}
    \exp \left\{ -{{[1+\xi (x-\mu )/\sigma ]}^{-1/\xi }} \right\} & \xi \ne 0  \\
    \exp \left\{ -\exp \left[ -(x-\mu )/\sigma  \right] \right\} & \xi =0  \\
@@ -37,6 +68,10 @@ $1+\xi (x-\mu )/\sigma >0$
 
 % Heuristic Population in-text term 4 (Fig params part2)
 $S\left( \gamma ,{{X}_{T}} \right)={{\left[ \left( 1+{{e}^{-s\left( 1+\gamma  \right)}} \right){{\left( 1+a{{X}_{T}} \right)}^{1/\Delta t}} \right]}^{-1}}$
+
+
+\end{document}
+
 
 
 
