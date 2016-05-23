@@ -87,7 +87,8 @@ mtext(bquote(Density), side=1, line=0.75)
 	# ==========
 # part 4: difference in xi's between population and the environment
 par(mar=pm.3)
-colorDens(vals=list(xis[,1], xis[,2], xis[,3], (xis[,3]-(xis[,1]+xis[,2]))), cols=c("blue","red","black","green"), revxy=FALSE, yaxt="s", bty="l")
+# colorDens(vals=list(xis[,1], xis[,2], xis[,3], (xis[,3]-(xis[,1]+xis[,2]))), cols=c("blue","red","black","green"), revxy=FALSE, yaxt="s", bty="l")
+colorDens(vals=list(xis[,1], xis[,2], xis[,3]), cols=c("blue","red","black"), revxy=FALSE, yaxt="s", bty="l")
 mtext(bquote(Tailedness~(xi)), side=1, line=0.75)
 mtext(bquote(Density), side=2, line=0.75)
 text(y=2.5, x=-0.75, "G", font=2)
