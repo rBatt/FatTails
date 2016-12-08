@@ -29,6 +29,7 @@
 \section{Equations}
 
 % GEV CDF
+GEV cummulative distribution function:  
 \[F\left( x;\mu ,\sigma ,\xi  \right)=\left\{ \begin{matrix}
    \exp \left\{ -{{[1+\xi (x-\mu )/\sigma ]}^{-1/\xi }} \right\} & \xi \ne 0  \\
    \exp \left\{ -\exp \left[ -(x-\mu )/\sigma  \right] \right\} & \xi =0  \\
@@ -45,25 +46,25 @@ $1+\xi (x-\mu )/\sigma >0$
 \end{array}\]
 
 % Heuristic Population Eq1 
-\[{{X}_{T}}\left( t+\Delta t \right)=B\left( \varphi_T \left( t \right),{{X}_{T}} \right)S\left( \gamma_T \left( t \right),{{X}_{T}} \right){{X}_{T}}\left( t \right)\]
+\[{{X}_{T}}\left( t+\Delta t \right)=B\left( \varphi \left( t \right),{{X}_{T}} \right)S\left( \gamma \left( t \right),{{X}_{T}} \right){{X}_{T}}\left( t \right)\]
 
 % Heuristic Population, in-text term 1
-\[B\left( \varphi_T \left( t \right),{{X}_{T}} \right)\]
+\[B\left( \varphi \left( t \right),{{X}_{T}} \right)\]
 
 %  Heuristic Population, in-text term 2
-\[S\left( \gamma_T \left( t \right),{{X}_{T}} \right)\]
+\[S\left( \gamma \left( t \right),{{X}_{T}} \right)\]
 
 % Heuristic Population Eq2
-\[{{X}_{T+1}}={{X}_{T}}\prod\limits_{i=1}^{1/\Delta t}{B\left( \varphi_T \left( i\Delta t \right),{{X}_{T}} \right)S\left( \gamma_T \left( i\Delta t \right),{{X}_{T}} \right)}\]
+\[{{X}_{T+1}}={{X}_{T}}\prod\limits_{i=1}^{1/\Delta t}{B\left( \varphi \left( i\Delta t \right),{{X}_{T}} \right)S\left( \gamma \left( i\Delta t \right),{{X}_{T}} \right)}\]
 
 % Heuristic Population Eq3
 \[\begin{array}{*{35}{l}}
-   {{x}_{T+1}} & ={{x}_{T}}+\sum\limits_{i=1}^{1/\Delta t}{\left\{ b\left( \varphi_T \left( i\Delta t \right),{{x}_{T}} \right)+s\left( \gamma_T \left( i\Delta t \right),{{x}_{T}} \right) \right\}}  \\
+   {{x}_{T+1}} & ={{x}_{T}}+\sum\limits_{i=1}^{1/\Delta t}{\left\{ b\left( \varphi \left( i\Delta t \right),{{x}_{T}} \right)+s\left( \gamma \left( i\Delta t \right),{{x}_{T}} \right) \right\}}  \\
    {} & ={{x}_{T}}+r\left( T,{{x}_{T}} \right)+\varepsilon \left( T,{{x}_{T}} \right)  \\
 \end{array}\]
 
 % Heuristic Population in-text term 3 (Fig params part1)
-\[B\left( \varphi  \right)=\max \left[ 1,{{e}^{b\left( 1+\varphi  \right)}} \right]\]
+\[B\left( \varphi  \right)=\max \left[ 1,{{e}^{-b\left( 1+\varphi  \right)}} \right]\]
 
 % Heuristic Population in-text term 4 (Fig params part2)
 $S\left( \gamma ,{{X}_{T}} \right)={{\left[ \left( 1+{{e}^{-s\left( 1+\gamma  \right)}} \right){{\left( 1+a{{X}_{T}} \right)}^{1/\Delta t}} \right]}^{-1}}$
