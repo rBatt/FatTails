@@ -380,7 +380,7 @@ fill.Full <- function(x){
 	# = Handle more complicated case =
 	# ================================
 	max.dat <- x[x[,"year4"]%in%max.yrs,]	
-	mu.day <- rollapply(sort(max.dat[,"daynum"]), mean, width=length(max.yrs), by=length(max.yrs))
+	mu.day <- rollapply(sort(max.dat[,"daynum"]), mean, width=length(max.yrs), by=length(max.yrs)) # for the years with the maximum number of samples, what is the average day for the first sample of the year, the second sample of the year, etc. Took me a bit to figure out what I was doing here while double checking code, but it makes sense. The idea is that the exact day of year will differ among years, but that if all years have samples ~similarly-ish spaced, then it makes sense to define a typical sampling date for each of the N samples, where N is the number of samples per year. This approach would fail/ not make sense if most years have 12 samples, each taken on the first of the month. But one of the years had 12 samples, taken each day from Jan 1-12. In this case, mu.day[1] would be fine, but then mu.day[2:12] would be off because of the one year that had its 12 samples very clustered.
 	
 	x.ranked00 <- cbind(x,rank00=findInterval(x[,"daynum"], c(mu.day), all.inside=TRUE))
 	
