@@ -521,7 +521,7 @@ dscat <- function(x, y, ...){
 	
 	dcs <- densCols(x,y, colramp=colorRampPalette(c("black","white")))
 	dfDens <- col2rgb(dcs)[1,] + 1L
-	zols <- colorRampPalette(c("#000099", "#00FEFF", "#45FE4F", "#FCFF00", "#FF9400", "#FF3100"))(256)
+	zols <- viridis::viridis(256) #colorRampPalette(c("#000099", "#00FEFF", "#45FE4F", "#FCFF00", "#FF9400", "#FF3100"))(256)
 	dfCol <- zols[dfDens]
 	d.ord <- order(dfDens)
 	
