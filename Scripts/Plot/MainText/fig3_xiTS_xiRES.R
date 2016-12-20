@@ -21,7 +21,7 @@ source("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Scripts/Functi
 # = Updated Dscat of xi vs xi.resid =
 # ===================================
 # png("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS2_xiTS_xiRES.png", res=150, units="in", height=3.5, width=3.5)
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS2_xiTS_xiRES.pdf", height=3.42, width=3.42)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/MainText/Fig3_xiTS_xiRES.pdf", height=3.42, width=3.42)
 # dev.new(height=3.5, width=3.5)
 dscat(z[,"xi.resid"], z[,"xi2"], mar=c(2.5,2.5,0,0), cex=1, ps=8, family="Times", mgp=c(3, 0.5, 0), tcl=-0.35)
 # abline(lm(xi~xi.resid, data=z[,]), lty="dashed", lwd=1)
