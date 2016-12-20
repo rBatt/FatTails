@@ -136,6 +136,51 @@ xiCat <- factor(xiCat)
 table(data.fat[,"Type"], xiCat)
 table(data.fat[,"Type"], xiCat)/rowSums(table(data.fat[,"Type"], xiCat))
 
+# ============================================
+# = R2 Multiple comparisons for % fat-tailed =
+# ============================================
+library(data.table)
+ddf <- as.data.table(data.fat)
+getFatP <- function(x, s){
+	P0 <- pnorm(q=x, mean=0, sd=s, lower.tail=TRUE)
+	P <- P0
+	P[P>0.5] <- 1-P0[P>0.5]
+	return(P)
+}
+ddf[,sh_p:=getFatP(sh_0, se.sh_0)]
+# ddf[,table(sh_p<0.05)]
+# ddf[,table(p.adjust(sh_p)<0.05)]
+
+
+assignCat <- function(sh_0, p, padj){
+	if(!missing(padj)){
+		padj <- match.arg(padj, choices=p.adjust.methods)
+		p <- p.adjust(p, method=padj)
+	}
+	xiCat2 <- rep(NA, length(sh_0))
+	xiCat2[sh_0>0& p<0.05] <- "Fat"
+	xiCat2[sh_0<0& p<0.05] <- "Bounded"
+	xiCat2[is.finite(sh_0) & p>=0.05] <- "Thin"
+	return(xiCat2)
+}
+ddf[,uncorrectedCat:=assignCat(sh_0, sh_p)]
+ddf[,bhCat:=assignCat(sh_0, sh_p, "BH")]
+ddf[,bonCat:=assignCat(sh_0, sh_p, "bonf")]
+ddf[,round(prop.table(table(Type,uncorrectedCat),1),3)]
+ddf[,round(prop.table(table(Type,bhCat),1),3)]
+ddf[,round(prop.table(table(Type,bonCat),1),3)]
+
+
+# xiCat2 <- rep(NA, nrow(ddf))
+# xiCat2[ddf[,sh_0>0& sh_p<0.05]] <- "Fat"
+# xiCat2[ddf[,sh_0<0& sh_p<0.05]] <- "Bounded"
+# xiCat2[ddf[,is.finite(sh_0) & sh_p>=0.05]] <- "Thin"
+# xiCat2 <- factor(xiCat2)
+#
+# table(data.fat[,"Type"], xiCat)
+# table(data.fat[,"Type"], xiCat)/rowSums(table(data.fat[,"Type"], xiCat))
+
+
 # # ==============================================================
 # # = Proportion fish time series in each category of tailedness =
 # # ==============================================================
