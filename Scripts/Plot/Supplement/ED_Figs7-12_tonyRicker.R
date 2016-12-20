@@ -41,11 +41,12 @@ gX <- gev.fit(as.numeric(X), show=F)
 # ================
 # = Figure 1 (7) =
 # ================
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS4_DeterRickerChaos.pdf", height=3.42, width=3.42)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS2_DeterRickerChaos.pdf", height=3.42, width=5)
 # dev.new()
-par(mfrow=c(2,2), mar=c(2.5,2.5,1,0), cex=1, ps=8, family="Times", mgp=c(1.5, 0.5, 0), tcl=-0.35)
+par(mfrow=c(2,3), mar=c(2,2.25,1.15,0), cex=1, ps=8, family="Times", mgp=c(1, 0.25, 0), tcl=-0.15)
 
 plot(X, type="l", xlab="Time")
+plot(X[1:100], type="l", xlab="Time", ylab="X")
 hist(X, main=bquote(GEV~xi==.(.001*round(1000*gX$mle[3]))),30)
 
 w <- arima(X, order=c(p,0,p))
@@ -58,8 +59,9 @@ abs(eigen(we)$values)
 Y <- w$residuals
 
 gY <- gev.fit(as.numeric(Y), show=F)
-plot(Y, type="l", ylab="residuals")
-hist(Y, main=bquote(GEV~xi==.(.001*round(1000*gY$mle[3]))),30)
+plot(Y, type="l", ylab="Residuals", xlab="Time")
+plot(Y[1:100], type="l", ylab="Residuals", xlab="Time")
+hist(Y, xlab="Residuals", main=bquote(GEV~xi==.(.001*round(1000*gY$mle[3]))),30)
 
 dev.off()
 
@@ -99,12 +101,13 @@ E <- E[step*(1:n)]
 gX <- gev.fit(as.numeric(X), show=F)
 
 # ---- Plot Figure 2 (8) ----
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS5_StochRickerChaos.pdf", height=5, width=3.42)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS3_StochRickerChaos.pdf", height=5, width=5)
 # dev.new()
-par(mfrow=c(3,2), mar=c(2.5,2.5,1,0), cex=1, ps=8, family="Times", mgp=c(1.5, 0.5, 0), tcl=-0.35)
+par(mfrow=c(3,3), mar=c(2,2.25,1.15,0.2), cex=1, ps=8, family="Times", mgp=c(1, 0.25, 0), tcl=-0.15)
 if(sd == 0) par(mfrow=c(2,2))
 
 plot(X, type="l", xlab="Time")
+plot(X[1:100], type="l", xlab="Time", ylab="X")
 hist(X, main=bquote(GEV~xi==.(.001*round(1000*gX$mle[3]))),30)
 
 w <- arima(X, order=c(p,0,p))
@@ -117,14 +120,16 @@ abs(eigen(we)$values)
 Y <- w$residuals
 
 gY <- gev.fit(as.numeric(Y), show=F)
-plot(Y, type="l", ylab="residuals")
-hist(Y, main=bquote(GEV~xi==.(.001*round(1000*gY$mle[3]))),30)
+plot(Y, type="l", ylab="Residuals", xlab="Time")
+plot(Y[1:100], type="l", ylab="Residuals", xlab="Time")
+hist(Y, xlab="Residuals", main=bquote(GEV~xi==.(.001*round(1000*gY$mle[3]))),30)
 
 if(sd != 0){
 	
 	gE <- gev.fit(as.numeric(E), show=F)	
-	plot(E, type="l", ylab="environment", xlab="Time")
-	hist(E, main=bquote(GEV~xi==.(.001*round(1000*gE$mle[3]))),30)
+	plot(E, type="l", ylab="Environment", xlab="Time")
+	plot(E[1:100], type="l", ylab="Environment", xlab="Time")
+	hist(E, xlab="Environment", main=bquote(GEV~xi==.(.001*round(1000*gE$mle[3]))),30)
 }
 dev.off()
 
@@ -186,13 +191,13 @@ output
 xx <- as.factor(output$r)
 
 # ---- Figure 3 (9) ----
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS6_xi_vs_r_3lines.pdf", height=3.42, width=3.42)
-par(mar=c(2.5,2.5,1,0), cex=1, ps=8, family="Times", mgp=c(1.5, 0.5, 0), tcl=-0.35)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS4_xi_vs_r_3lines.pdf", height=3.42, width=3.42)
+par(mar=c(2,2,0.2,0.2), cex=1, ps=8, family="Times", mgp=c(1, 0.25, 0), tcl=-0.15)
 # dev.new()
 plot(gX ~ xx, data=output, lty="blank", xlab="r", ylab=bquote(GEV~xi))
-lines(gX ~ xx, data=output)
-lines(gY ~ xx, data=output, col='blue')
-lines(gE ~ xx, data=output, col='red')
+lines(gX ~ xx, data=output, lwd=2)
+lines(gY ~ xx, data=output, col='blue', lty=2, lwd=2)
+lines(gE ~ xx, data=output, col='red', lty=3, lwd=2)
 dev.off()
 
 
@@ -231,12 +236,13 @@ E <- E[step*(1:n)]
 gX <- gev.fit(as.numeric(X), show=F)
 
 # ---- Plot Figure 4 (10) ----
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS7_StochRickerStable.pdf", height=5, width=3.42)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS5_StochRickerStable.pdf", height=5, width=5)
 # dev.new()
-par(mfrow=c(3,2), mar=c(2.5,2.5,1,0), cex=1, ps=8, family="Times", mgp=c(1.5, 0.5, 0), tcl=-0.35)
+par(mfrow=c(3,3), mar=c(2,2.25,1.15,0.2), cex=1, ps=8, family="Times", mgp=c(1, 0.25, 0), tcl=-0.15)
 if(sd == 0) par(mfrow=c(2,2))
 
 plot(X, type="l", xlab="Time")
+plot(X[1:100], type="l", xlab="Time", ylab="X")
 hist(X, main=bquote(GEV~xi==.(.001*round(1000*gX$mle[3]))),30)
 
 w <- arima(X, order=c(p,0,p))
@@ -249,14 +255,16 @@ abs(eigen(we)$values)
 Y <- w$residuals
 
 gY <- gev.fit(as.numeric(Y), show=F)
-plot(Y, type="l", ylab="residuals")
-hist(Y, main=bquote(GEV~xi==.(.001*round(1000*gY$mle[3]))),30)
+plot(Y, type="l", ylab="Residuals", xlab="Time")
+plot(Y[1:100], type="l", ylab="Residuals", xlab="Time")
+hist(Y, xlab="Residuals", main=bquote(GEV~xi==.(.001*round(1000*gY$mle[3]))),30)
 
 if(sd != 0){
 	
 	gE <- gev.fit(as.numeric(E), show=F)	
-	plot(E, type="l", ylab="environment", xlab="Time")
-	hist(E, main=bquote(GEV~xi==.(.001*round(1000*gE$mle[3]))),30)
+	plot(E, type="l", ylab="Environment", xlab="Time")
+	plot(E[1:100], type="l", ylab="Environment", xlab="Time")
+	hist(E, xlab="Environment", main=bquote(GEV~xi==.(.001*round(1000*gE$mle[3]))),30)
 }
 dev.off()
 
@@ -318,13 +326,13 @@ output
 xx <- as.factor(output$expon)
 
 # ---- Figure 5 (8) ----
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS8_xi_vs_E_3lines.pdf", height=3.42, width=3.42)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS6_xi_vs_E_3lines.pdf", height=3.42, width=3.42)
 # dev.new()
-par(mar=c(2.5,2.5,1,0), cex=1, ps=8, family="Times", mgp=c(1.5, 0.5, 0), tcl=-0.35)
+par(mar=c(2,2,0.2,0.2), cex=1, ps=8, family="Times", mgp=c(1, 0.25, 0), tcl=-0.15)
 plot(gX ~ xx, data=output, lty="blank", xlab="E exponential", ylab=bquote(GEV~xi))
-lines(gX ~ xx, data=output)
-lines(gY ~ xx, data=output, col='blue')
-lines(gE ~ xx, data=output, col='red')
+lines(gX ~ xx, data=output, lwd=2)
+lines(gY ~ xx, data=output, col='blue', lty=2, lwd=2)
+lines(gE ~ xx, data=output, col='red', lty=3, lwd=2)
 dev.off()
 
 
@@ -364,12 +372,13 @@ E <- E[step*(1:n)]
 gX <- gev.fit(as.numeric(X), show=F)
 
 # ---- Plot Figure 6 (9) ----
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS9_StochRickerLowStable.pdf", height=5, width=3.42)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS7_StochRickerLowStable.pdf", height=5, width=5)
 # dev.new()
-par(mfrow=c(3,2), mar=c(2.5,2.5,1,0), cex=1, ps=8, family="Times", mgp=c(1.5, 0.5, 0), tcl=-0.35)
+par(mfrow=c(3,3), mar=c(2.25,2.25,1.15,0.2), cex=1, ps=8, family="Times", mgp=c(1, 0.25, 0), tcl=-0.15)
 if(sd == 0) par(mfrow=c(2,2))
 
 plot(X, type="l", xlab="Time")
+plot(X[1:100], type="l", xlab="Time", ylab="X")
 hist(X, main=bquote(GEV~xi==.(.001*round(1000*gX$mle[3]))),30)
 
 w <- arima(X, order=c(p,0,p))
@@ -382,14 +391,16 @@ abs(eigen(we)$values)
 Y <- w$residuals
 
 gY <- gev.fit(as.numeric(Y), show=F)
-plot(Y, type="l", ylab="residuals")
-hist(Y, main=bquote(GEV~xi==.(.001*round(1000*gY$mle[3]))),30)
+plot(Y, type="l", ylab="Residuals", xlab="Time")
+plot(Y[1:100], type="l", ylab="Residuals", xlab="Time")
+hist(Y, xlab="Residuals", main=bquote(GEV~xi==.(.001*round(1000*gY$mle[3]))),30)
 
 if(sd != 0){
 	
 	gE <- gev.fit(as.numeric(E), show=F)	
-	plot(E, type="l", ylab="environment", xlab="Time")
-	hist(E, main=bquote(GEV~xi==.(.001*round(1000*gE$mle[3]))),30)
+	plot(E, type="l", ylab="Environment", xlab="Time")
+	plot(E[1:100], type="l", ylab="Environment", xlab="Time")
+	hist(E, xlab="Environment", main=bquote(GEV~xi==.(.001*round(1000*gE$mle[3]))),30)
 }
 dev.off()
 
@@ -438,14 +449,14 @@ dev.off()
 # Y <- w$residuals
 #
 # gY <- gev.fit(as.numeric(Y), show=F)
-# plot(Y, type="l", ylab="residuals")
-# hist(Y, main=paste('GEV.sh = ',.001*round(1000*gY$mle[3])),30)
+# plot(Y, type="l", ylab="Residuals")
+# hist(Y, xlab="Residuals", main=paste('GEV.sh = ',.001*round(1000*gY$mle[3])),30)
 #
 # if(sd != 0){
 #
 # 	gE <- gev.fit(as.numeric(E), show=F)
-# 	plot(E, type="l", ylab="environment")
-# 	hist(E, main=paste('GEV.sh = ',.001*round(1000*gE$mle[3])),30)
+# 	plot(E, type="l", ylab="Environment")
+# 	hist(E, xlab="Environment", main=paste('GEV.sh = ',.001*round(1000*gE$mle[3])),30)
 # }
 # mtext("1-1 Hassell", side=3, outer=TRUE, line=-0.5)
 #
@@ -515,13 +526,13 @@ dev.off()
 # Y <- w$residuals
 #
 # gY <- gev.fit(as.numeric(Y), show=F)
-# plot(Y, type="l", ylab="residuals")
-# hist(Y, main=paste('GEV.sh = ',.001*round(1000*gY$mle[3])),30)
+# plot(Y, type="l", ylab="Residuals")
+# hist(Y, xlab="Residuals", main=paste('GEV.sh = ',.001*round(1000*gY$mle[3])),30)
 #
 # if(sd != 0){
 #
 # 	gE <- gev.fit(as.numeric(E), show=F)
-# 	plot(E, type="l", ylab="environment")
-# 	hist(E, main=paste('GEV.sh = ',.001*round(1000*gE$mle[3])),30)
+# 	plot(E, type="l", ylab="Environment")
+# 	hist(E, xlab="Environment", main=paste('GEV.sh = ',.001*round(1000*gE$mle[3])),30)
 # }
 # mtext("Cushing 2001", side=3, outer=TRUE, line=-0.5)
