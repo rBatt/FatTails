@@ -13,7 +13,7 @@ library("beanplot")
 # ====================
 # = Fattest Examples =
 # ====================
-lepLog <- data.stat[,"location"]=="MO" & data.stat[,"variable"]=="cpue1_Sum" & data.stat[,"taxID"]=="Lepomis"
+lepLog <- data.stat[,"location"]=="ME" & data.stat[,"variable"]=="cpue1_Sum" & data.stat[,"taxID"]=="Lepomis"
 fLep <- data.stat[lepLog,]
 
 kelLog <- data.stat[,"location"]=="CB" & data.stat[,"variable"]=="density" & data.stat[,"taxID"]=="Kellicottia"
@@ -27,7 +27,7 @@ png(filename="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/
 par(mfrow=c(1,3), ps=10, mar=c(2,3,0.5,0.5), oma=c(0.5,0,0,0), cex=1, family="Times", mgp=c(1.1, 0.35, 0), tcl=-0.35)
 plot(fLep[,"year4"], fLep[,"Data"], xlab="", ylab=bquote(Lake~~Mendota~~italic(Lepomis)), type="l", col="gray")
 points(fLep[,"year4"], fLep[,"Data"], pch=20)
-text(1994, max(fLep[,"Data"])*0.85, labels=bquote(atop(xi~'='~1.2,({0.6<xi}<1.8))), cex=0.85, pos=4)
+text(1987, max(fLep[,"Data"], na.rm=TRUE)*0.85, labels=bquote(atop(xi~'='~1.2,({0.6<xi}<1.8))), cex=0.85, pos=4)
 
 plot(fKel[,"year4"], fKel[,"Data"], xlab="", ylab=bquote(Crystal~~Bog~~italic(Kellicottia)), type="l", col="gray")
 points(fKel[,"year4"], fKel[,"Data"], pch=20)
