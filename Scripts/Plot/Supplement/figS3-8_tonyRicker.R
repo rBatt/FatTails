@@ -41,7 +41,7 @@ gX <- gev.fit(as.numeric(X), show=F)
 # ================
 # = Figure 1 (7) =
 # ================
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS2_DeterRickerChaos.pdf", height=3.42, width=5)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS3_DeterRickerChaos.pdf", height=3.42, width=5)
 # dev.new()
 par(mfrow=c(2,3), mar=c(2,2.25,1.15,0), cex=1, ps=8, family="Times", mgp=c(1, 0.25, 0), tcl=-0.15)
 
@@ -101,7 +101,7 @@ E <- E[step*(1:n)]
 gX <- gev.fit(as.numeric(X), show=F)
 
 # ---- Plot Figure 2 (8) ----
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS3_StochRickerChaos.pdf", height=5, width=5)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS4_StochRickerChaos.pdf", height=5, width=5)
 # dev.new()
 par(mfrow=c(3,3), mar=c(2,2.25,1.15,0.2), cex=1, ps=8, family="Times", mgp=c(1, 0.25, 0), tcl=-0.15)
 if(sd == 0) par(mfrow=c(2,2))
@@ -191,7 +191,7 @@ output
 xx <- as.factor(output$r)
 
 # ---- Figure 3 (9) ----
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS4_xi_vs_r_3lines.pdf", height=3.42, width=3.42)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS5_xi_vs_r_3lines.pdf", height=3.42, width=3.42)
 par(mar=c(2,2,0.2,0.2), cex=1, ps=8, family="Times", mgp=c(1, 0.25, 0), tcl=-0.15)
 # dev.new()
 plot(gX ~ xx, data=output, lty="blank", xlab="r", ylab=bquote(GEV~xi))
@@ -236,7 +236,7 @@ E <- E[step*(1:n)]
 gX <- gev.fit(as.numeric(X), show=F)
 
 # ---- Plot Figure 4 (10) ----
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS5_StochRickerStable.pdf", height=5, width=5)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS6_StochRickerStable.pdf", height=5, width=5)
 # dev.new()
 par(mfrow=c(3,3), mar=c(2,2.25,1.15,0.2), cex=1, ps=8, family="Times", mgp=c(1, 0.25, 0), tcl=-0.15)
 if(sd == 0) par(mfrow=c(2,2))
@@ -326,7 +326,7 @@ output
 xx <- as.factor(output$expon)
 
 # ---- Figure 5 (8) ----
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS6_xi_vs_E_3lines.pdf", height=3.42, width=3.42)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS7_xi_vs_E_3lines.pdf", height=3.42, width=3.42)
 # dev.new()
 par(mar=c(2,2,0.2,0.2), cex=1, ps=8, family="Times", mgp=c(1, 0.25, 0), tcl=-0.15)
 plot(gX ~ xx, data=output, lty="blank", xlab="E exponential", ylab=bquote(GEV~xi))
@@ -372,7 +372,7 @@ E <- E[step*(1:n)]
 gX <- gev.fit(as.numeric(X), show=F)
 
 # ---- Plot Figure 6 (9) ----
-pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS7_StochRickerLowStable.pdf", height=5, width=5)
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS8_StochRickerLowStable.pdf", height=5, width=5)
 # dev.new()
 par(mfrow=c(3,3), mar=c(2.25,2.25,1.15,0.2), cex=1, ps=8, family="Times", mgp=c(1, 0.25, 0), tcl=-0.15)
 if(sd == 0) par(mfrow=c(2,2))

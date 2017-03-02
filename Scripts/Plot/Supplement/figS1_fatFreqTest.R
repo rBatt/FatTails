@@ -29,8 +29,8 @@ load(file="/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Data/data.f
 data.fat <- as.data.table(data.fat)
 
 df_freq <- merge(data.fat[,list(Type, taxLvl, taxID, location, variable, sh_0, N)], dsum, by=c("taxID","location","variable"), all=FALSE) # drops 2 w/ non-finite shape standard error
-png("~/Desktop/xi_sampsPerYear_empirical.png", units="in", width=5, height=5, res=150)
-par(mfrow=c(2,2))
+pdf("/Users/Battrd/Documents/School&Work/WiscResearch/FatTails/Figures/Supplement/FigS1_fatFreqTest.pdf", width=3.5, height=3.5)
+par(mfrow=c(2,2), mar=c(2.5,2.5,1,0.75), cex=1, ps=8, tcl=-0.15, mgp=c(1,0.25,0))
 df_freq[,j={plot(Freq, sh_0, main=Type, xlab="Median samples per year", ylab=bquote(xi))},by="Type"]
 # abline(v=c(1, 4, 26, 52, 365))
 dev.off()
