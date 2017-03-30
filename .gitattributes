@@ -1,0 +1,4 @@
+*.RData filter=lfs diff=lfs merge=lfs -text
+FatTailsDataX.txt filter=lfs diff=lfs merge=lfs -text
+FatTailsDataFull.txt filter=lfs diff=lfs merge=lfs -text
+FatTailsDataMax.txt filter=lfs diff=lfs merge=lfs -text
