@@ -1,7 +1,7 @@
 FatTails
 ========
 
-"Extreme Events in Ecosystem Time Series"
+"Extreme Events in Lake Ecosystem Time Series"
 
 Authors: Ryan D. Batt<sup>1,3</sup>, Stephen R. Carpenter<sup>1</sup>, Anthony R. Ives<sup>2</sup>
 
@@ -10,7 +10,7 @@ Affiliations:
 <sup>2</sup>Department of Zoology, University of Wisconsin – Madison, Madison, WI 53706 USA.  
 <sup>3</sup>Present Address: Department Ecology, Evolution, and Natural Resources, Rutgers University, New Brunswick, NJ 08901 USA.  
 
-This repository is associated with a manuscript that is to be submitted. It was created so that our research could be more transparent and reproducible. However, the R scripts were written for my personal use – I tried to keep it reasonably commented, but it is not necessarily intended for use by others. Some functions that should should be useful for other users can be found in the [Functions](https://github.com/rBatt/FatTails/tree/master/Scripts/Functions) folder. Note that not all functions or scripts (or even data) are still relevant to the current manuscript – much of it is old or exploratory.
+This repository is associated with a study that has been [published at Limnology and Oceanography Letters](http://onlinelibrary.wiley.com/doi/10.1002/lol2.10037/full). It was created so that our research could be more transparent and reproducible. However, the R scripts were written for my personal use – I tried to keep it reasonably commented, but it is not necessarily intended for use by others. Some functions that should should be useful for other users can be found in the [Functions](https://github.com/rBatt/FatTails/tree/master/Scripts/Functions) folder. Note that not all functions or scripts (or even data) are still relevant to the current manuscript – much of it is old or exploratory. 
 
 The data files in the [FatTails_rawData](https://github.com/rBatt/FatTails/tree/master/FatTails_rawData) folder were collected by and belong to the [North Temperate Lakes Long Term Ecological Research Program](https://lter.limnology.wisc.edu/). Use of these data must adhere to the [NTL-LTER Data Access Policy](https://lter.limnology.wisc.edu/about/ntl-lter-data-access-policy). 
 
